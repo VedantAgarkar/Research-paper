@@ -1,0 +1,468 @@
+                         RESEARCH LANDSCAPE
+
+                 ┌─────────────────────────────┐
+                 │     LITERATURE COVERAGE      │
+                 │     How much studied?       │
+                 └──────────────┬──────────────┘
+                                │
+                                ▼
+                 ┌─────────────────────────────┐
+                 │   SOLUTION MATURITY          │
+                 │   How well solved?           │
+                 └──────────────┬──────────────┘
+                                │
+                                ▼
+                 ┌─────────────────────────────┐
+                 │     UNRESOLVEDNESS           │
+                 │     What remains broken?     │
+                 └──────────────┬──────────────┘
+                                │
+              ┌─────────────────┴─────────────────┐
+              ▼                                   ▼
+     OUR RELEVANCE                         EVIDENCE STRENGTH
+     Does it matter?                       Do we have proof?
+              │                                   │
+              └─────────────────┬─────────────────┘
+                                ▼
+                    ┌────────────────────────┐
+                    │    GAP POTENTIAL       │
+                    │   0 ───────────── 5    │
+                    └────────────┬───────────┘
+                                 ▼
+                    INTERSECTION ANALYSIS
+                                 ▼
+                       SKEPTICAL VALIDATION
+                                 ▼
+                         ACTUAL RESEARCH GAP
+
+
+                         EVIDENCE HIERARCHY
+
+Research Evidence Hierarchy
+**Never allow Level 0–1 evidence to independently establish a research gap.**
+Level 5:
+Multiple independent studies + realistic datasets + rigorous evaluation
+
+Level 4:
+Multiple studies + quantitative evaluation, but limited realism
+
+Level 3:
+Single strong study or multiple weaker studies
+
+Level 2:
+Author claim / future work / indirect evidence
+
+Level 1:
+Inference from methodology
+
+Level 0:
+Speculation
+
+
+CLAIM-EVIDENCE AUDIT
+
+For every major contribution claimed by a paper:
+
+1. Record the author's claim.
+2. Locate experimental evidence.
+3. Determine whether the evidence supports the claim.
+4. Identify conditions under which the claim holds.
+5. Identify what the experiment does not establish.
+6. Assign evidence strength.
+
+Explicitly flag:
+
+SUPPORTED
+PARTIALLY SUPPORTED
+WEAKLY SUPPORTED
+NOT DEMONSTRATED
+CONTRADICTED
+
+
+
+
+COMPARABILITY
+
+Dataset same/different
+Fall definition same/different
+Class distribution
+Train/test protocol
+Subjects
+Environment
+Camera
+Metrics
+Evaluation protocol
+
+
+Paper 04:
+Pose estimation significantly improves detection.
+
+Paper 11:
+Pose estimation provides little improvement.
+
+Paper 19:
+Bounding-box temporal features outperform skeleton features.
+
+
+Add "Failure Scenario Mining"
+
+Don't only extract what the papers tested.
+
+Extract what real life will throw at your system.
+
+Build a table:
+
+Scenario	Papers tested	Papers failed	Importance
+Sitting	12	4	Very high
+Walking downstairs	3	2	Very high
+Occluded by railing	1	1	Very high
+Night	2	1	High
+Two people	3	2	High
+Person already lying down	5	2	High
+
+
+
+
+Research papers mostly test:
+
+standing → falling → lying
+
+But rarely test:
+
+walking → slipping → recovery
+walking downstairs → stumble
+sitting on stairs
+lying on stairs intentionally
+person partially hidden by railing
+two people crossing
+person carrying objects
+night + occlusion
+slow collapse
+fall outside camera center
+
+
+
+Add a "Gap Type" classification
+
+This will stop you from mixing fundamentally different things.
+
+Every candidate gap should be classified as one of:
+
+Scientific gap
+
+Existing knowledge is insufficient.
+
+Methodological gap
+
+Existing methods have a technical weakness.
+
+Dataset gap
+
+Existing datasets don't represent the real problem.
+
+Evaluation gap
+
+Methods aren't being tested under meaningful conditions.
+
+Generalization gap
+
+Models work in one environment but fail elsewhere.
+
+Deployment gap
+
+Research works in experiments but isn't practically deployable.
+
+System gap
+
+Individual components exist, but end-to-end response isn't addressed.
+
+Integration gap
+
+Mostly engineering integration, with limited scientific novelty.
+
+This is very important for your project.
+
+Your alert acknowledgement/escalation system might be a system/deployment contribution, while staircase robustness could potentially be a methodological/evaluation contribution.
+
+Those aren't equivalent.
+
+
+
+Tell the agent:
+
+Before recommending a contribution, compare it against every paper and identify the closest existing system.
+
+For each proposed idea:
+
+PROPOSED CONTRIBUTION
+        ↓
+Closest existing paper
+        ↓
+What they already do
+        ↓
+What we add
+        ↓
+Is the difference scientifically meaningful?
+
+Then force it to answer:
+
+"If we remove our branding and describe our system neutrally, what is actually new?"
+
+That question is brutal and useful.
+
+
+dd a "Minimum Novel Contribution" test
+
+For every candidate research direction:
+
+If our system achieves:
+
+Existing accuracy = 95%
+Our accuracy = 96%
+
+Is that meaningful?
+
+If not, what additional evidence would make the contribution meaningful?
+
+Possible answers:
+
+better false-positive rate
+unseen environment
+cross-camera generalization
+staircase-specific robustness
+lower latency
+lower computational cost
+better real-world generalization
+
+This forces the agent to think beyond one accuracy number.
+
+10. Add an "Experiment Generator"
+
+Once the gaps are identified, make the agent automatically turn them into experiments.
+
+For example:
+
+GAP:
+Poor evaluation under staircase occlusion.
+
+EXPERIMENT:
+Compare detection performance under:
+
+E1: unobstructed staircase
+E2: partial railing occlusion
+E3: severe occlusion
+E4: multiple people + occlusion
+
+Metrics:
+Recall
+Precision
+F1
+False-positive rate
+Detection latency
+
+Then:
+
+GAP:
+Poor distinction between falling and sitting.
+
+EXPERIMENT:
+
+Fall
+Sit
+Sit on stairs
+Kneel
+Bend
+Stumble
+Lie down
+
+Measure confusion matrix.
+
+This is where literature analysis starts feeding directly into your research methodology.
+
+11. Add an "Ablation Map"
+
+Your eventual system might contain:
+
+YOLO
+ +
+Tracking
+ +
+Pose
+ +
+Temporal model
+ +
+Fall verification
+
+The agent should recommend experiments such as:
+
+Baseline 1: Detection only
+
+Baseline 2: Detection + tracking
+
+Baseline 3: Detection + tracking + pose
+
+Baseline 4: Detection + tracking + temporal features
+
+Baseline 5: Full system
+
+Then you can answer:
+
+Which component actually contributes to performance?
+
+That's research.
+
+Otherwise you're just stacking AI Lego bricks and calling the tower innovation.
+
+12. Add a "Research Question Generator"
+
+Don't jump directly from gap → system.
+
+Have it generate multiple competing research questions.
+
+For example:
+
+RQ1
+
+Can temporal movement analysis reduce false positives in staircase fall detection?
+
+RQ2
+
+How robust are vision-based fall detectors to staircase-specific occlusion?
+
+RQ3
+
+Can a lightweight local-processing architecture achieve real-time fall detection while maintaining acceptable detection performance?
+
+RQ4
+
+How does multi-person tracking affect fall detection reliability in shared staircase environments?
+
+Then score them:
+
+RQ	Novelty	Importance	Feasibility	Testability
+RQ1	4	5	5	5
+RQ2	5	5	4	4
+RQ3	3	4	5	5
+
+Now you're choosing the research question, not accidentally choosing a model first.
+
+13. Add a "Decision Log"
+
+Tell the agent to maintain:
+
+RESEARCH DECISION LOG
+
+Decision:
+Why:
+Evidence:
+Papers supporting:
+Papers contradicting:
+Confidence:
+Date:
+
+Examples:
+
+Decision:
+Use temporal verification rather than single-frame classification.
+
+Reason:
+Multiple papers identify temporal context as important.
+
+Confidence:
+High
+
+Later, when your mentor asks:
+
+"Why did you choose this approach?"
+
+you have the answer.
+
+14. Add an "Unknowns Register"
+
+This is surprisingly valuable.
+
+Create:
+
+Unknown	Why unknown	How to resolve
+Performance under railing occlusion	Few papers test it	Experiment
+Real elderly fall data	Dataset scarcity	Collect/augment
+Best temporal window	Papers disagree	Ablation study
+Night performance	Limited evidence	Controlled experiment
+
+Your research project then becomes:
+
+Literature → Unknowns → Experiments → Evidence
+
+That's a very clean scientific workflow.
+
+15. Finally, create the ultimate research map
+
+I'd have Notion generate this at the end:
+
+                    ┌────────────────────┐
+                    │ EXISTING KNOWLEDGE │
+                    └─────────┬──────────┘
+                              ↓
+                 ┌────────────────────────┐
+                 │ WHAT IS WELL SOLVED?   │
+                 └───────────┬────────────┘
+                             ↓
+                 ┌────────────────────────┐
+                 │ WHAT REMAINS DIFFICULT?│
+                 └───────────┬────────────┘
+                             ↓
+                 ┌────────────────────────┐
+                 │ WHAT IS UNDEREXPLORED? │
+                 └───────────┬────────────┘
+                             ↓
+                 ┌────────────────────────┐
+                 │ WHAT DO PAPERS DISAGREE│
+                 │ ABOUT?                 │
+                 └───────────┬────────────┘
+                             ↓
+                 ┌────────────────────────┐
+                 │ WHAT FAILURES RECUR?   │
+                 └───────────┬────────────┘
+                             ↓
+                 ┌────────────────────────┐
+                 │ CANDIDATE RESEARCH GAP │
+                 └───────────┬────────────┘
+                             ↓
+                 ┌────────────────────────┐
+                 │ GAP STRESS TEST        │
+                 └───────────┬────────────┘
+                             ↓
+                 ┌────────────────────────┐
+                 │ SURVIVING GAP          │
+                 └───────────┬────────────┘
+                             ↓
+                 ┌────────────────────────┐
+                 │ RESEARCH QUESTION      │
+                 └───────────┬────────────┘
+                             ↓
+                 ┌────────────────────────┐
+                 │ HYPOTHESIS             │
+                 └───────────┬────────────┘
+                             ↓
+                 ┌────────────────────────┐
+                 │ EXPERIMENTS             │
+                 └───────────┬────────────┘
+                             ↓
+                 ┌────────────────────────┐
+                 │ MEASURABLE CONTRIBUTION │
+                 └────────────────────────┘
+If you're building this as a serious research skill, I'd add these 7 modules to what we already designed:
+
+Claim-Evidence Audit
+Comparability Analysis
+Contradiction Detector
+Failure Scenario Mining
+Gap-Type Classification
+Novelty Collision Detection
+Experiment Generator
+
+Those are the difference between "AI summarizes 30 papers" and "AI helps us conduct a defensible literature investigation."
+
+And one rule should sit at the very top of the Notion skill in caps:
+
+NEVER INVENT A RESEARCH GAP. A GAP MUST EMERGE FROM EVIDENCE, COMPARISON, AND CRITICAL ANALYSIS OF THE LITERATURE.
