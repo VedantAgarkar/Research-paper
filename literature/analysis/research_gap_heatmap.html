@@ -6,13 +6,35 @@
 <title>Research Gap Heatmap - CCTV Staircase Fall Detection</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0a0d14;--surface:#111622;--surface2:#161d2e;--border:#1e2a40;--text:#e2e8f0;--muted:#64748b;--dim:#334155;--accent:#3b82f6;--accent2:#8b5cf6}
+:root, [data-theme="dark"] {
+  --bg:#0a0d14;--surface:#111622;--surface2:#161d2e;--border:#1e2a40;
+  --text:#e2e8f0;--muted:#94a3b8;--dim:#475569;--accent:#3b82f6;--accent2:#8b5cf6;
+  --header-grad:linear-gradient(135deg,#0f172a 0%,#1e1b4b 50%,#0f172a 100%);
+  --header-title:linear-gradient(135deg,#60a5fa,#a78bfa,#f472b6);
+  --tip-bg:#1e293b;--tip-border:#334155;--tip-shadow:0 8px 24px rgba(0,0,0,.5);
+  --tr-border:rgba(30,42,64,.6);--tr-hover:rgba(59,130,246,.05);
+  --filter-active:rgba(59,130,246,.15);
+  --pm-n-bg:rgba(15,23,42,.8);--pm-n-color:#475569;--pm-n-border:#1e2a40;
+  --quote-bg:rgba(139,92,246,.06);
+}
+
+[data-theme="light"] {
+  --bg:#f8fafc;--surface:#ffffff;--surface2:#f1f5f9;--border:#cbd5e1;
+  --text:#0f172a;--muted:#475569;--dim:#94a3b8;--accent:#2563eb;--accent2:#7c3aed;
+  --header-grad:linear-gradient(135deg,#eef2ff 0%,#f5f3ff 50%,#fdf2f8 100%);
+  --header-title:linear-gradient(135deg,#1d4ed8,#7c3aed,#db2777);
+  --tip-bg:#ffffff;--tip-border:#cbd5e1;--tip-shadow:0 10px 25px rgba(0,0,0,.12);
+  --tr-border:#e2e8f0;--tr-hover:rgba(37,99,235,.05);
+  --filter-active:rgba(37,99,235,.12);
+  --pm-n-bg:#f1f5f9;--pm-n-color:#94a3b8;--pm-n-border:#e2e8f0;
+  --quote-bg:rgba(124,58,237,.06);
+}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:13px;line-height:1.5}
 
 /* HEADER */
-.header{background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 50%,#0f172a 100%);border-bottom:1px solid var(--border);padding:32px 40px 28px}
-.header h1{font-size:22px;font-weight:800;background:linear-gradient(135deg,#60a5fa,#a78bfa,#f472b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px}
+.header{background:var(--header-grad);border-bottom:1px solid var(--border);padding:32px 40px 28px}
+.header h1{font-size:22px;font-weight:800;background:var(--header-title);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px}
 .header p{color:var(--muted);font-size:13px;max-width:700px}
 .header-meta{display:flex;gap:20px;margin-top:18px;flex-wrap:wrap}
 .mb{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 14px;font-size:12px;color:var(--muted)}
@@ -32,8 +54,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 /* TOOLTIP SYSTEM */
 .tipwrap{position:relative;display:inline-block;cursor:help;border-bottom:1px dashed #475569}
 .tipwrap:hover .tipbox{opacity:1;visibility:visible;transform:translateX(-50%) translateY(-4px)}
-.tipbox{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%) translateY(0);background:#1e293b;border:1px solid var(--border);border-radius:8px;padding:10px 14px;width:260px;font-size:12px;font-weight:400;color:var(--text);line-height:1.6;opacity:0;visibility:hidden;transition:all .18s;z-index:100;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,.5)}
-.tipbox::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:#1e293b}
+.tipbox{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%) translateY(0);background:var(--tip-bg);border:1px solid var(--tip-border);border-radius:8px;padding:10px 14px;width:260px;font-size:12px;font-weight:400;color:var(--text);line-height:1.6;opacity:0;visibility:hidden;transition:all .18s;z-index:100;pointer-events:none;box-shadow:var(--tip-shadow)}
+.tipbox::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:var(--tip-bg)}
 .tipbox strong{color:#60a5fa;display:block;margin-bottom:4px;font-size:12px}
 .tipbox .eg{margin-top:6px;padding-top:6px;border-top:1px solid var(--border);color:var(--muted);font-size:11px}
 
@@ -51,8 +73,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 table{width:100%;border-collapse:collapse}
 thead th{background:var(--surface2);padding:10px 12px;text-align:center;font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;border-bottom:1px solid var(--border);white-space:nowrap;position:sticky;top:0;z-index:20}
 thead th:first-child{text-align:left;min-width:220px}
-tbody tr{border-bottom:1px solid rgba(30,42,64,.6)}
-tbody tr:hover{background:rgba(59,130,246,.04)}
+tbody tr{border-bottom:1px solid var(--tr-border)}
+tbody tr:hover{background:var(--tr-hover)}
 .ch{background:var(--surface2)!important}
 .ch td{padding:8px 12px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid var(--border)}
 td{padding:7px 10px;vertical-align:middle}
@@ -86,7 +108,7 @@ td:nth-child(2){font-size:11px;color:var(--muted);font-family:'JetBrains Mono',m
 .pm-cell{display:inline-flex;align-items:center;justify-content:center;width:36px;height:28px;border-radius:4px;font-size:11px;font-weight:700}
 .pm-y{background:rgba(16,185,129,.2);color:#6ee7b7;border:1px solid rgba(16,185,129,.3)}
 .pm-p{background:rgba(245,158,11,.2);color:#fcd34d;border:1px solid rgba(245,158,11,.3)}
-.pm-n{background:rgba(15,23,42,.8);color:#334155;border:1px solid #1e2a40}
+.pm-n{background:var(--pm-n-bg);color:var(--pm-n-color);border:1px solid var(--pm-n-border)}
 .pm-leg{display:flex;gap:16px;margin-bottom:20px;flex-wrap:wrap}
 .pm-li{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
 .pm-lc{width:32px;height:22px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
@@ -122,8 +144,8 @@ td:nth-child(2){font-size:11px;color:var(--muted);font-family:'JetBrains Mono',m
 .it table{width:100%}
 .it td,.it th{padding:10px 14px}
 .it thead th{background:var(--surface2);text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);border-bottom:1px solid var(--border);position:static}
-.it tbody tr{border-bottom:1px solid rgba(30,42,64,.5)}
-.it tbody tr:hover{background:rgba(59,130,246,.04)}
+.it tbody tr{border-bottom:1px solid var(--tr-border)}
+.it tbody tr:hover{background:var(--tr-hover)}
 .cn{font-weight:600;font-size:12.5px}
 .cp{font-size:11px;color:var(--muted)}
 .ints{max-width:860px}
@@ -132,17 +154,72 @@ td:nth-child(2){font-size:11px;color:var(--muted);font-family:'JetBrains Mono',m
 .ints ul{padding-left:20px}
 .ints li{color:var(--muted);font-size:13px;line-height:1.8;margin-bottom:4px}
 .ints li strong{color:var(--text)}
-blockquote{border-left:3px solid var(--accent2);padding:12px 16px;background:rgba(139,92,246,.06);border-radius:0 6px 6px 0;color:var(--text);font-size:13px;line-height:1.7;margin:12px 0}
+blockquote{border-left:3px solid var(--accent2);padding:12px 16px;background:var(--quote-bg);border-radius:0 6px 6px 0;color:var(--text);font-size:13px;line-height:1.7;margin:12px 0}
 .sh{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;gap:20px;flex-wrap:wrap}
 .st{font-size:18px;font-weight:700;color:var(--text)}
 .ss{font-size:13px;color:var(--muted);margin-top:4px}
 @media(max-width:900px){.content{padding:16px}.header{padding:20px}.tabs{padding:0 16px}.zgrid{grid-template-columns:1fr}}
+
+/* THEME TOGGLE BUTTON */
+.theme-toggle{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;box-shadow:0 2px 5px rgba(0,0,0,0.06);white-space:nowrap}
+.theme-toggle:hover{border-color:var(--accent);transform:translateY(-1px);color:var(--accent)}
+
+/* LIGHT MODE TWEAKS FOR HEATMAP & BADGES */
+[data-theme="light"] .h0{background:#f1f5f9;color:#64748b}
+[data-theme="light"] .h05{background:#e2e8f0;color:#475569}
+[data-theme="light"] .h1{background:#dbeafe;color:#1e40af}
+[data-theme="light"] .h15{background:#bfdbfe;color:#1e3a8a}
+[data-theme="light"] .h2{background:#cffafe;color:#0e7490}
+[data-theme="light"] .h25{background:#a5f3fc;color:#155e75}
+[data-theme="light"] .h3{background:#dcfce7;color:#166534}
+[data-theme="light"] .h35{background:#bbf7d0;color:#14532d}
+[data-theme="light"] .h4{background:#fef3c7;color:#92400e}
+[data-theme="light"] .h45{background:#fde68a;color:#78350f}
+[data-theme="light"] .h5{background:#fee2e2;color:#991b1b}
+
+[data-theme="light"] .g0{background:#f1f5f9;color:#64748b}
+[data-theme="light"] .g05{background:#e0e7ff;color:#3730a3}
+[data-theme="light"] .g1{background:#dbeafe;color:#1e40af}
+[data-theme="light"] .g15{background:#bfdbfe;color:#1e3a8a}
+[data-theme="light"] .g2{background:#d1fae5;color:#065f46}
+[data-theme="light"] .g25{background:#a7f3d0;color:#064e3b}
+[data-theme="light"] .g3{background:#fef3c7;color:#92400e}
+[data-theme="light"] .g35{background:#fde68a;color:#78350f}
+[data-theme="light"] .g4{background:#fed7aa;color:#9a3412}
+[data-theme="light"] .g45{background:#fdba74;color:#7c2d12}
+[data-theme="light"] .g5{background:#fee2e2;color:#991b1b}
+
+[data-theme="light"] .pm-y{background:#d1fae5;color:#065f46;border:1px solid #a7f3d0}
+[data-theme="light"] .pm-p{background:#fef3c7;color:#92400e;border:1px solid #fde68a}
+[data-theme="light"] .paper-hdr{color:#0284c7}
+[data-theme="light"] .gvh{background:#fee2e2;color:#991b1b;border-color:#fca5a5}
+[data-theme="light"] .gh{background:#fef3c7;color:#92400e;border-color:#fde68a}
+[data-theme="light"] .gm{background:#dcfce7;color:#166534;border-color:#86efac}
+[data-theme="light"] .gl{background:#dbeafe;color:#1e40af;border-color:#93c5fd}
+[data-theme="light"] .tipwrap{border-bottom-color:#cbd5e1}
+[data-theme="light"] .filter-btn:hover, [data-theme="light"] .filter-btn.active{background:var(--filter-active)}
 </style>
+<script>
+(function(){
+  try {
+    const saved = localStorage.getItem('gap_heatmap_theme') || 
+      (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+    document.documentElement.setAttribute('data-theme', saved);
+  } catch(e) {}
+})();
+</script>
 </head>
 <body>
 <div class="header">
-  <h1>Research Gap Heatmap</h1>
-  <p>Evidence-driven landscape of 41 research dimensions for real-time CCTV-based elderly fall detection in staircase environments. All scores derived from systematic analysis of 12 papers (Phases 1-9).</p>
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap">
+    <div>
+      <h1>Research Gap Heatmap</h1>
+      <p>Evidence-driven landscape of 41 research dimensions for real-time CCTV-based elderly fall detection in staircase environments. All scores derived from systematic analysis of 12 papers (Phases 1-9).</p>
+    </div>
+    <button id="themeToggle" class="theme-toggle" onclick="toggleTheme()" title="Switch Light/Dark Mode" aria-label="Toggle theme">
+      <span id="themeIcon">☀️</span> <span id="themeText">Light Mode</span>
+    </button>
+  </div>
   <div class="header-meta">
     <div class="mb">Papers analyzed: <span>12</span></div>
     <div class="mb">Dimensions: <span>41</span></div>
@@ -618,6 +695,37 @@ function show(id,el){
   el.classList.add('active');
   if(id==='paper'&&!document.getElementById('pm-head').children.length)buildPM();
 }
+
+
+/* ════════════════════════════════════════════
+   THEME TOGGLE
+════════════════════════════════════════════ */
+function updateThemeUI(theme){
+  const icon = document.getElementById('themeIcon');
+  const text = document.getElementById('themeText');
+  if(icon && text){
+    if(theme === 'light'){
+      icon.textContent = '🌙';
+      text.textContent = 'Dark Mode';
+    } else {
+      icon.textContent = '☀️';
+      text.textContent = 'Light Mode';
+    }
+  }
+}
+
+function toggleTheme(){
+  const curr = document.documentElement.getAttribute('data-theme') || 'dark';
+  const next = curr === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  try {
+    localStorage.setItem('gap_heatmap_theme', next);
+  } catch(e) {}
+  updateThemeUI(next);
+}
+
+// Initial sync
+updateThemeUI(document.documentElement.getAttribute('data-theme') || 'dark');
 
 /* INIT */
 buildHM();buildP();buildZ();buildI();
