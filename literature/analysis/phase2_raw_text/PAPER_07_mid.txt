@@ -1,0 +1,706 @@
+--- PAGE 1 ---
+1 ---
+Cognitive Computation           (2026) 18:12 
+https://doi.org/10.1007/s12559-026-10550-5
+ 
+ Mufti Mahmud
+muftimahmud@gmail.com; mufti.mahmud@kfupm.edu.sa
+Md Jaber Al Nahian
+mdjabera@ualberta.ca; mdjaberal.nahian@gmail.com
+Md Atiqur Rahman Ahad
+mahad@uel.ac.uk
+Karl Andersson
+karl.andersson@ltu.se
+1 Department of Radiology and Diagnostic Imaging, 
+University of Alberta, Edmonton, Canada
+2 Department of Information and Communication Technology, 
+Bangladesh University of Professionals, 1216 Dhaka, 
+Bangladesh
+3 Information and Computer Science Department, King Fahd 
+University of Petroleum & Minerals, 31261 Dhahran, Saudi 
+Arabia
+4 SDAIA-KFUPM Joint Research Center for AI, King Fahd 
+University of Petroleum & Minerals, 31261 Dhahran, Saudi 
+Arabia
+5 Interdisciplinary Research Center for Bio Systems and 
+Machines, King Fahd University of Petroleum & Minerals, 
+31261 Dhahran, Saudi Arabia
+6 Institute of Information Technology, Jahangirnagar 
+University, 1342 Savar, Dhaka, Bangladesh
+7 Department of Computer Science and Digital Technology, 
+University of East London,  h t t p s : / / a h a d v i s i o n l a b . c o m   
+8 Department of Computer Science, University of Calgary, 
+Calgary, Canada
+9 Department of Computer Science, Texas A&M University, 
+Texas, USA
+10 Department of Computer Science and Engineering, 
+University of Chittagong, 4331 Chittagong, Bangladesh
+11 Department of Computer Science, Electrical and Space 
+Engineering, Lulea University of Technology,  
+931 87 Skelleftea, Sweden
+Abstract
+Accidental falls have emerged as a major public health concern, especially among individuals aged 65 and older, due to 
+their high incidence and severe consequences. Without timely intervention, such falls can result in fractures, traumatic 
+brain injuries, and long-term complications. As a result, considerable research has focused on developing automated fall 
+detection systems that integrate intelligent algorithms with sensor-based data acquisition to enable rapid response and 
+medical assistance. This study follows the PRISMA framework to conduct a systematic literature review. A comprehensive 
+search was performed across major databases including PubMed, Google Scholar, Scopus, and IEEE Xplore using fall 
+detection–related keywords. From an initial pool of 596 articles, duplicates were removed and strict inclusion/exclusion 
+criteria were applied, resulting in 182 relevant articles for in-depth analysis. This review examines a wide range of Arti -
+ficial Intelligence (AI) and Machine Learning (ML) approaches applied to fall detection using diverse sensor modalities, 
+including wearable, vision-based, ambient, and multimodal systems. Additionally, it summarizes the publicly available 
+datasets and sensor configurations used in existing studies. This broad perspective is essential to compare trade-offs across 
+sensing modalities and support effective system development for real-world deployment. This review provides a com -
+parative overview of AI/ML
+--- PAGE 2 ---
+2 ---
+Cognitive Computation           (2026) 18:12 
+Introduction
+The world is beginning to observe a prolonged change 
+in demographic age distribution, owing to the increasing 
+average lifespan and decreasing birth rate trends. People 
+live longer lives now than before. The percentage of older 
+people in the overall population is growing tremendously. 
+In 2020, 727 million people worldwide were reported to be 
+65 or older [ 1]. The global elderly population is projected 
+to almost double over the next three decades, reaching over 
+1.5 billion by 2050 [ 1]. Nearly every region of the world 
+will experience an increase in the ageing population by 
+2050. The percentage of people aged 65 and up is expected 
+to rise from 9.3% to 16.0% within thirty years [ 2]. Ageing 
+is often associated with deteriorating functionalities, such 
+as physiological, visual, and cognitive impairments, which 
+increase the likelihood of falling. Around 28-35 per cent 
+of elderly individuals aged 65 or above every year are esti -
+mated to fall [3]. As age and frailty increase, the frequency 
+of falls significantly increases. An estimated 646,000 fatal 
+falls occur annually, making it the second leading cause of 
+mortality by accidental injuries after road accidents [ 4]. 
+Nearly 37.3 million falls each year require to receive med -
+ical treatment [ 5].
+More than 17 million disability-adjusted life years 
+(DALYs) have been lost as a result of these falls [ 4]. Fall-
+related deaths account for almost 80% of deaths in low and 
+middle-income countries, with 60% of these deaths hap -
+pening in Southeast and Western Pacific Asia [ 6]. Senior 
+citizens over 70 years who fall each year and suffer serious 
+or minor medical injuries are estimated to be between 32 
+to 42 per cent [ 7]. Fall is one of the unexpected occur -
+rences in regular activities, impacting individual health. 
+Fall events demonstrate loss of voluntary body control and 
+drastic shifts in body acceleration. Additionally, fall occur -
+rences create monetary and mental pressure on the caregiv-
+ers and decrease life quality. Early detection of falls will 
+help to reduce severe effects and support healthcare [ 8–12] 
+sector. Fall recognition and prevention are two strategies 
+for responding earlier to elderly fall events. Researchers 
+studied these strategies, particularly various fall detec -
+tion methods explored and discovered over the past two 
+decades. Different Artificial Intelligence and Machine 
+Learning [ 13–23] algorithms are examined alongside the 
+utilisation of multiple kinds of sensors for fall detection 
+(see Fig. 1).
+A significant number of literature reviews are per -
+formed on fall detection and prediction systems. Most 
+review works cover specified categories and technologies 
+implemented for fall detection and prevention. Pannurat 
+et al. [24] reviewed existing elderly fall detection schemes 
+based on wearable and ambient sensors, prioritising wear -
+able sensor-based systems. The authors also analys
+--- PAGE 3 ---
+3 ---
+Cognitive Computation           (2026) 18:12 
+towards the target elderly was assessed by investing in 
+the implementation and designing procedures of several 
+state-of-the-art fall detection devices. The authors divided 
+the studied works into two categories: based on evalua -
+tion criteria and based on device wearability (wearable 
+and non-wearable sensor-based systems). Cippitelli et al. 
+[27] presented a survey on the state of the fall detection 
+systems presented in the literature based on RAdio Detec -
+tion And Ranging (RADAR) sensors and RGB-depth 
+(RGBD) sensors. Different RADAR and RGBD sensors 
+were explored in this study, along with several feature 
+extraction techniques, algorithms and evaluation criteria 
+used in selected existing fall detection systems. Several 
+open research challenges were identified, and directions 
+to the field’s future research trends were provided in the 
+paper. Khan et al. [ 28] developed a review on human fall 
+detection approaches from the point of availability of fall 
+dataset perspective. They divided the existing systems 
+into two categories: enough fall data and insufficient fall 
+training data, completely independent of feature extrac -
+tion methods and the type of sensors used in the systems. 
+Due to less real fall training data, the authors identified 
+the fall detection system as an anomaly detection problem 
+that belongs to the insufficient data category. Several ML 
+algorithms were discussed, which work well in fall-related 
+data. Finally, the authors suggest future research direc -
+tions for efficiently identifying fall events. Ramachandran 
+et al. [ 29] surveyed the application of ML algorithms in 
+wearable fall detection systems with an overview of dif -
+ferent sensor-based fall detection systems such as vision 
+sensors and environment and wearable sensors. Several 
+research works were investigated to determine the imple -
+mented wearable sensors and sensor placement, ML algo -
+rithms and their performances. The authors also classified 
+wearable sensor-based systems into threshold-based and 
+ML-based fall detection systems. The survey concluded 
+by discussing the effect of biological and personal pro -
+files on detecting fall events. Nizam et al. [ 30] conducted 
+a systematic review of fall detection methods based on 
+human activity classification and divided the fall detection 
+systems into wearable, ambient and vision-based catego -
+ries. A detailed discussion on each category was presented 
+based on different sensor technologies. The authors added 
+a brief review of depth sensor-based fall detection sys -
+tems and compared their performances. A brief summary 
+of recently published reviews on fall detection is shown in 
+Table 1 where limitations of existing reviews are included.
+Although the studies mentioned earlier cover the current 
+state-of-the-art fall detection approaches, most surveys only 
+focus on wearable or vision-based fall detection systems. 
+Most of the systematic reviews a
+--- PAGE 4 ---
+4 ---
+Cognitive Computation           (2026) 18:12 
+Survey Methodology
+Based on previous studies, this review describes the meth -
+ods of detecting falls and how they can help research -
+ers develop new AI-based approaches for fall detection. 
+We have used four scholarly databases (Google Scholar, 
+Pubmed, Scopus, and IEEEXplore) to download fall detec -
+tion research papers that have been published between 
+2006 and 2025.
+The previous literature on fall detection was compre -
+hensively analysed and treated without bias by searching 
+Fall Detection Approaches”, “Vision Sensor-based Fall 
+Detection Approaches”, “Ambient Sensor-based Fall 
+Detection Approaches”, and “Multimodal Sensor-based 
+Fall Detection Approaches” demonstrate the fall detection 
+approaches based on wearable, vision, ambient, and multi -
+modal sensors, respectively. The selected articles’ outcomes 
+are critically analysed in the “Performance Analysis” sec -
+tion. Existing Challenges and Future Works” outlines the 
+existing challenges in fall detection and provides some rec-
+ommendations. Lastly, “Conclusion” wraps up the entire 
+work and concludes the study.
+Table 1 Summary and limitations of recently published review articles on fall detection approaches
+Ref. Year Modality Model Sys-
+tematic 
+Review
+Publication 
+year range 
+of studied 
+articles
+Number 
+of studies 
+included
+Limitations
+[24] 2014 Wearable, 
+Vision, Ambient, 
+Multimodal
+Threshold, ML No Up to 2014  60 No deep dive into deep learning methods; no 
+benchmark/meta-analysis; lacks real-world elderly 
+data; wearable fusion underdeveloped
+[25] 2019 Wearables ML Yes 2002 to 2019 29 Limited databases searched
+[26] 2014 Wearable, 
+Vision, Ambient, 
+Multimodal
+Threshold, ML Yes Up to 2013 113 Manual screening bias; lack of real-world valida-
+tion; inconsistent evaluation criteria; few long-
+term studies
+[27] 2017 Vision, Ambient Threshold, ML, 
+DL
+No 2011 to 2017  40 No quantitative meta-analysis; narrow modality 
+focus
+[28] 2017 Wearable, 
+Vision, Ambient, 
+Multimodal
+Threshold, ML No Up to 2016 Not 
+mentioned
+No performance meta-analysis; does not compare 
+sensor fusion systems
+[29] 2020 Wearable Threshold, ML, 
+DL
+No 2005 to 2019 Not 
+mentioned
+No meta-analysis or statistical comparison of 
+model performances
+[30] 2020 Wearable, 
+Vision, Ambient, 
+Multimodal
+Threshold, ML, 
+DL
+Yes 2005 to 2019  40 Fusion techniques are underexplored and 
+unsynchronized
+[31] 2021 Wearable Sensor, 
+Vision, WiFI, 
+Radar
+ML No Not 
+mentioned
+Not 
+mentioned
+No dataset description, No recommendations for 
+future research, A very limited number of studies 
+included
+[32] 2021 Vision ANN, ML Yes 2015 to 2020 81 No recommendation, Only confined to Vison-
+based FDS
+[33] 2021 Wearable and 
+Now-wearable
+ML Yes 2010 to 2020 33 Not covered Deep Learning and Threshold-based 
+models
+[34] 2022 Wearables ML, DL, TBA Yes 2017 to 2020 85 Not covered Vision/ambient/Multimodal based 
+FDS
+[35] 2021 Wearables Models were 
+not concerned
+Yes 2014 to 2019 Not 
+menti
+--- PAGE 5 ---
+5 ---
+Cognitive Computation           (2026) 18:12 
+in time. We have categorised fall detection studies based 
+on different types of sensors. Table 3 presents the different 
+types of sensors and their methods, ranges, advantages, and 
+potential drawbacks.
+The Accelerometer sensor is the most used one in wear -
+able sensors. It is used to collect acceleration information 
+due to falls. Gyroscope sensors are utilised to measure a 
+tracked person’s rotation and angular velocity. Magnetom -
+eter sensors are also incorporated in many studies to detect 
+falls. Furthermore, various sensors, such as ECG, sEMG, 
+FSR, etc., are used in wearable Fall detection systems 
+(FDS). Apart from wearable sensors, vision sensor-based 
+FDS has become popular with computational technology 
+advancement in recent years. Depth cameras and RGB 
+cameras are the most utilised sensing equipment in vision-
+based FDS. Alongside wearable and vision sensors, ambient 
+sensor-based FDS has exhibited improved performance and 
+earned high acceptance towards the elderly. Ambient sen -
+sors like Radio-Frequency Identification (RFID), Acoustic 
+sensors, Radar sensors, Pressure sensors, etc., improve the 
+FDSs significantly.
+Wearable Sensor-based Fall Detection 
+Approaches
+Research on wearable sensor-based fall detection has gained 
+popularity in the research community since 2006. Research-
+ers are attempting to detect falls utilising ML and threshold-
+based algorithms. Figure 3 represents a general architecture 
+of the wearable FDS. This section aims to provide a better 
+insight into wearable sensor-based FDSs that use ML and 
+threshold-based algorithms. Table 4 provides a compre -
+hensive overview of the sensor types, placement locations, 
+and extracted features used across a wide range of wearable 
+systems. It highlights the impact of sensor modality (e.g., 
+accelerometer, gyroscope, pressure sensors) and position 
+(e.g., waist, wrist, foot) on detection accuracy and reliabil -
+ity. Additionally, the feature sets vary from handcrafted sta-
+tistical descriptors (e.g., SMV , variance, entropy) to learned 
+temporal representations, reflecting the algorithmic diver -
+sity of these approaches. This diversity emphasizes the need 
+to align sensor configuration and feature design with the tar-
+get deployment scenario, especially for achieving real-time 
+and resource-efficient detection. We have collected publicly 
+available datasets used in the selected articles for this work. 
+A comparative summary of different publicly available 
+datasets is presented in Table 5. The following subsections 
+discuss wearable sensor-based fall detection systems and 
+their working process based on algorithms and the sensor 
+data they used.
+databases using search terms directly related to fall detec -
+tion. As mentioned earlier, the search terms for the data -
+bases are given in Table 2. We have found 596 articles from 
+four databases using the selected search terms. Then, we 
+removed the duplicate articles from
+--- PAGE 6 ---
+6 ---
+Cognitive Computation           (2026) 18:12 
+implemented a low-computing-cost threshold algorithm 
+using zero-crossing and Kalman filtering techniques, vali -
+dated on the SisFall dataset. These systems emphasize sim-
+plicity and robustness in fall detection.
+Smartphone-Based FDS
+Integrating accelerometers with smartphones has also been 
+explored. Basili et al. [ 47] and Yi et al. [ 48] implemented 
+systems combining smartphone sensors with external accel-
+erometers, focusing on human posture analysis and real-
+time fall alerts. Enhanced by additional sensors like ECG 
+[49], these systems expanded functionality while retaining 
+threshold-based simplicity.
+Multi-Sensor Systems
+To improve detection accuracy, accelerometers are often 
+combined with other sensors. Combining a barometer with 
+Threshold-Based Approaches
+Threshold-based approaches have been extensively utilized 
+in wearable Fall Detection Systems (FDS), particularly 
+leveraging accelerometer sensors. Many studies focus on 
+integrating accelerometer data with additional sensors or 
+communication technologies to enhance detection accuracy, 
+power efficiency, and real-time capabilities.
+Accelerometer-Only Systems
+Numerous studies rely solely on accelerometer data to 
+detect falls by setting predefined thresholds. For instance, 
+Qian et al. [ 44] developed a system with a multilevel 
+threshold algorithm, achieving high accuracy and scalabil -
+ity through real-time processing with MEMS sensors and 
+Narrow Band IoT. Similarly, Gannapathy et al. [45] utilized 
+waist-mounted 3D accelerometers and Zigbee transceiv -
+ers to notify contacts of detected falls. Sucerquia et al. [ 46] 
+Fig. 2 The systematic selection 
+procedure of the studied articles 
+based on PRISMA search strate-
+gies. At first, a list of 596 articles 
+was obtained through a search 
+string from Scopus, Google 
+Scholar, IEEE Xplore and PubMed 
+databases. Finally, 182 articles 
+have been selected through the 
+PRISMA steps
+ 
+1 3
+   12  Page 6 of 44
+
+--- PAGE 7 ---
+7 ---
+Cognitive Computation           (2026) 18:12 
+post-fall impacts using barometric altimeters. Vyas et al. 
+[55] developed a non-intrusive wearable fall detection sys -
+tem by embedding piezoresistive textile pressure sensors 
+and an accelerometer in socks. They have employed a 
+threshold-based dual-check algorithm to distinguish falls 
+from normal activities.
+an accelerometer [ 50, 51] improves fall detection by pro -
+viding altitude information to distinguish between falls and 
+other movements, such as lying down or sitting. Acceler -
+ometer-gyroscope systems [52, 53] leverage angular veloc-
+ity for more precise fall classification. Systems like those 
+proposed by Sabatini et al. [ 54] even detect both pre- and 
+Table 3 Description, range, advantages, and disadvantages of different sensor categories
+Category Sensor Description Detec-
+tion 
+Range
+Cost Ease of 
+Setup
+Power 
+Consumption
+Durability Security Preci-
+sion
+Wearable Accelerometer Measures acceleration in 
+three axes.
+±16g Low Easy Low Moderate High High
+Gyroscope Measures rotation and 
+angular velocity.
+±1000 
+◦/s
+Moderate Easy Low High High High
+Magnetometer Measures magnetic field 
+strength and spatial 
+orientation.
+±1900 
+µT
+Low Easy Low High High Low
+ECG Captures electrical activity 
+of the heart.
+±1.5mV Low Easy Low High Moderate High
+sEMG Records electrical activity 
+of skeletal muscles.
+±1.5mV High Easy Low High High Low
+FSR Measures pressure and 
+force via resistance 
+changes.
+Up to 
+150 kg
+Low Easy Low High High Low
+Barometer Measures atmospheric 
+pressure for altitude 
+estimation.
+300 to 
+1100 
+hPa
+Low Easy Low High High High
+Vision Depth Camera Measures distance using 
+the speed of light.
+Up to 
+10 m
+High Moderate High High High High
+RGB Camera Captures visible light 
+images in red, green, and 
+blue channels.
+Up to 
+10 m
+Moderate Moderate High High Moderate High
+Ambient RFID Detects tags using radio 
+frequency signals.
+Up to 
+10 m
+Moderate Easy Low High High Mod-
+erate
+WiFi Uses radio frequency for 
+wireless communication.
+Up to 
+50 m
+Low Easy Moderate High High High
+Acoustic Measures sound levels via 
+acoustic waves.
+20 Hz to 
+20 kHz
+Low Easy Low to High High High Low
+Pressure Measures force applied on 
+a surface.
+15 to 
+115 kPa
+Low Easy Low High High High
+Radar Detects objects using radio 
+waves.
+Up to 
+100 m
+High Difficult High High High High
+Infrared Detects warm objects using 
+infrared radiation.
+10 to 30 
+m
+Low Easy Low High High High
+Fig. 3 Wearable sensor-based fall 
+detection block diagram where 
+body-worn sensors such as acceler-
+ometer, gyroscope, magnetometer, 
+and heart rate sensor can be used. 
+Sensor-recorded data can be passed 
+through preprocessing, feature 
+extraction, and classification steps 
+to detect falls
+ 
+1 3
+Page 7 of 44    12 
+
+--- PAGE 8 ---
+8 ---
+Cognitive Computation           (2026) 18:12 
+Ref. Year Sensors Sens. Pos. Features
+[55] 2025 Pres, Acc Sock Pressure readings, resultant acceleration vector, smoothed 
+acceleration
+[56] 2025 Acc, Gyr Waist / Lower back Raw time-series data, auto-feature extraction via CNN-BiLSTM
+[57] 2024 Acc Leg FFT features, filtered signal, statistical and temporal data 
+sequences
+[58] 2024 Pres Foot insole Time-series stress video from plantar pressure, interpolated 
+10 × 10 maps
+[59] 2022 Acc Waist SMV , spatial orientation, filtered angle change
+[60] 2022 Acc, Gyr Wrist, Waist, Ankle Raw accelerometer and gyroscope data
+[61] 2023 Acc, Gyr Wrist 88 statistical and spectral global features
+[62] 2023 Acc, Gyr Shank, Pelvis, Upper/Lower 
+Arms, Forearm, Thoracic, 
+Foot, Hip, Hand, Head
+Raw time-series and convolutional learned features
+[63] 2021 Acc, Gyr Waist Time-series data, spectral features
+[64] 2024 Acc, Gyr Waist, Thigh Spatial and Temporal Features
+[65] 2023 Acc, Gyr NA Acceleration, Angular Velocity
+[44] 2022 Acc, Gyr Wrist SMV
+[66] 2021 Acc Waist SMV
+[67] 2020 Acc, Gyr Chest Max., Min. Peak, Mean, SMV , SD, RMS, etc.
+[68] 2020 Acc Waist Mean, Kurtosis, Variance, Range, Correlation, etc.
+[69] 2020 Acc Wrist mean, median, SD, mean absolute deviation, etc.
+[51] 2020 Acc,Bar Chest Falling interrupt, Hit interrupt, SVMa, etc.
+[70] 2019 Acc and Gyr Waist Mean, Variance, Kurtosis, SVMa, SMA, etc.
+[71] 2019 Acc, Gyr Chest Angular velocity
+[72] 2019 Acc Waist Mean, SD, Range
+[73] 2018 Acc, Gyr, Mag Wrist Spatial orientation, Movement decomposition
+[74] 2018 Acc, Gyr, Mag, Bar Waist Distance, Stride time, Coefficient of variation, etc.
+[75] 2018 Acc, Gyr Upper trunk Signal magnitude, Attitude angle
+[76] 2018 Acc, Gyr Waist Mean, Variance, Kurtosis, SVM, SMA, etc.
+[77] 2018 Acc Waist Mean, Kurtosis, SD, Variance, Range, Skewness, etc.
+[46] 2018 Acc Waist Peak, Variance, and Angles
+[78] 2017 FSR, Acc Foot Fall index, Pitch, Roll
+[79] 2017 Acc Pocket Orientation, Velocity, Displacement
+[53] 2017 Acc, Gyr Waist Total vector acceleration, Angular velocity
+[80] 2017 Camera Waist HOG, GLBP
+[81] 2017 sEMG Limb, ankle Absolute Value, Variance, Zero Crossing, etc.
+[82] 2017 Acc Neck, waist, chest Acceleration magnitude
+[83] 2017 Acc, Bar Neck SVMa, SMA, etc.
+[50] 2017 Acc, Bar Neck MA V , MA V Difference
+[84] 2016 Acc Pocket Resultant acceleration
+[47] 2016 Acc Foot, ankle, arm, waist Signal magnitude
+[52] 2016 Acc, Gyr Chest Sum acceleration vector, Angular velocity
+[85] 2016 Acc, Gyr Upper trunk Acceleration, Trunk angle, Angular velocity
+[86] 2016 Acc, Gyr, Mag, Bar Waist Yaw, Pitch and roll angles
+[87] 2016 Acc Chest Acceleration, Inactive sub-periods
+[88] 2016 Acc, ToF RTx N/A Mean, Mean of Absolute, Variance, Skewness, etc.
+[89] 2015 ECG Not specified Heart rate variability
+[90] 2015 Acc, Gyr, Mag Waist Pitch and roll angles, SVMa
+[91] 2015 Acc, Gyr Chest, Waist Angular velocity, acceleration
+[92] 2015 Acc Wrist Energy values
+[54] 2015 Acc, Gyr, Bar RAIS Velo
+--- PAGE 9 ---
+9 ---
+Cognitive Computation           (2026) 18:12 
+Machine Learning-Based Approaches
+Machine learning (ML) methods have significantly trans -
+formed wearable Fall Detection Systems (FDS), leveraging 
+data from various sensors to improve detection accuracy, 
+adaptability, and efficiency. This section synthesizes ML-
+based FDS approaches by focusing on sensor types, data 
+processing methods, feature extraction, and sensor place -
+ment while categorizing similar studies.
+Accelerometer and Gyroscope Systems
+Accelerometers and gyroscopes are fundamental in ML-
+based FDS for capturing motion dynamics. Aziz et al. [ 93] 
+utilized a waist-mounted inertial sensor combining a tri-
+axial accelerometer and gyroscope to analyze pre-impact 
+falls. By examining window sizes and lead times, their 
+study demonstrated how SVM classifiers with an RBF 
+kernel could achieve accurate fall detection. He et al. [ 75, 
+85] employed Kalman filters for estimation and KNN clas -
+sifiers to classify falls, optimizing features such as signal 
+magnitude and altitude angle. Similarly, Shibuya et al. 
+[91] integrated multi-axis accelerometers and gyroscopes 
+in a Wireless Gait Analysis Sensor (WGAS), extracting 
+six ranges of angular velocity and acceleration features for 
+SVM classification. These systems, with sensors placed 
+on the upper trunk or waist, emphasize the importance of 
+precise feature engineering in robust fall detection. Waheed 
+et al. [63] introduced a noise-tolerant fall detection system 
+Wearable IMU Systems
+Inertial Measurement Units (IMUs) combining accelerom -
+eters, gyroscopes, and sometimes magnetometers provide 
+comprehensive motion analysis. For instance, Liu et al. 
+[103] introduced a gravity center detection algorithm with 
+IMU (9-axis) data to distinguish falls from normal activities. 
+Similarly, Pierleoni et al. [86, 90] developed wearable sys-
+tems incorporating Attitude and Heading Reference Systems 
+(AHRS) and barometers for improved motion and orientation 
+tracking.
+Novel Wearable Devices
+Innovative FDS designs have emerged, such as footwear-
+based systems [ 78], which embed accelerometers and 
+force sensors in insoles to analyze pitch, roll, and fall 
+indices. Additionally, 9-axis IMU-based systems [ 74, 95] 
+focus on angular velocity and trunk motion to detect falls 
+and assess risk, demonstrating the versatility of wearable 
+FDS.
+Camera-Assisted Systems
+Camera-integrated wearable systems add a layer of visual 
+analysis. Ozcan et al. [96] utilized edge orientation and opti-
+cal flow descriptors to detect falls, while their later work 
+[80] incorporated HOG and GLBP features for indoor and 
+outdoor fall detection.
+Ref. Year Sensors Sens. Pos. Features
+[48] 2014 Acc Chest, thigh Not specified
+[49] 2014 Acc Chest, thigh SVMa
+[95] 2014 Acc, Gyr, Mag Sternum Trunk angular velocity and angle
+[96] 2013 Camera Waist HEO and HES
+[97] 2013 Acc Hip, wrist Mean, SD, Energy, Entropy, Correlation
+[98] 2013 Acc Upper trunk Resultant acceleration
+[99] 2013 
+--- PAGE 10 ---
+10 ---
+Cognitive Computation           (2026) 18:12 
+threshold-based methods and a range of machine learning 
+algorithms to detect falls in real time. To prioritize critical 
+features in wearable sensor data for fall detection, Sahni 
+et al. [ 56] proposed an ensemble deep learning framework 
+combining CNN with channel attention and BiLSTM with 
+temporal attention.
+Feature-Rich Accelerometer Systems
+Sophisticated feature extraction pipelines improve FDS 
+robustness. Nahian et al. [ 66] proposed a pipeline that 
+extracted over 7,700 cross-disciplinary features from accel-
+erometer data. Feature selection using mutual information 
+and the Boruta algorithm ensured high accuracy (99%) 
+across datasets like UR Fall, MOBIFALL, and UP Fall, 
+employing classifiers such as SVM, Random Forest, and 
+Naïve Bayes. Luo et al. [94] utilized accelerometers placed 
+on the head, ankles, and waist, applying decision tree clas -
+sifiers to analyze mobility statistics and optimize sensor 
+positions. These studies underscore the value of dominant 
+feature identification and optimal placement for achiev -
+ing generalized and efficient fall detection. De Raeve et al. 
+[59] designed low-cost Bluetooth Low Energy (BLE) fall 
+detection wearable device, especially for elderly residents in 
+nursing homes.This proposed device uses a threshold-based 
+acceleration and orientation detection while comparing 
+results with a CNN-based classifier. A et al. [57] developed 
+an AI-based wearable system using accelerometer and edge 
+computing boards and deep learning algorithms to detect 
+and prevent falls in elderly people.
+Multi-Sensor Fusion Systems
+The fusion of data from multiple sensors enriches detection 
+precision. Quadros et al. [ 73] combined accelerometers, 
+gyroscopes, and magnetometers in wrist-worn devices, con-
+trasting ML and threshold-based methods for evaluating 
+signal effectiveness. Wang et al. [83] integrated barometric 
+sensors with accelerometers, employing wrapper-based fea-
+ture selection and binary decision tree classifiers to balance 
+fall detection accuracy and energy consumption. Nho et al. 
+[69] incorporated heart rate sensors with accelerometers, 
+leveraging Gaussian Mixture Models (GMM) and a two-
+stage feature selection process to enhance user adaptabil -
+ity. These studies highlight the benefits of sensor fusion in 
+improving performance.
+Advanced ML Architectures
+Emerging ML architectures address complex fall detection 
+challenges. Al-qaness et al. [ 64] introduced MKLS-Net, 
+which integrates multi-kernel convolution, LSTM, and 
+based on wearable sensors and deep learning, utilizing a 
+bidirectional LSTM model with RNN stacking for process-
+ing time-series accelerometer and gyroscope data. Mek -
+ruksavanich and Jitpattanakul introduced [ 60] FallNeXt, a 
+sensor-based fall detection system incorporating accelerom-
+eter and gyroscope data with a deep residual model using 
+multi-branch aggregation. Yhdego et al. [ 62] developed a 
+wearable sensor based re
+--- PAGE 11 ---
+11 ---
+Cognitive Computation           (2026) 18:12 
+a comprehensive evaluation of surface electromyography 
+(sEMG) sensor-based fall detection systems by analyzing 
+data collected from sensors placed on the lower limbs of 
+participants during various activities. They assessed the 
+effectiveness of fifteen feature extraction methods and five 
+classification models, including support vector machines 
+(SVM) and k-nearest neighbors (KNN), in identifying fall 
+scenarios. Their findings emphasized the critical role of fea-
+ture selection and optimal sensor placement in enhancing 
+detection accuracy and system reliability.
+Vision Sensor Based Fall Detection 
+Approaches
+With the advancement of computational power and com -
+puter vision algorithms, researchers utilise vision sensors to 
+detect falls. Similar to the wearable FDSs, the vision-based 
+FDSs also used ML and threshold algorithms. A general 
+structure of the vision-based FDS is shown in Fig. 4. Table 6 
+gives a comparative summary of vision sensor-based FDSs 
+studied in this work. The publicly accessible vision-based 
+fall datasets were presented in Table 7.
+Threshold-Based Approaches
+Threshold-based approaches have been extensively utilized 
+in vision-based Fall Detection Systems (FDS), leveraging 
+background subtraction and feature analysis to detect falls. 
+These systems often rely on setting optimal threshold values 
+for extracted features to distinguish fall events from normal 
+activities.
+Background Subtraction and Feature Extraction
+Rajabi et al. [ 158] proposed a vision-based FDS using a 
+Gaussian Mixture Model (GMM) for background subtrac -
+tion to extract moving objects from video sequences. Fea -
+tures such as pixel distance, center of mass width variation, 
+self-attention mechanisms to analyze spatial and temporal 
+sensor data. This model achieved more than 99% accuracy 
+across MobiAct, SisFall, and UniMib-SHAR datasets, effec-
+tively distinguishing falls from similar activities. Yu et al. 
+[65] employed a TinyCNN in a low-power microcontroller, 
+demonstrating 98% sensitivity and specificity on KFall 
+and SisFall datasets by capturing both temporal and spatial 
+motion features. Medrano et al. [ 79] proposed a novelty 
+detection approach using SVM-based anomaly detectors 
+to classify fall events as deviations from normal patterns, 
+addressing the challenge of diverse fall scenarios. These 
+systems exemplify advancements in real-time, resource-
+efficient FDS implementations. Guo et al. [ 58] proposed 
+PIFall, a wearable fall detection system using high-reso -
+lution pressure insoles with a 90-sensor matrix and time-
+series "stress video" analysis, employing a ResNet(2+1)D 
+model for robust classification of elderly activities.
+Innovative Sensor Integration
+Integrating novel sensors expands the functionality of FDS. 
+Shastry et al. [ 88] combined IMUs with Time of Flight 
+(ToF) transceivers to enhance fall detection precision by 
+integrating location tracking and reducing false alarms 

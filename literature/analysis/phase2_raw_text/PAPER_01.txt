@@ -1,0 +1,1429 @@
+
+--- PAGE 1 ---
+Received 19 December 2024, accepted 29 December 2024, date of publication 17 January 2025,
+date of current version 12 February 2025.
+Digital Object Identifier 10.1 109/ACCESS.2025.3531324
+Bi-Modal Multiperspective Percussive (BiMP)
+Dataset for Visual and Audio Human Fall
+Detection
+JOE DIBBLE 1, (Member, IEEE), AND MICHAEL C. F. BAZZOCCHI
+ 1,2, (Member, IEEE)
+1Astronautics and Robotics Laboratory (ASTRO Lab), Department of Mechanical and Aerospace Engineering, Clarkson University, Potsdam, NY 13699, USA
+2Astronautics and Robotics Laboratory (ASTRO Lab), Department of Earth and Space Science and Engineering, Y ork University, Toronto, ON M3J 1P3, Canada
+Corresponding author: Michael C. F. Bazzocchi (mbazz@yorku.ca)
+This work was supported by the La Fondation Dassault Systèmes.
+This work involved human subjects or animals in its research. Approval of all ethical and experimental procedures and protocols was
+granted by Clarkson University, Institutional Review Board (IRB), under Approval No. 24-06.
+ABSTRACT Falls are the leading cause of injuries and fatalities among older individuals propagating
+concerns for health and safety. Mitigating these concerns requires timely intervention and response to
+minimize health complications. Autonomous fall detection systems are often offered as a means to alleviate
+these concerns. Typical fall detection systems classify a fall event using either inertial- or vision-based data.
+Aside from these two modes of input for fall detection, sparse human fall audio data is available. Audio
+datasets associated with the dynamic impact of human falls from the perspective of a spatial environment are
+both unavailable publicly and focused on niche applications. This dataset provides multimodal composition
+of visual and audio data to aid in fall detection technique development. Though this dataset emphasizes audio
+novelty, a synchronized visual component is included offering a multifaceted collection of data. Audio input
+for fall detection systems presents an opportunity for new approaches towards autonomous fall detection.
+This dataset comprises human movement representing activities of daily living and falls of 25 participants
+in various residential settings, yielding 1,300 instances of unique visual and audio samples. Promising
+utility of the bi-modal multiperspective percussive (BiMP) dataset is demonstrated through experimental
+data evaluations using techniques including: GoogLeNet, Long Short Term Memory, Continuous Wavelet
+Transforms, and Short-time Fourier Transforms for human fall detection achieving accuracies up to 96%.
+The concept of audio-based fall detection has the potential to mitigate concerns regarding privacy and
+invasiveness, in addition to broadening the scope of fall detection mechanisms.
+INDEX TERMS Assisted living, audio analysis, fall detection, machine learning, multimodal dataset.
+I. INTRODUCTION
+Falls in older adults are a significant public health issue
+with profound effects on independence, quality of life,
+and overall healthcare costs [1]. Falls being the leading
+cause of injuries and injury-related deaths among older
+adults [2], [3], increases demand for effective fall detection
+and prevention (FDP) support mechanisms. Physical impacts
+of falling cause complications for older adults who wish to
+The associate editor coordinating the review of this manuscript and
+approving it for publication was Larbi Boubchir
+ .
+remain living in their homes. In addition to potential phys-
+ical complications, psychological effects including anxiety
+towards falling again, and reduced levels of activity and
+social engagement exacerbate risks of falling and diminish
+the overall quality of life [4], [5]. Aside from the physical
+and mental health effects of falls, frequency and volume of
+falls of older individuals are projected to increase, giving
+rise to additional economic motivations for mitigation of the
+older adult fall epidemic [6]. Consequently, the development
+and implementation of effective FDP systems are crucial
+for supporting the aging population, ensuring their safety,
+26782
+
+ 2025 The Authors. This work is licensed under a Creative Commons Attribution 4.0 License.
+For more information, see https://creativecommons.org/licenses/by/4.0/ VOLUME 13, 2025
+--- PAGE 2 ---
+J. Dibble, M. C. F. Bazzocchi: BiMP Dataset for Visual and Audio Human Fall Detection
+and maintaining a sustainable quality of life. The common
+theme motivating development of FDP schemes revolves
+around an effort to minimize the severe outcomes and
+adverse effects stemming from falls impacting the older adult
+demographic [7].
+From a high-level perspective, most FDP systems share
+a general mode of operation, involving input data from
+real-time monitoring and processing the data through a
+classifier. V ariations of FDP schemes differ in aspects such
+as architecture, implementation, mode of execution, and data
+format being generalized into two categories on the basis
+visual or sensor data [8]. The two categories encompass a
+broad variety of visual and sensor data arranged in diverse
+formats, and have been instrumental towards establishing
+FDP mechanisms.
+Aside from visual- and sensor-based approaches towards
+FDP systems development, with exceptions such as [9]
+and [10], the potential for audio fall detection has been largely
+overlooked. Both existing audio-based FDPs and the utilities
+necessary for their development are scarce. Notwithstanding
+the resource of already existent and not publicly available
+datasets, i.e., [9] and [10], audio data from falls is not
+commonly recognized for or preserved as a viable means of
+input for fall detection mechanisms. Characterisation of falls
+in terms of audio information has the potential to invoke more
+avenues of autonomous fall detection.
+Audio fall detection, as presented in scenarios such as [9],
+provide visual-audio recordings inclusive of verbal responses
+of older adults during falls. Similarly, [10] perpetuates falling
+audio for: verbal response, body collision, and background
+noise using wearable cameras for data collection. These
+efforts provide a benchmark for application of audio fall
+detection, establishing nuance within the FDP context.
+Furthering audio fall detection, this work aims to provide fall
+audio independent of verbal utterance from an environmental
+perspective. The focus is to capture the dynamic impact audio
+of a fall from a listening device in proximity of a person,
+as opposed to being attached. Although verbal interference
+from a fallen person merits consideration, so too do fall
+instances when no verbal response is able to be provided by
+a fallen individual.
+In this paper, a multimodal and multiperspective human
+fall dataset with synchronized audio and visual formats from a
+spatial environmental perspective is developed and evaluated
+using deep learning and data processing techniques. This
+dataset places emphasis on the collection and inclusion of
+dynamic impact fall audio. Further, this dataset aims to
+address the lack of publicly available audio fall impact
+data independent of verbal input from an environmental
+perspective, capturing the audio essence of a human fall
+as accurately as possible. Recognizing the utility of video
+data in the context of autonomous fall detection, the audio
+data presented is accompanied by complimentary video data.
+Inclusion of both audio and visual data offers the capacity for
+multimodal analysis and evaluation of fall detection methods,
+opposed to analyses using a singular visual- or audio-
+input. To evaluate the developed bi-modal multiperspective
+percussive (BiMP) dataset, this paper devises multiple FDP
+methods, using deep learning as well as image and audio
+processing techniques, for fall classification. The devised
+FDP methods not only demonstrate the potential of the BiMP
+dataset for FDP system development and evaluation, but also
+prove to be effective FDP methods for fall detection and
+classification.
+Fall detection systems can be trained using this dataset
+and implemented in environments with expected older adult
+ambulation. This dataset provides a means to expand the
+utility of smart home and mobile robotic devices, thus
+promoting safety for older adults. For example, fall detection
+systems can be integrated into one or more of the many smart
+home devices that are already present in the homes of older
+adults, which capture audio or visual data.
+This paper includes a review of work related to visual,
+sensorial, and audio fall detection mechanisms, along with
+a review of available human fall datasets (Section II),
+followed by the methodology of this dataset’s construction
+(Section III). The methodology discusses the breakdown
+of participants, environments, equipment used, and fall
+characteristics exhibited in this dataset. It also includes
+the demographic statistics and physical characteristics of
+participants, environmental considerations, and fall simula-
+tion instructions. Furthermore, the storage and processing
+of data is discussed to articulate the hierarchy of data
+storage, along with precautions taken to ensure participant
+privacy (Section IV). Additional analysis (Section V), results
+(Section VI), limitations (Section VI-B), and conclusions
+(Section VII) are discussed providing context towards the
+viability of this dataset for FDP system development and eval-
+uation. This work was conducted under Clarkson University’s
+Institutional Review Board (IRB) approval number 24-06.
+II. RELATED WORK
+The following sections are intended to articulate some
+relevant FDP systems and the methods on which they rely.
+The first section discusses available FDPs that rely on
+video input and the techniques leading to fall classification.
+Similarly, the following section discusses FDPs reliant on
+sensor-based data, and the methods for classification used.
+The section following discusses methods used to classify
+a fall based on audio input, while the final section offers
+insights on already available fall datasets.
+A. VISUAL-BASED FDP SYSTEMS
+Fall detection using visual inputs implement various tech-
+niques of image processing. Conventional practices in the
+analysis of visual data can be typically achieved through
+image manipulation or using key point locations, examples
+of which can be found in [11]. Examples of image manipu-
+lation would include masking, augmentation, or background
+extraction. Alternatively, methods using key point locations
+typically define a systematic classification of joint locations
+or features. Analyses using key points typically result in
+VOLUME 13, 2025 26783
+--- PAGE 3 ---
+J. Dibble, M. C. F. Bazzocchi: BiMP Dataset for Visual and Audio Human Fall Detection
+some rendition of a skeleton re-composition of extracted
+joint position information. Image manipulation or key point
+location are commonly implemented though are not criteria
+for visual methods. Additionally these modes of analysis can
+be used in parallel or in tandem with each other.
+Image manipulation can be seen in the method presented
+in [12] to detect falls using human body shape. Exemplifying
+the usage of background removal, this technique extracted
+background information from each video frame and used
+the leftover foreground information in the determination of a
+fall. Similarly, background segmentation in [13] was accom-
+plished through converting red-green-blue (RGB) inputs to
+binary images using a mask region-based convolutional
+neural network (R-CNN). This study used both a publicly
+available dataset University of Rzeszów (UR) fall detection
+dataset [14] in conjunction with a self-collected dataset.
+Fall detection was achieved using secondary convolutional
+neural network (CNN) feature extractions as inputs of
+an attention guided bi-directional long short-term memory
+(LSTM) classifier. Using a specified human posture model
+derived from joint configurations, [15] extrapolated kinetic
+information of a person in an RGB video as input to a logistic
+regression classifier for fall determination. Additionally,
+[15] constructed a custom dataset in combination with the
+FallVideo dataset from [16]. Further examples of visual fall
+detection were presented in [17] using image manipulation
+and key joint locations.
+Despite the application of work done previously, limi-
+tations include classification bias due to low variation of
+data, and requirements for continuous visual monitoring.
+Nonetheless, available work involving visual inputs for fall
+detection demonstrate the utility and application of visual fall
+datasets. Additional to the datasets used to develop existing
+visual fall detection techniques, a higher volume of visual
+fall data, from alternative viewpoints offers a more diverse
+sample set on which to train fall detection mechanisms. Fall
+data from multiple perspectives effectively facilitates a wider
+range of view angles from which a fall can be detected.
+B. SENSOR-BASED FDP SYSTEMS
+Sensor-based fall detection involves a vast selection of
+sensors. Some sensors are intended to be worn, and others
+are intended to be integrated into an environment, such as
+floors. These include, but are not limited to, sensors such
+as: pressure plates, accelerometers, gyroscopes, manometers,
+and inertial measurement units. Sensor-based fall detection
+can be accomplished using a single type of sensor, or a
+combination of multiple sensors in a multi-input mode of
+detection.
+For instance, [18] utilized data from a smartphone
+accelerometer in combination with a threshold-based method
+to detect different types of events, e.g., a fall-like event,
+such as lying on the floor, or a sudden stop after walking.
+If a fall-like event was detected by the threshold-based
+method, a multiple kernel learning support vector machine
+was implemented to confirm a fall, or a nonfall. Similarly,
+an inertial measurement unit combining an accelerometer,
+gyroscope, and magnetometer were used in [19]. Using the
+data from these devices, an evaluation was then carried
+out for classifications using: a threshold based method,
+a threshold based method with Madgwick’s Decomposition,
+and machine learning methods. Using a piezoelectric sensor,
+[20] developed a fall detection system based on floor
+vibration characteristics.
+The implementation of sensors has shown to be a viable
+option towards a solution for FDP mechanisms. However,
+limitations are inherent due to the invasive nature of wearable
+sensors, in addition to sparsity of available training data
+for niche sensor configurations. To this end, despite the
+comparability of input data with that of visual methods,
+sensor-based datasets offer insight and methodologies that
+are applicable in the construction of a fall dataset in spite of
+dissimilar fall data format.
+C. AUDIO-BASED FDP SYSTEMS AND DATASETS
+There are very few datasets and FDP systems that focus
+on audio-based fall detection. In [9], visual and audio fall
+detection methods were developed using a self-procured
+dataset inclusive of phonetic audio associated with a fall,
+in addition to visual fall data. The visual fall detection
+used a histogram-based classification of silhouette extraction
+and postural recognition, combined with an audible call for
+help. Similarly, [10] used visual data, combined with verbal,
+and environmental audio from egocentric cameras. The
+method was evaluated using decision fusion techniques for
+various visual learning models, and Mel-frequency Cepstral
+Coefficient audio features.
+These techniques leverage fall associated audio for fall
+detection although verbal utterances accompanying a fall
+are a prevalent constituent in the analyses. Despite the
+distinguished advantage of audio in FDP techniques pre-
+sented by these works, further investigation should address
+instances of falls resulting in, or causing unconsciousness,
+incoherence, or compromised speech [28]. These instances
+are in correlation with limitations inherent in audio FDP
+systems, and audio fall data availability. However, these
+further steps would require the development of a new fall
+dataset that includes the required audio data, since such a
+dataset is not publicly available.
+Impact audio is an inherent constituent in falls of conscious
+and unconscious persons alike. An FDP designed to detect
+impact audio has the potential to recognize a fall in events
+where a person is unresponsive. The sparse nature of dynamic
+impact audio of falls prompts the development of a resource
+inclusive of such. Impact audio data would thus provide
+means for nuanced autonomous fall detection.
+The presented work is aimed towards providing a resource
+effectively capturing diverse fall data enabling development
+of both visual and audio FDP techniques. The visual
+portion of this work is intended to provide a comprehensive
+26784 VOLUME 13, 2025
+--- PAGE 4 ---
+J. Dibble, M. C. F. Bazzocchi: BiMP Dataset for Visual and Audio Human Fall Detection
+TABLE 1. Related datasets and their specifications.
+collection of human falls recorded from various perspectives.
+Additionally, the audio component is meant to provide a
+multi-perspective collection of exclusively percussive audio
+fall data, not inclusive of verbal noise.
+D. HUMAN FALL DATASETS
+Human fall datasets (HFDs) are a significant contribution
+to the development of learning-based fall detection meth-
+ods [29]. Fall datasets typically consist of orchestrated falls,
+which safely produce data that imitates characteristics of an
+actual fall. Typical constituents of HFDs include fall events
+(FEs), which exemplify fall characteristics, and activities
+of daily living (ADLs), which provide characteristics of
+regularly anticipated movement.
+Established HFDs are listed in Table 1. There are
+commonalities shared between each of the listed datasets,
+although they present human fall data in different capacities.
+Each dataset interprets fall dynamics from distinct reference
+frames, capturing and quantifying signals produced by the
+motion. The presented datasets capture unique signals using
+various methodologies, and sensing equipment.
+Datasets such as in CIRDO Corpus [9] and MUVIM [26]
+employ methodologies depicting ADLs and FEs for scenario-
+based recording. In contrast, isolated instance-based record-
+ing of FEs and ADLs separately is typical of the other datasets
+presented.
+In [21], the SisFall dataset is presented, which is comprised
+of acceleration and rotation data using two accelerometers
+and a gyroscope from thirty-eight participants. The sensors
+were placed at the waist of each participant. Additional
+preliminary analyses were included to test the dataset,
+using fourteen extracted features and two threshold-based
+classifiers. Activities were performed in classrooms using a
+landing mat to ensure participant safety.
+Similarly, [22] presents a motion signal dataset, referred
+to as FallAllD, as a result of an accelerometer, gyroscope,
+magnetometer, and barometer readings placed at waist, wrist,
+and neck positions, for numerous movements performed
+by fifteen participants. Acceleration-based fall classification
+was conducted using deep learning and machine learning
+techniques for the FallAllD dataset. Participants performed
+movements using protective gear including a helmet, arm
+protection, knee pads, and a back protector, eliminating the
+need for a dampening fall pad to minimize data interference.
+The MobiFall dataset in [23], presents smartphone
+accelerometer and gyroscope data collection for twenty-four
+participants. The dataset was recorded using smartphones
+providing data for two primary approaches to fall detection:
+threshold-based and machine learning methods. The smart-
+phone was placed naturally in a pocket of the participant
+during recording of movements. Additionally, a landing mat
+was used to protect participants while performing FEs.
+The TST Fall detection dataset presented in [24], provides
+RGB-D visual and acceleration data from two accelerome-
+ters. Classification of visually determined joint positions and
+accelerometer angle and acceleration from eleven volunteers
+were used to produce a dataset evaluating combined visual-
+and sensor-based fall detection. Analyses highlight the
+benefit of data synchronization between sensors. Data was
+recorded using a singular depth camera, in addition to two
+wrist and a waist mounted IMUs for eleven participants.
+Using a combination of a smartphone, accelerometer, gyro-
+scope, and magnetometer, the UMAFall dataset[25] provides
+sensor data from seventeen participants for five sensor loca-
+tions. Comparative acceleration magnitudes for individual
+sensing points were presented for classification. Sensors
+were attached to the ankle, waist, right wrist, chest, and a
+smartphone was carried in the right pocket. Three unique
+environments were used to collect data, implementing mat-
+tresses to prevent participant injury while performing falls.
+The MUVIM visual dataset was collected in [26], pro-
+viding RGB, infrared, depth, and thermal image data. All
+cameras were mounted to the ceiling and were used to
+record forty participants. Visual data for each camera was
+comparatively evaluated using a 3D CNN auto-encoder. The
+study included scenarios that contained both scripted ADLs
+and FEs. Not all recordings were inclusive of both ADLs
+and FEs, some only simulated ADLs. Furthermore, the safety
+equipment used was a crash mat to cushion the fall of
+participants performing FEs.
+VOLUME 13, 2025 26785
+--- PAGE 5 ---
+J. Dibble, M. C. F. Bazzocchi: BiMP Dataset for Visual and Audio Human Fall Detection
+The visual URFD dataset, in [14], presented RGB and
+depth data in combination with inertial data. Accelerometer,
+gyroscope, and single camera visual and depth data were
+collected for five participants undergoing threshold-based
+sensor classification, SVM, and KNN visual classification.
+This system effectively integrates both motion and visual
+data purposed towards a higher capacity to distinguish falls
+from daily activities. This study implemented a singular
+depth camera, and an IMU worn on a user’s pelvic region.
+Five participants performed eight different activities, using a
+carpet to prevent injury during the falling movements.
+The CIRDO Corpus dataset, in [9], recorded audio data
+using two microphones and visual data with three cameras,
+for seventeen participants. Cameras were placed on one
+side of the room facing the incident straight on, and the
+other at a forty-five degree angle and audio was captured
+using two microphones. One microphone was suspended
+from the ceiling, while the other was positioned on a
+nearby piece of furniture. The audio data included various
+forms of participant vocalization. Audio classification was
+achieved using an Automatic Speech Recognition (ASR)
+system, and visual data was classified using a histogram-
+based approach. Recorded activities captured ADLs and
+FEs in a shared scenario. A smart room environment was
+used, as it resembled a typical living space, and falls were
+performed on a carpet.
+The visual and audio EGOFALLS dataset, presented
+in [10], used RGB and IR cameras to record fourteen
+participants. Visual classification was conducted using four
+learning models combined with features extracted from the
+audio using Mel-Frequency Cepstral Coefficients (MFCC).
+Cameras were placed egocentrically to collect RGB, infrared,
+and audio data. Classification schemes used late decision
+fusion, integrating descriptors from visual and auditory
+data. The audio data included ambient and verbal sounds
+surrounding the event. The egocentric camera positions were
+on the neck and waist of fourteen participants.
+The BiMP dataset is uniquely intended to present multi-
+modal (visal and audio) representations of FEs and ADLs
+from a diverse set of viewing angles and perspectives. Addi-
+tionally, the audio data provided in the BiMP dataset captures
+the fall impact noise independent of vocal interjection.
+The ADLs and FEs used in the BiMP dataset were
+selected with reference to those used in previous datasets.
+Additionally, the modalities of the BiMP dataset are evaluated
+independent of one another to establish the fall characteristics
+inherent in each modality. The following methodology pro-
+vides a comprehensive explanation of constituent attributes
+of the BiMP dataset.
+III. METHODOLOGY
+Effective learning-based fall detection relies on a dataset that
+accurately aligns with the intended application, is diverse
+in composition, and provides sufficient volume to allow for
+performance evaluations [30]. Thus, this dataset is purposed
+towards a robust and cohesive presentation of data, reflective
+of multiple anticipated real-world scenarios.
+Accurate recreation of an anticipated scenario demands
+consideration and minimization of variation between antic-
+ipated and recorded events. This section provides the
+background information, rationale, and the framework for the
+various aspects involved in the construction of the fall dataset.
+To achieve a fall dataset comprised of accurate, multi-
+perspective visual and audio data, it is important to clearly
+formulate the required constituents defining these qualities.
+Therefore, the methodology for data collection must consider
+factors affecting the desired fall data. These factors include:
+the particular fall characteristics, the activities of the study
+and movement definitions, the environment in which the
+collection happens, participant demographics and character-
+istics, and the equipment used to record the data.
+The following sections provide further insight around the
+factors listed above, beginning with the fall characteristics
+inherent in the target demographic of older adults.
+A. FALL CHARACTERISTICS
+Accurate data collection requires the integration of innate
+characteristics associated with falls of older adults in order
+to reproduce similar motions. The nature of falls in older
+individuals according to [31], concluded that the most
+prominent culprit responsible for falls was due to improper
+shift of the individual’s weight. Furthermore, investigation
+in [32], indicated that longer choice step reaction time
+(CSRT) resulted in higher risk of falling. The relationship
+drawn between aging and longer CSRT implied older adults
+subject to falling would also be typically subject to a limited
+reaction time, thus, resulting in a fall where reactionary
+reflexes lag behind. This results in a fall where the impact
+is not cushioned by appendages or limbs in a manner that
+a person with a typical reaction time would be able to
+mitigate the severity of the impact associated with a fall.
+Similarly, [33] offered support for the idea that impaired
+reaction time placed older individuals at higher risk of injury
+in the event of a fall.
+Not all older adults are subject to prolonged reaction times
+or higher impact severity. Some older adults are able to
+cushion their falls in a timely manner; however, it is not
+common. In [34], reaction times in arm responses between a
+younger demographic and an older demographic during a fall
+were observed. The findings of this study support the idea that
+reaction time is prolonged with an age increase. This paper
+also indicated that the reaction of older individuals, in terms
+of physical response to a fall, is to use their arms to dampen
+their fall.
+Aside from a lower capacity for optimal reaction time,
+there is little indication that older adults are not inclined to
+reactionary measures of using their hands to cushion a fall,
+albeit with a delayed response time. The reflexive instinct
+for a person to use their hands and arms to dampen a fall
+transcends the age differential and remains a prevalent mode
+of fall mitigation among older adults.
+26786 VOLUME 13, 2025
+--- PAGE 6 ---
+J. Dibble, M. C. F. Bazzocchi: BiMP Dataset for Visual and Audio Human Fall Detection
+This information offers an opportunity for increased
+accuracy in the reproduction of a fall. Delayed reaction time
+in the event of a fall was thereby incorporated into the
+data collection as part of the instruction for imitating falls
+of older adults. When falling, participants were asked to
+react naturally in their reflexes, though to delay the action.
+These considerations were instituted for the activities each
+participant performed.
+B. ACTIVITIES OF THE STUDY
+The human fall datasets listed in Table 1 collectively present
+an extensive range of daily living and fall movements.
+Nonetheless, many of the movements included in those
+datasets share underlying characteristics which can be
+grouped into fundamental movements shared across the
+datasets presented in Table 1.
+Due to the subtle noise production of regular ADLs
+in comparison with the FEs, the incorporation of the
+miscellaneous ADLs offer various common household noises
+that differ from that of a fall in order to diversify the audible
+component of this dataset. These miscellaneous ADLs take
+the form of dropping an object or using an appliance
+typical of the given environment (e.g., pulling out a chair,
+opening/closing an appliance door, moving a laundry basket).
+As mentioned previously, each of the miscellaneous ADLs
+are listed in Table 3 and are environment specific.
+TABLE 2. ADLs and FEs included in this dataset.
+TABLE 3. Miscellaneous ADLs unique to each room.
+An explanation on how to perform movements listed in
+Table 2 was given to each participant prior to recording.
+The recording of a movement would then begin once the
+participant assumed the initial standing or sitting position
+that would be proceeded by the movement (i.e., a participant
+would initially be in a seated position for ADL5 and FE5).
+Once recording began, each participant would silently count
+to ten and then perform the movement. Once the participant
+had completed the movement, the recording would stop three
+seconds after all motion stopped. The environments where
+the activities were performed are further explained in the
+following subsection.
+C. ENVIRONMENT
+The previous section addressed procedural variables asso-
+ciated with bodily motion, while this section addresses the
+environmental considerations.
+Background information can significantly influence learn-
+ing networks as it can affect attributes such as training bias,
+context, and feature extraction. Both [35] and [36] present
+examples of how image background impacts the ability of
+the learning network. Although these works are not directly
+concerned with the development of human fall datasets, they
+communicate the influence background information can have
+on learning networks. The significance of image background
+in the context of learning, demonstrates the importance of
+data collection in an environment that conveys the visual
+ambience of the intended application.
+Visual background information included in this dataset
+was captured in a mock home laboratory. The setting was
+chosen for the relevance it provides within the context of this
+work, as it replicates an environment where older adults are
+statistically prone to fall [3].
+The laboratory rooms used in the data collection are:
+(a) living space, (b) bedroom, (c) kitchen/dining room,
+(d) laundry room, and (e) secondary bedroom. Due to the
+relatively low percentage of falls that actually occur within
+the bathroom [37], and privacy implications, a bathroom
+setting was not included in this data collection. Additionally,
+outdoor environments have been omitted from data collection
+as this work is aimed towards further development of
+aging in place technologies. Concern is therefore prioritized
+within the home rather than the external environment.
+It is worth noting that in addition to privacy challenges
+related to the placement of fixed cameras in bathrooms,
+bathrooms are often constrained spaces with unique elements
+dissimilar to the remainder of the home (e.g., obscuring
+curtains, smooth tubs, wet features, locking doors), which
+can make it difficult for mobile robots to access or observe.
+Similarly, fixed cameras are typically impractical in most
+outdoor environments, and outdoor environments can have
+challenging geographic features, poor lighting conditions,
+and inclement weather that restrict the use of mobile robots
+for data capture.
+The rooms depicted in Fig. 1, where data collection was
+performed, are Clarkson University’s Simulation Laboratory.
+VOLUME 13, 2025 26787
+--- PAGE 7 ---
+J. Dibble, M. C. F. Bazzocchi: BiMP Dataset for Visual and Audio Human Fall Detection
+FIGURE 1. Views of each rooms: (a) living space, (b) bedroom, (c) kitchen/dining room, (d) laundry room, (e) secondary bedroom room.
+TABLE 4. Participant characteristics overview.
+This laboratory is structured as an imitation home purposed
+towards facilitating realistic home care. The appearance of
+the laboratory offered facilities that aligned well with the
+environmental requirements of this dataset. The inclusion
+of these rooms offered diverse backgrounds similar to
+what is expected in a residential setting. In addition to
+the environmental constituents of the dataset, participant
+attributes are provided in the following section.
+D. PARTICIPANT DEMOGRAPHICS
+All participants involved in this study were voluntary with
+the option to opt out of participation at any given point
+of completion. Exclusion criteria for participation consisted
+of individuals younger than eighteen years of age, and any
+participants allergic to the materials of the safety equipment.
+A total of twenty-five volunteers participated in performing
+FEs and ADLs for this study. Participant characteristics such
+as: age, weight, and height, are summarized in Table 4 in
+TABLE 5. Particant demographic overview.
+terms of the statistical distribution. Furthermore, Table 5,
+presents the dataset composition in terms of participant
+gender, ethnicity, and dominant hand. Participants were not
+required to disclose their gender identity on the preliminary
+questionnaire and did so of their own volition.
+Among the statistical quantities included in Table 4 is
+the Simpson’s Diversity Index (SDI) for each characteristic
+calculated using the definition provided in [38]. The SDI
+computes the likelihood of two random samples belonging
+to the same category. The SDI values range from zero (no
+diversity) to one (infinite diversity). As can be seen in Table4,
+the physical participant characteristics have relatively high
+diversity. The SDI was not computed for the demographics
+26788 VOLUME 13, 2025
+--- PAGE 8 ---
+J. Dibble, M. C. F. Bazzocchi: BiMP Dataset for Visual and Audio Human Fall Detection
+in Table 5, since by definition the diversity values would be
+low due to the limited discrete number of groupings (e.g., two
+groupings for dominant hand). If desired, these values can
+also be computed directly given the values in Table 5. Further
+discussion on the limitations of the participant demographic
+diversity can be found in Section VI-B.
+The exclusion criteria of age and allergy considerations
+did not affect any volunteers that signed up to participate in
+the study resulting in the involvement of all volunteers. The
+voluntary participation and study location, therefore, were
+the only influences on the demographic and characteristics
+of study participants.
+Each participant performed ADLs and FEs in a specific
+room. Four laboratory rooms (a)-(d) were used to record
+six participants each. None of the participants appear in
+multiple rooms, meaning no two scenarios feature the
+same participant. A single participant was recorded in the
+remaining room, i.e., room (e). Following are specifications
+of the equipment used while recording the data.
+E. EQUIPMENT
+Data was collected with a Reolink RLK8-800B4 sys-
+tem [39], comprised of four 3840p×2160p, 20 frames per
+second cameras, combined with a two terabyte network
+video recorder. Cameras were placed as evenly around the
+room as possible, each of which viewed the same central
+location.
+The positioning of the cameras in this fashion offered
+multiple viewing angles of the same incident, while also
+recording audio data from diverse spatial regions. In each
+room, cameras were placed as evenly as possible around
+the incident to avoid data similarity. The vertical place-
+ment of each camera in this study ranged from 90 cm
+to 180 cm. While not specifically designed for mobile
+humanoid robots, this range of heights is well-suited for the
+training and testing of FDP techniques in mobile robotic
+systems [40].
+The equipment used for safety included a vest for torso
+padding, a helmet, knee and elbow pads, and gloves. Safety
+equipment used for the fall events was worn as shown in
+Fig. 2. The knee and elbow pads were equipped with adhesive
+cloth to imitate clothing. The pads were covered in cloth
+in order to provide audio mimicking the impact sound of a
+clothed joint opposed to that of a safety pad.
+Each participant wore this safety equipment while per-
+forming all FEs. Similar to the unwanted interference landing
+mats play in accelerometer data collection [22], audio data
+collection is subject to the same influence. To avoid any
+potential interference from the landing mat on the integrity
+of data collection, this study opted to use wearable safety
+equipment.
+Comprehensive inclusion of the the spatial, movement,
+and participant attributes provide context for the recorded
+data, which was then processed and reposited for further
+analysis.
+FIGURE 2. Safety equipment used: 1) helmet, 2) vest, 3) elbow pads,
+4) gloves, and 5) knee pads.
+IV. DATA FORMATTING AND STORAGE
+After recording each participant, data was moved to a folder
+in a secure, password protected server. A folder was assigned
+to each room labeled according to rooms (a)-(e). Within
+that folder, additional sub-folders, were assigned for each
+participant, labeled by the letter of the room wherein the
+recording was taken, followed by the number corresponding
+to the order in which that person participated, referred to
+as the participant identifier. Each participant folder includes
+two sub-folders labeled ADL and FE. Inside these folders are
+the video recordings of each participant.
+Videos were stored as.mp4 files, and were labeled
+according to the movement keys listed in Tables 2-3, being
+preceded by their participant identifier. The organization
+of folders and stored data follows the directory structure
+presented in Fig. 3. The figure displays folder hierarchy and
+visual fall data. The ADL data was identically formatted and
+stored. The audio data were stored as.wav files using the same
+folder structure as the visual data.
+All identifiable personal attributes have been removed
+from the collected data, meaning all faces have been
+blurred, all tattoos have been blurred, and there are no
+names associated with any participants in the presented
+data. The demographic and characteristic information for
+each participant was labeled and stored with the collected
+data. Participant information was labeled in accordance with
+their participant identifier. Formatting data involved rotating,
+blurring, and trimming videos, and extracting audio files.
+VOLUME 13, 2025 26789
+--- PAGE 9 ---
+J. Dibble, M. C. F. Bazzocchi: BiMP Dataset for Visual and Audio Human Fall Detection
+FIGURE 3. Organization of the stored data and hierarchy of the folders.
+Personally identifiable information was removed from the
+dataset, which can be made freely available in compliance
+with the limits of the IRB approval.
+V. ANALYSIS
+This analysis serves to evaluate both the visual and audio
+dataset components for fall detection. Both audio and visual
+constituents were independently evaluated using unique and
+distinguishable class features. Thus, classification techniques
+were employed for audio and visual data independently in
+order to quantify the recognizable fall characteristics inherent
+in each modality. The dataset was used to train and test
+classifiers for both data modalities, purposed towards binary
+classification of FEs as falls and ADLs as nonfalls.
+This work prioritized the classification of falls over
+specific movement classifications, thereby removing the
+necessity of a non-binary classification scheme. More
+specific movement classification beyond fall or nonfall is
+beyond the scope of this research, but is achievable using this
+dataset.
+TABLE 6. Classifier input and data preparation.
+A. EVALUATION
+Classification of the dataset was conducted using multiple
+methods in order to establish its viability for different
+analyses. Each method of classification was supported by
+two sets of validation metrics and involved training neural
+networks. In the context of this work, neural networks
+constitute a classifier and are able to identify patterns and
+similarities in data. Each classifier was initially trained and
+tested using a 70-30 data split using data from rooms (a)-(d).
+The remaining data from room (e) was then used as secondary
+test data for the trained model. The training set included of
+889 sequences and 381 complementary test sequences. The
+secondary test set from room (e) included 56 files.
+Beyond the data partition, both visual and audio portions of
+the dataset have each undergone two unique classifications.
+Each classifier for both modes of data input and the associated
+specifications are listed in Table 6. Each of the classifiers
+were trained on the dataset, and validated on it twice.
+The model used for each analysis of both the audio and
+visual data is a GoogLeNet architecture [41] consisting of
+144 layers that contribute to 11 major modules. The common
+model between the analyses is presented in Fig. 4, depicting
+a GoogLeNet architecture.
+Using the GoogLeNet, an input image undergoes multiple
+layers of convolution and max pooling prior to the inception
+modules presented in Fig. 4. In total, the model uses nine
+inception modules comprised of convolutional, pooling, and
+depth concatenation layers. The light blue represents convo-
+lutional layers, green represents max pooling layers, orange
+represents depth concatenation layers, purple represents a
+FIGURE 4. High level GoogLeNet architecture diagram. Colors associated
+with layer type: light blue-convolutional, green-max pooling,
+orange-depth concatenation, purple-dropout, dark blue-fully connected.
+26790 VOLUME 13, 2025
+--- PAGE 10 ---
+J. Dibble, M. C. F. Bazzocchi: BiMP Dataset for Visual and Audio Human Fall Detection
+FIGURE 5. GoogLeNet inception module layer breakdown, with the same
+color scheme used as in Fig. 4.
+dropout layer, and dark blue represents a fully connected
+layer.
+GoogLeNet was used for its versatility in capturing spatial
+features of different sizes. The ability of the GoogLeNet
+to capture both local and global spatial dependencies,
+offers high adaptability for the varying input formats and
+data. The applicability of a GoogLeNet architecture thus
+accommodates the data preparation techniques described in
+Table 6. The diagram shows the structure of the inception
+modules, and the number on the right of each module
+indicates how many of them are concatenated between max
+pooling layers. The nine inception modules make up three
+inception sequences, denoted by the number to the right of
+the inception modules in Fig. 4.
+The architecture of the inception modules leverages dif-
+ferent convolutions in parallel, capturing features of various
+dimensions. The layers and architecture for the inception
+modules are shown in Fig. 5.
+Each inception module provides multi-level feature extrac-
+tion, where medium-sized spatial features are captured by
+the (3 × 3) convolutions and larger spatial features are
+captured by the (5 × 5) convolutions. These inception
+modules are sequentially connected in between max pooling
+layers, creating inception sequences (IS) for further feature
+extraction.
+The inception sequence of tandem inception modules,
+as shown in Fig. 4, are labeled according to the number
+appearing next to the module. The sequences are structured
+as follows:
+• IS 1: 2 sequential inception modules
+• IS 2: 5 sequential inception modules
+• IS 3: 2 sequential inception modules
+Each inception sequence captures information at different
+levels as a result of combined outputs of elements from the
+processing layers of the module. The first inception sequence
+extracts basic low-level features. The initial sequence focuses
+on finer details in the feature extraction, such as edges
+colors and textures. The second inception sequence is
+responsible for intermediate features, capturing more context
+than the preceding sequence, such as shapes or objects. The
+subsequent and final inception sequence captures the highest-
+level, most abstract features, representing patterns or objects
+of higher complexity.
+The GoogLeNet architecture is a common thread in all
+visual and audio data evaluations presented in this study. The
+TABLE 7. Classifier hyperparameters.
+same structure was used for all evaluations, with the addition
+of a long short-term memory (LSTM) network for a portion of
+the visual data evaluation. To preserve temporal information,
+an LSTM is appended after the GoogLeNet CNN. The
+addition of the LSTM incorporates features extracted from
+individual frames as part of an evaluation across the entire
+sequence. This evaluation scenario modifies the structure of
+the model described in Fig. 4 by inserting a bi-directional
+LSTM intended for capturing temporal features of the visual
+data, between the final max pooling, and dropout layer.
+Training was completed using a Intel(R) Core (TM) i7-
+7700 CPU @ 3.60 GHz processor and 64.0 GBs of RAM.
+Training times would take up to two days to complete,
+using hyperparameters listed in Table 7. The final tuned
+hyperparameters were the product of iterative trials and
+adjustments.
+Prior to classification, data was formatted to match the
+classifier (length × width× RGB color channel) input
+layer of the size 224 pixels×224 pixels×3. The model was
+designed for image classification, thus, resulting in each
+individual recording being rearranged to align with the model
+architecture.
+The conversion of audio signal to a pictorial representa-
+tion was accomplished through two processing techniques:
+wavelets (Section V -C1) and spectrograms (Section V -C2).
+These two signal processing techniques render a heatmap
+image representing the audio signal associated with each
+recording.
+B. VISUAL COMPONENT CLASSIFIERS
+The two approaches used to classify visual data involve a
+GoogLeNet single image classification, and a GoogLeNet-
+LSTM sequential image classification. Aside from the resiz-
+ing of video frames to match the model input requirements,
+image augmentation was not applied in this analysis but may
+be considered for future work. The required preparation and
+handling of data are listed in the third column of Table 6.
+The GoogLeNet without the LSTM was used to classify the
+images that were a result of merging frames from a singular
+video into a single frame. Each video was split into individual
+frames that were resized to (224 pixels ×224 pixels) and
+stored in an array with the corresponding RGB values. Frame
+sequences were represented by the average RGB value across
+all frames for each pixel location, which produced a singular
+averaged image for classification.
+VOLUME 13, 2025 26791
+--- PAGE 11 ---
+J. Dibble, M. C. F. Bazzocchi: BiMP Dataset for Visual and Audio Human Fall Detection
+The addition of the LSTM involves temporal aspects of
+the data in classification. Converting a video for this model
+involved frame extraction, resizing, and sequential storage.
+Similar to the merged array, this array was structured with
+the same pixel size (224 pixels×224 pixels) for both height
+and width, where each pixel in a frame maintained the same
+RGB values.
+The GoogLeNet diagram in Fig. 4 depicts the model used
+for feature extraction for both analyses, along with classifi-
+cation of merged images. The GoogLeNet-LSTM modifies
+the network presented by redirecting the GoogLeNet global
+pooling output into a sequential feature array, passing it to
+an additional sequence input layer. The input layer takes
+each sequence element as a feature vector. The sequences are
+processed twofold by a bi-directional LSTM layer, followed
+by regularization and the conversion of LSTM outputs
+to probability space outputs for classification. The LSTM
+introduced additional complexities with the inclusion of
+temporal features, thus increasing the volume of learnables.
+The additional complexities were mitigated by implementing
+a learning rate drop for more precise weight adjustments over
+time.
+C. AUDIO COMPONENT CLASSIFIERS
+The classification of the audio portion of this dataset used
+the same GoogLeNet architecture displayed in Fig. 4. The
+GoogLeNet architecture accepts images for classification,
+thus, audio data was formatted as pictorial inputs. Raw audio
+signals were extracted from each video and were processed
+without filtering. The exploration of filtering processes
+extends beyond the focus of this work and provides a basis for
+future analyses that may prove to be advantageous regarding
+data clarity or classification performance. The experiments
+were conducted in closed environments focused on the
+noise generated by the activity. It was expected that sounds
+generated by the participants performing the activities would
+contribute to the background noise. However, separation of
+mixed audio signals produced by concurrent sources is not
+a trivial task [42], and deviated beyond the scope of this
+work. Depending on the intended application, the addition
+or removal of background noise from the dataset may be
+necessary to improve fall detection outcomes. The noise
+present in the current dataset can be considered reflective of a
+quiet home environment. Similarly, filtering techniques may
+be considered in future work as none have been included as
+part of the analyses in this work.
+Audio signals were converted into images through the
+application of wavelet and spectrogram transforms, capturing
+the temporal data within a single image. The transforms
+return the frequency and amplitude constituents of an audio
+signal over time. Frequency quantifies the amount of repeated
+vibrations captured in a signal over a given period of time.
+The amplitude of a signal, is the magnitude of the vibration
+experienced at a given time or frequency. Short-time Fourier
+transforms and continuous wavelet transforms were chosen
+for their unique abilities to produce time-frequency detailed
+representations of signal characteristics as a learnable
+image [43].
+1) WAVELETS
+Each wavelet heatmap was the result of a continuous
+wavelet transform (CWT) applied to the audio signal asso-
+ciated with the recorded movement. The wavelets provided
+time-frequency representations of the audio signal. The CWT
+of continuous audio signal from a fall event with a wavelet
+function is defined in (1) [44]:
+CWT (s,τ )= 1√s
+∫∞
+−∞
+x(t)ˆψ
+( t−τ
+s
+)
+dt (1)
+where the associated wavelet coefficients are the scale
+factor, s, the translation factor,τ , the complex conjugate of the
+wavelet function,ˆψ(t), and the continuous audio signal, x(t).
+The bump wavelet defined in (2) [44] is the wavelet
+function used in the CWT and it maintains spectral content
+of signals over time.
+ˆψ(ω)= exp
+
+1− 1
+1−
+(ω−ωpeak
+σ
+)2
+
+
+for|ω−ωpeak|<σ (2)
+The frequencies, ω, at a given time, t, center the wavelet
+around the peak frequency, ωpeak , for an effective wavelet
+range defined by bandwidth, σ .
+The scale factor, s, refers to the compression or enlarge-
+ment of the wavelet. Higher values for the scale factors
+correspond to lower frequencies, and lower values are
+associated with the higher frequencies. Coarse signal features
+are dependent on a larger scale value; whereas, smoother
+features are dependent on a smaller value.
+The translation factor, τ , refers to the incremental shift of
+the wavelet for a given time step. These wavelet coefficients
+are obtained after applying the wavelet to a signal, and
+are representative of the wavelet function compared to the
+continuous signal.
+A pictorial representation of the CWT can be seen in
+Fig. 6(a) and 6(b) in the form of a heatmap. Fig. 6(a) is the
+wavelet transform of the audio from an ADL, and Fig. 6(b) is
+of an FE. The wavelet transform heatmaps represent the scale
+as frequency along the y-axis for a given time on the x-axis.
+Both subfigures are accompanied by a scale (i.e., the color bar
+right of the subfigures) corresponding to the magnitude of the
+wavelet coefficients. Higher magnitudes indicate a stronger
+correlation of the wavelet with the signal for a given scale and
+translation value. The benefit of the transform in this form is
+that it presents transient features, or sudden changes in the
+audio signal as visibly identifiable characteristics.
+2) SPECTROGRAMS
+In addition to the CWT, spectrograms of short-time Fourier
+transforms (STFT) facilitate similar visual reconstruction of a
+26792 VOLUME 13, 2025
+--- PAGE 12 ---
+J. Dibble, M. C. F. Bazzocchi: BiMP Dataset for Visual and Audio Human Fall Detection
+FIGURE 6. Comparison of example continuous wavelet and short-time Fourier transform heatmaps for ADL and FE conditions.
+signal. The STFT is a signal processing technique for analysis
+of a signal where the frequency profile changes over time.
+This provides representation of a signal in both the time and
+frequency domains.
+The process applies the Fourier transform to short
+overlapping signal segments. The result is a time-frequency
+representation of the frequency profile for the signals
+duration. The definition of the STFT is presented in (3) [45]:
+STFT{x(t)}(T,ω )≡ X (T,ω )
+X (T,ω )=
+∫∞
+−∞
+x(t)w(t− T )e−iωt dt (3)
+where x(t) is the input signal, or the audio signal in this
+case, w(t− T ) is the window function centered at a given
+time, T , and e−iωt is the complex exponential representing
+the Fourier transform.
+The window function w(t− T ) is used to isolate a segment
+of the signal x(t) for analysis. The window function used is
+the Hamming window and is defined in (4) [45], representing
+the window of observation centered at time T , and N being
+the number of discretized time segments of the signal.
+w(t− T )= 0.54− 0.46 cos
+( 2π(t− T )
+N− 1
+)
+(4)
+This function limits the contribution of the signal outside
+close proximity of time T . The temporal information is
+maintained through window overlap, as the window is
+incrementally shifted for each specified time.
+The window function has piecewise features resulting in
+a non-zero value over a limited time duration, and zero
+elsewhere. The value for the function converges to zero at
+the duration boundaries. The analyses completed with the
+STFT utilized a window size of 50 ms with an overlap
+length of 25 ms. The window and overlap lengths produce an
+isolated signal segment. The isolated signal segments were
+VOLUME 13, 2025 26793
+--- PAGE 13 ---
+J. Dibble, M. C. F. Bazzocchi: BiMP Dataset for Visual and Audio Human Fall Detection
+chronologically combined providing a temporal depiction of
+adjoined signal segments.
+Time-frequency representations of STFT applied to audio
+signals are displayed in Fig. 6(c) and 6(d) for ADL audio
+and FE audio transforms, respectively. The figures exhibit a
+time-frequency representation of audio signals using STFT,
+where the y-axes represent frequency magnitude and the
+x-axes represent time. The color bar on the right of each
+subfigure represents the magnitude of the STFT in decibels.
+The frequency range in the STFT spectrograms is a
+result of the positive frequency components of the com-
+plex conjugates of the negative frequencies. The mag-
+nitude spectrum is symmetric about a zero frequency
+reference, resulting in a spectrogram frequency range with
+a minimum constraint of zero. Signal processing of the
+audio signal in this fashion is an alternative to that of
+a wavelet, providing an alternate means of audio signal
+visualization.
+D. CLASSIFICATION METRICS
+The evaluation metrics for classification of both the audio and
+visual analysis were accuracy, recall, and precision. These
+metrics were used to evaluate the classification of the 70-30
+test data, and the room (e) test data.
+The measures of accuracy, recall, and precision are defined
+in (5), (6), and (7), respectively. These metrics are a
+quantification of the correct and incorrect classifications of
+the model. Each of these metrics are used to establish the
+integrity of the data presented and the viability of the dataset
+for the purpose of fall detection.
+Each of these quantities are calculated using the number
+of correct and incorrect predictions. In accordance with
+the binary classification scheme, correct and incorrect
+predictions are indicated bytrue and false labels, respectively.
+Additionally, falls and nonfalls are represented by positive
+and negative labels, respectively.
+Therefore, classification predicts the correct classifications
+as either a true positive (TP) or a true negative (TN),
+and incorrect classifications as false positives (FP) and
+false negatives (FN). Correct and incorrect classifications
+thus provide the variable for the evaluation metrics defined
+as:
+Accuracy (%)= 100
+( TP+ TN
+TP+ TN+ FP+ FN
+)
+(5)
+Recall (%)= 100
+( TP
+TP+ FN
+)
+(6)
+Precision (%)= 100
+( TP
+TP+ FP
+)
+(7)
+The accuracy quantifies the overall correctness of the
+classifications; whereas, the recall quantifies the ability of
+the classifier to capture all positive instances. Alternatively,
+precision measures the correctness of positive classifications.
+Following are the results of applying the processes outlined
+within the context of this analysis.
+TABLE 8. Visual classification metrics.
+TABLE 9. Visual positive and negative predictions.
+VI. RESULTS
+This section presents a comprehensive evaluation of the
+BiMP dataset, employing the analytical techniques outlined
+in Section V. The primary focus is on the performance of
+the fall detection classification schemes and the ability of the
+dataset to portray relevant fall characteristics. Additionally,
+the dataset limitations are identified and discussed.
+The results of using a GoogLeNet to classify merged
+frames of a video indicate a differentiable trend in fallen
+and nonfallen data formatted as a singular image. Results
+yielded by the LSTM in combination with the GoogLeNet
+likewise showcase relevant sequential characteristics of the
+intended motion as a recognizable aspect of the dataset.
+Complementary to the metrics displayed in Table 8, are
+quantifiable true and false classifications of the visual data
+in Table 9.
+Similar to the visual evaluation of the dataset, the audio
+portion was also evaluated. Classification using CWT and
+STFT signal processing techniques display promising results,
+indicating adequate fall representation. Audio evaluation
+metrics are displayed in Table 10, with the associated true
+and false predictions in Table 11.
+The first two rows of each of the Tables presented in this
+section display the results for the data collected in rooms (a)-
+(d) using a 70-30 training-testing split. These rows display the
+evaluation metrics during model training. The last two rows
+of each table include the results for data collected in room (e),
+which was used as a validation set.
+A. CLASSIFIER EVALUATION
+The scope of this work is focused towards creating a dataset
+for human fall detection; however, the validation of the
+dataset is established through the development of fall classi-
+fication techniques. The developed fall detection techniques
+indicate the presence of clear human fall characteristics
+within the dataset.
+The FN quantities from Tables 9 and 11 indicate the
+GoogLeNet-LSTM classifier provides the fewest misclassi-
+fied falls in training, and fewer misclassifications than the
+others. Additionally, classification using CWT provided the
+26794 VOLUME 13, 2025
+--- PAGE 14 ---
+J. Dibble, M. C. F. Bazzocchi: BiMP Dataset for Visual and Audio Human Fall Detection
+TABLE 10. Audio classification metrics.
+TABLE 11. Audio positives and negative predictions.
+second lowest amount of misclasifications of the validation
+set, although they are all misclassified falls.
+Nonetheless, the accuracies of the classifiers used to detect
+falls indicate high capability of differentiating between ADLs
+and FEs. The STFT classifier performed less desirably with
+the validation set; however, it still demonstrates its viability
+for fall classification. The lower prediction accuracy may
+be resolvable in the future using a different neural network,
+or different STFT parameters.
+The BiMP dataset offers visual and audio fall data for
+human fall detection, substantiated by the distinguishable
+characteristics inherent in the data. The percussive audio data
+associated with a fall impact promotes the development of fall
+detection techniques from proximate listening devices.
+The metrics discussed in Section V -Destablish a baseline
+to gauge the classifiability of the presented data. The
+evaluation of these metrics, presented in Tables 8 and 10
+substantiate the classifiability of the dataset. The resulting
+evaluation of the dataset is indicative that this dataset has the
+potential to be a valuable resource for developing future fall
+detection mechanisms.
+B. LIMITATIONS
+The limited diversity of participant characteristics in the
+dataset is a current limitation. While participant demo-
+graphics include various characteristics, the participants in
+the study should ideally include older adults exclusively.
+However, this is a known challenge due to the inher-
+ent safety issues involved in older adult simulation of
+fall events. Similarly, gender and ethnicity should ideally
+reflect a comparative composition of the senior population;
+whereas, the study demographics more closely reflect the
+geographic region wherein the dataset was developed,
+namely, rural, upstate New Y ork, USA. In this dataset,
+the geographical limitations inherent to the area wherein
+this study was performed, namely, rural upstate New Y ork,
+bias the demographics to those of the local region. The
+application of this dataset should consider both the specific
+target demographic, and for widespread implementations, the
+broader population diversity and characteristics. However,
+demographic inaccuracies are inherent for any instance
+of training data noninclusive of the anticipated user(s)
+exclusively. Future work could consider collecting data from
+constant observation of older adults in their living settings
+to increase the fidelity of the dataset. However, aside from
+increased cost, observation duration, and privacy concerns,
+this also creates challenges related to both capturing multiple
+perspectives and variety in the characteristics of the falls
+observed.
+The impact of dissimilarities present in the BiMP dataset
+participant and intended user demographics are not easily
+quantifiable, but have the capacity to influence classification
+metrics of various system architectures. The impact of
+demographic diversity on the widespread applicability of the
+models used is beyond the scope of this work. The models
+used in this analysis aid in the evaluation of the ability of
+the dataset to provide data detectable by various methods.
+The models are not intended for widespread replication and
+implementation, but rather to serve as a benchmark for the
+contents of the dataset.
+Emphasis has been placed on the background used for
+data collection. While environmental variables are intended
+to replicate those characteristic of a home, it is impossible to
+account for all the application environments.
+The safety equipment used was not typical attire of older
+adults prone to falling. The inclusion of safety equipment
+negatively affects the similarity of collected data and unantic-
+ipated falls. The safety equipment is a necessary precaution;
+however, its implementation produces the potential for
+unwanted elements affecting signal frequency of audio data,
+and visually inaccurate attire. Nonetheless, participant safety
+is paramount to any other aspect of this work.
+Limitations are also inherent in the inability for orches-
+trated falls to perfectly display characteristics of a natural fall.
+Orchestrated and natural falls display different reactionary
+elements. The reflex response in each of these cases
+exemplify dissimilar body weight shifts and response times.
+These differences potentially influence visual data, and
+the impact responsible for the audio signal; nonetheless,
+minimization of these concerns was achieved by instructing
+participants to slightly delay their reflexes while falling.
+VII. CONCLUSION
+This dataset presents multiple perspectives of a singular
+incident, providing unrepeated activity recordings. Further,
+multi-perspective recording captures unique environmental
+fall audio characteristics, providing a basis for sound-based
+fall detection from varying listening locations.
+Data processing using GoogLeNet singularly and with an
+additional LSTM showed promising results as both systems
+displayed aptitude for differentiating between falls and non-
+falls with accuracies ranging from 91%-96%. Much like the
+results from the visual analysis, CWT and STFT processing
+techniques used for audio fall detection exhibited accuracies
+ranging between 89% and 96% ability in distinguishing fallen
+and nonfallen states.
+VOLUME 13, 2025 26795
+--- PAGE 15 ---
+J. Dibble, M. C. F. Bazzocchi: BiMP Dataset for Visual and Audio Human Fall Detection
+A foreseeable utility of this dataset leverages the preva-
+lence of virtual assistants in homes. Virtual assistants
+provide new potential avenues for audio fall detection using
+smart home devices. The existent listening nature of virtual
+assistants and smart home devices within households provide
+a secure means for audio monitoring and therefore fall
+detection that deviates from privacy concerns associated with
+continuous visual monitoring. This concept has the potential
+for fall detection regardless of verbal instruction to the virtual
+assistant; this being important in the event of a fall resulting
+in unconsciousness. However, applications of this dataset are
+not restricted to a stationary device, as there is the potential
+for integration of FDP systems into mobile devices or robots
+equipped with microphones. Despite the promising results
+when evaluating both fall data information input formats, the
+potential for fall detection using both inputs simultaneously
+merits consideration in future work.
+Potential for the combined use of input modalities include
+a fall detected by audio, which is succeeded by a form of
+confirmation using visual data during or after the incident;
+having applications in environments with any combination
+of listening or visual monitoring capabilities, including smart
+homes. Additionally the efficacy of weighted voting is being
+explored when using both input modalities. Further learning
+methods could incorporate aggregation or decision level
+fusion of individual classifiers.
+Considerations for potential challenges regarding signal
+interference from additional sources are beyond the scope
+of this work. The reasoning behind these exclusions stems
+from the focus of this work to provide a basis to be
+built upon, meaning to capture the essence of the incident
+without it being convoluted with interfering signals. Thus,
+providing adequate basis for scenarios noninclusive of
+outside interference while simultaneously allowing the ability
+to add interferences specific to the objectives of further work.
+The novelty of this dataset is highlighted in the presentation
+of variable perspective, multi-modal (e.g., visual and audio)
+fall data. Broad analyses leveraging image processing, signal
+transform, and machine learning techniques provide context
+for the efficacy of the proposed dataset. Promising classi-
+fication results indicate distinguishable fall characteristics
+inherent in the dataset. Furthermore, these constituent fall
+characteristics are exemplified in their identifiability across
+diverse methods of processing and classification.
+REFERENCES
+[1] C. Florence, G. Bergen, A. Atherly, E. R. Burns, J. A. Stevens, and
+C. Drake, ‘‘Medical costs of fatal and nonfatal falls in older adults,’’
+J. Amer . Geriatrics Soc., vol. 66, no. 4, pp. 693–698, Mar. 2018.
+[2] CDC. Keep on Your Feet—CDC.gov. Accessed: Jul. 1, 2024.
+[Online]. Available: https://www.cdc.gov/injury/features/older-adult-
+falls/index.html
+[3] B. Moreland, R. Kakara, and A. Henry, ‘‘Trends in nonfatal falls
+and fall-related injuries among adults aged ≥65 years—United States,
+2012–2018,’’ MMWR. Morbidity Mortality Weekly Rep., vol. 69, no. 27,
+pp. 875–881, Jul. 2020.
+[4] A. de Souza Dias, L. N. D. Alves, A. S. Freitas, J. S. dos Reis, and
+E. N. Dias, ‘‘Accidents caused by falls in the elderly people: A public health
+problem,’’ J. Health Technol.-JHT, vol. 1, no. 1, p. 117, Jul. 2022.
+[5] A. R. Luzardo, N. F. D. Paula Jr., M. Medeiros, P . C. B. Wolkers, and
+S. M. A. D. Santos, ‘‘Repercussions of hospitalization due to fall of the
+elderly: Health care and prevention,’’ Revista Brasileira de Enfermagem ,
+vol. 71, no. 2, pp. 763–769, 2018.
+[6] D. Houry, C. Florence, G. Baldwin, J. Stevens, and R. McClure,
+‘‘The CDC injury center’s response to the growing public health problem of
+falls among older adults,’’Amer . J. Lifestyle Med., vol. 10, no. 1, pp. 74–77,
+Jan. 2016.
+[7] L. Ren and Y . Peng, ‘‘Research of fall detection and fall pre-
+vention technologies: A systematic review,’’ IEEE Access, vol. 7,
+pp. 77702–77722, 2019.
+[8] L. Martínez-Villaseñor, H. Pönce, and R. A. Espinosa-Loera, ‘‘Multimodal
+database for human activity recognition and fall detection,’’ Proceedings,
+vol. 2, no. 19, p. 1237, Oct. 2018.
+[9] M. V acher, S. Bouakaz, M.-É. B. Chaumon, F. Aman, R. A. Khan,
+S. Bekkadja, F. Portet, E. Guillou, S. Rossato, and B. Lecouteux,
+‘‘The CIRDO corpus: Comprehensive audio/video database of domestic
+falls of elderly people,’’ in Proc. 10th Int. Conf. Lang. Resources Eval.
+(LREC), May 2016, pp. 1389–1396.
+[10] X. Wang, ‘‘EGOFALLS: A visual-audio dataset and benchmark for fall
+detection using egocentric cameras,’’ 2023, arXiv:2309.04579.
+[11] J. Gutiérrez, V . Rodríguez, and S. Martin, ‘‘Comprehensive review of
+vision-based fall detection systems,’’ Sensors, vol. 21, no. 3, p. 947,
+Feb. 2021.
+[12] J.-L. Chua, Y . C. Chang, and W. K. Lim, ‘‘A simple vision-based fall
+detection technique for indoor video surveillance,’’ Signal, Image Video
+Process., vol. 9, no. 3, pp. 623–633, Mar. 2015.
+[13] Y . Chen, W. Li, L. Wang, J. Hu, and M. Y e, ‘‘Vision-based fall event
+detection in complex background using attention guided bi-directional
+LSTM,’’ IEEE Access, vol. 8, pp. 161337–161348, 2020.
+[14] B. Kwolek and M. Kepski, ‘‘Human fall detection on embedded
+platform using depth maps and wireless accelerometer,’’Comput. Methods
+Programs Biomed., vol. 117, no. 3, pp. 489–501, Dec. 2014.
+[15] J. Zhang, C. Wu, and Y . Wang, ‘‘Human fall detection based on body
+posture spatio-temporal evolution,’’ Sensors, vol. 20, no. 3, p. 946,
+Feb. 2020.
+[16] F. Harrou, N. Zerrouki, Y . Sun, and A. Houacine, ‘‘Vision-based fall
+detection system for improving safety of elderly people,’’ IEEE Instrum.
+Meas. Mag., vol. 20, no. 6, pp. 49–55, Dec. 2017.
+[17] N. T. Newaz and E. Hanada, ‘‘The methods of fall detection: A literature
+review,’’Sensors, vol. 23, no. 11, p. 5212, May 2023.
+[18] A. Shahzad and K. Kim, ‘‘FallDroid: An automated smart-phone-based
+fall detection system using multiple kernel learning,’’ IEEE Trans. Ind.
+Informat., vol. 15, no. 1, pp. 35–44, Jan. 2019.
+[19] T. de Quadros, A. E. Lazzaretti, and F. K. Schneider, ‘‘A movement
+decomposition and machine learning-based fall detection system using
+wrist wearable device,’’ IEEE Sensors J., vol. 18, no. 12, pp. 5082–5089,
+Jun. 2018.
+[20] M. Alwan, P . J. Rajendran, S. Kell, D. Mack, S. Dalal, M. Wolfe, and
+R. Felder, ‘‘A smart and passive floor-vibration based fall detector for
+elderly,’’ in Proc. 2nd Int. Conf. Inf. Commun. Technol., vol. 1, 2006,
+pp. 1003–1007.
+[21] A. Sucerquia, J. López, and J. V argas-Bonilla, ‘‘SisFall: A fall and
+movement dataset,’’ Sensors, vol. 17, no. 1, p. 198, Jan. 2017.
+[22] M. Saleh, M. Abbas, and R. B. Le Jeannès, ‘‘FallAllD: An open dataset
+of human falls and activities of daily living for classical and deep learning
+applications,’’ IEEE Sensors J., vol. 21, no. 2, pp. 1849–1858, Jan. 2021.
+[23] G. V avoulas, M. Pediaditis, E. G. Spanakis, and M. Tsiknakis,
+‘‘The MobiFall dataset: An initial evaluation of fall detection algorithms
+using smartphones,’’ in Proc. 13th IEEE Int. Conf. Bioinf. BioEng.,
+Nov. 2013, pp. 1–4.
+[24] S. Gasparrini, E. Cippitelli, E. Gambi, S. Spinsante, J. Wåhslén, I. Orhan,
+and T. Lindh, ‘‘Proposal and experimental evaluation of fall detection
+solution based on wearable and depth data fusion,’’ in Proc. Emerg.
+Technol. Better Living ICT Innov.Cham, Switzerland: Springer, Oct. 2015,
+pp. 99–108.
+[25] E. Casilari, J. A. Santoyo-Ramón, and J. M. Cano-García, ‘‘UMAFall:
+A multisensor dataset for the research on automatic fall detection,’’ Proc.
+Comput. Sci., vol. 110, pp. 32–39, Jun. 2017.
+[26] S. Denkovski, S. S. Khan, B. Malamis, S. Y . Moon, B. Y e, and
+A. Mihailidis, ‘‘Multi visual modality fall detection dataset,’’IEEE Access,
+vol. 10, pp. 106422–106435, 2022.
+26796 VOLUME 13, 2025
+--- PAGE 16 ---
+J. Dibble, M. C. F. Bazzocchi: BiMP Dataset for Visual and Audio Human Fall Detection
+[27] J. C. E. Guerrero, E. M. España, M. M. Añasco, and J. E. P . Lopera,
+‘‘Dataset for human fall recognition in an uncontrolled environment,’’Data
+Brief, vol. 45, Dec. 2022, Art. no. 108610.
+[28] R. Kohno, T. Nantsupawat, and D. Benditt, ‘‘Trends in subcutaneous
+cardiac monitoring technology,’’J. Innov. Cardiac Rhythm Manage., vol. 9,
+no. 7, pp. 3247–3255, Jul. 2018.
+[29] S. Usmani, A. Saboor, M. Haris, M. A. Khan, and H. Park, ‘‘Latest
+research trends in fall detection and prevention using machine learning:
+A systematic review,’’Sensors, vol. 21, no. 15, p. 5134, Jul. 2021.
+[30] S. Picard, C. Chapdelaine, C. Cappi, L. Gardes, E. Jenn, B. Lefevre,
+and T. Soumarmon, ‘‘Ensuring dataset quality for machine learning
+certification,’’ in Proc. IEEE Int. Symp. Softw. Rel. Eng. Workshops
+(ISSREW), Oct. 2020, pp. 275–282.
+[31] S. N. Robinovitch, F. Feldman, Y . Y ang, R. Schonnop, P . M. Leung,
+T. Sarraf, J. Sims-Gould, and M. Loughin, ‘‘Video capture of the
+circumstances of falls in elderly people residing in long-term care: An
+observational study,’’Lancet, vol. 381, no. 9860, pp. 47–54, 2013.
+[32] D. Wang, J. Zhang, Y . Sun, W. Zhu, S. Tian, and Y . Liu, ‘‘Evaluating
+the fall risk among elderly population by choice step reaction test,’’ Clin.
+Interventions Aging, vol. 11, pp. 1075–1082, Aug. 2016.
+[33] S. D. Berry and R. R. Miller, ‘‘Falls: Epidemiology, pathophysiology,
+and relationship to fracture,’’ Current Osteoporosis Rep., vol. 6, no. 4,
+pp. 149–154, Dec. 2008.
+[34] Z. Merrill, A. J. Chambers, and R. Cham, ‘‘Arm reactions in response to an
+unexpected slip—Impact of aging,’’ J. Biomechanics, vol. 58, pp. 21–26,
+Jun. 2017.
+[35] X. Jian, C. Lv, and R. Wang, ‘‘Nonuniformity correction of single infrared
+images based on deep filter neural network,’’ Symmetry, vol. 10, no. 11,
+p. 612, Nov. 2018.
+[36] S. Mahjoubi, F. Y e, Y . Bao, W. Meng, and X. Zhang, ‘‘Identification and
+classification of exfoliated graphene flakes from microscopy images using
+a hierarchical deep convolutional neural network,’’Eng. Appl. Artif. Intell.,
+vol. 119, Mar. 2023, Art. no. 105743.
+[37] G. Mulley, ‘‘Falls in older people,’’ J.-Roy. Soc. Med., vol. 94, no. 4, p. 202,
+2001.
+[38] J. Zhou, E. Agichtein, and S. Kallumadi, ‘‘Diversifying multi-aspect search
+results using Simpson’s diversity index,’’ inProc. 29th ACM Int. Conf. Inf.
+Knowl. Manage., 2020, pp. 2345–2348.
+[39] Rlk8-800b4: 8-Channel Poe 4k 8MP Security Camera System: Reolink
+Official, Reolink. Accessed: Dec. 19, 2024. [Online]. Available:
+https://reolink.com/us/product/rlk8-800b4/#specifications
+[40] Y . Tong, H. Liu, and Z. Zhang, ‘‘Advancements in humanoid robots:
+A comprehensive review and future prospects,’’ IEEE/CAA J. Autom.
+Sinica, vol. 11, no. 2, pp. 301–328, Feb. 2024.
+[41] T. Bezdan and N. Džakula, ‘‘Convolutional neural network layers and
+architectures,’’ in Proc. Int. Sci. Conf. Inf. Technol. Data Rel. Res.
+Belgrade, Serbia: Singidunum University, 2019, pp. 445–451.
+[42] N. Dubey and R. Mehra, ‘‘Unsupervised learning based modified C-ICA
+for audio source separation in blind scenario,’’ Int. J. Inf. Technol. Comput.
+Sci., vol. 2016, pp. 2074–9015, May 2016.
+[43] M. F. Siddique, Z. Ahmad, N. Ullah, and J. Kim, ‘‘A hybrid deep learning
+approach: Integrating short-time Fourier transform and continuous wavelet
+transform for improved pipeline leak detection,’’ Sensors, vol. 23, no. 19,
+p. 8079, Sep. 2023.
+[44] I. Kiskin, D. Zilli, Y . Li, M. Sinka, K. Willis, and S. Roberts,
+‘‘Bioacoustic detection with wavelet-conditioned convolutional neural
+networks,’’Neural Comput. Appl., vol. 32, no. 4, pp. 915–927, Feb. 2020.
+[45] J. Allen, ‘‘Short term spectral analysis, synthesis, and modification by
+discrete Fourier transform,’’IEEE Trans. Acoust., Speech, Signal Process.,
+vol. ASSP-25, no. 3, pp. 235–238, Jun. 1977.
+JOE DIBBLE (Member, IEEE) received the B.S.
+and M.S. degrees in mechanical engineering from
+Clarkson University, USA, in 2021 and 2024,
+respectively.
+From 2022 to 2024, he was a Research Assistant
+with the Astronautics and Robotics Laboratory
+(ASTRO Lab), Clarkson University. His research
+interests include social robotics, controls, and
+applications in aging in place.
+MICHAEL C. F. BAZZOCCHI (Member, IEEE)
+is an Assistant Professor with Y ork University,
+and the Director of the Astronautics and Robotics
+Laboratory (ASTRO Lab). He is also a Research
+Associate Professor with Clarkson University.
+Previously, he held positions with the University
+of Toronto, Canada, in mechanical and indus-
+trial engineering; the Institute for Robotics and
+Mechatronics; the Toronto Institute of Advanced
+Manufacturing; and the Institute for Aerospace
+Studies. He was a Researcher in onboard space systems with Luleå
+University of Technology, Sweden. He was a Spacecraft Concurrent
+Design Engineer with the RHEA Group, Canadian Space Agency [Satellite
+Concurrent Design (satCODE)] project. In addition to his work in aerospace
+engineering, he enjoys volunteer work—he is the Founder and the President
+of the Trek for Teens Foundation (a charity that supports homeless youth),
+and is actively involved in various educational, social justice, and leadership-
+based charities.
+VOLUME 13, 2025 26797

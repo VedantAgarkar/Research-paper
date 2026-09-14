@@ -1,0 +1,301 @@
+--- PAGE 1 ---
+1 ---
+Human Fall Detection in Surveillance Videos
+Simran Jain
+Department of Computer Science and Engineering
+National Institute of Technology, Tiruchirappalli
+Tiruchirappalli, India
+simran2jain1995@gmail.com
+K. Sitara
+Department of Computer Science and Engineering
+National Institute of Technology, Tiruchirappalli
+Tiruchirappalli, India
+sitara@nitt.edu
+Abstract—The development of healthy aging and the assistance
+of older people in their everyday activities is one of the most
+pressing concerns in modern cultures. Human fall is such an
+irregular action that occurs when a person gets startled and loses
+their equilibrium, resulting in sliding. These accidents among
+old people can result in long-term impairments and even death.
+Automated detection of falls has gotten a lot of interest in
+computer vision and pattern recognition areas because of its
+social and economic implications. Although wearable sensor-
+based techniques have achieved excellent detection rates, some
+potential users are hesitant to wear them, and so their usage
+has not yet become standard. As a result, new ways have arisen,
+such as vision-based solutions. Fall detection that is accurate
+for the help of older persons is critical in reducing the number
+of fatalities and injuries caused by falls. The inﬂuence of deep
+learning on vision-based systems, such as action recognition, has
+transformed the landscape. The emergence of Smart Environ-
+ments and Internet of Things concepts, together with the growing
+number of cameras in our everyday lives, creates an ideal setting
+for vision-based solutions. As a result, this paper aims to provide
+a vision-based method that uses Convolutional Neural Networks
+to determine if a series of frames involves a fall event or not.
+The proposed approach is using Histogram of Oriented Gradient
+(HOG) features extracted from series of frame to determine the
+fall event.
+Index Terms—Deep Learning, Computer Vision, Histogram of
+Oriented Gradient,Pattern Recognition.
+I. I NTRODUCTION
+The population is aging at a quicker rate than ever before.
+According to the United Nations Population Fund (UNFPA)
+(UNFPA, 2012), by 2050, the worldwide population of adults
+aged 60 and up would reach 2 billion. Currently, health related
+problems have targeted a large percentage of older population.
+Many people are facing problems in living because of these
+challenges, which are compounded by the normal decrease
+in physical and cognitive abilities of the aged. Due to the
+physical weakness associated with aging, fall occurs frequently
+among old people, and it has bad impact on their health by
+making them prone to injury resulting in health issues. In HMS
+(Health Monitoring Systems), rapid and accurate fall detection
+is critical for providing appropriate services and medical
+assistance [1]. Thus, human fall is an alarming event which
+must be monitored. Surveillance video cameras give crucial
+information for watching people’s behaviour throughout the
+fall event. Various approaches employin
+--- PAGE 2 ---
+2 ---
+mobile phone. User may not have mobile phone with him/her
+all the time, so some injurious fall may not be detected.
+Yuxi Wang, Kaishun Wu and Zhong Zhang, Christopher
+[10] [11] devised fall detection techniques without using any
+handheld or wearable sensors by installing the tracking system
+in the surrounding of people. Such techniques have eliminated
+the need for wearable or handheld sensors for which people
+may be reluctant to wear or carry but such technology cannot
+be used on the go and is limited to some speciﬁc arena.
+B. Vision Based
+Sagar Chhetri, Abeer Alsadoon and N ´u˜nez-Marcos, Azkune
+[2] [3] had developed a technique for fall detection using the
+optical ﬂow in image frames of video sequences. The optical
+ﬂow features were extracted and were reﬁned using a deep
+convolutional neural network. The ﬁnally extracted features
+were passed to classiﬁer layers composed of a fully connected
+followed by a softmax layer. This approach concluded the fall
+detection with accuracy of 93%. The main challenged posed by
+this approach is very high processing power and time required
+for generating optical ﬂow features on images.
+Kun Wang, Guitao Cao [4] had devised a vision-based
+fall detection technique by combining computer vision-based
+features, namely, Histograms of Oriented Gradients (HOG),
+Local Binary Pattern (LBP) and a feature extracted by the
+Deep Learning Framework Caffe to form a combination a
+feature set. Each image frame was pre-processed to extract
+these features and combination feature vector is generated on
+each frame. Classiﬁcation is done on each frame using SVM
+classiﬁer, thus it worked as a single frame classiﬁcation model.
+This work has reported the sensitivity of 92% and speciﬁcity of
+89%. This approach is facing challenges because of its single
+frame classiﬁcation nature instead of working on a sequence
+of frames, which led to compromised accuracy of the model.
+F. Harrou, N. Zerrouki [5] used tracking techniques in a
+near area to detect falls. Authors proposed a methodology
+for computing a person’s silhouette and extracting information
+such as the spatial orientation of the silhouette’s centre orbits
+a geometric orientation using labelling of connected compo-
+nents.
+The use of 3D vision to take advantage of 3D structures
+is another area of visionbased fall detection systems. This
+technique necessitates the use of many cameras (passive
+systems) or active depth cameras, such as the Microsoft Kinect
+or time-ofﬂight cameras, to derive depth maps. Because of
+its inexpensive price and outstanding performance, the Kinect
+camera is extremely popular. Auvinet et al. [6] employed a
+Kinect camera to create a 3D silhouette, which was then used
+to examine the volume distribution along the vertical axis.
+Gasparrini et al. [7] utilised a similar camera to extract 3D
+data before using a tracking system to identify falls. Kinect
+software offers body joints, which Planinc and Kampel [8]
+utilised to determine the main axes’ orientation based on
+--- PAGE 3 ---
+3 ---
+Pattern (LBP) [4]. Histogram of Oriented Gradient (HOG)
+features have been chosen because of their ability to detect
+change in orientation and direction in the consecutive image
+frames. Also, HOG feature extraction is simpler as compared
+to optical ﬂow feature extraction [2][3] while ensuring good
+accuracy. HOG features focus on change in orientation and
+gradient in the series of frames to detect motion. The change in
+the consecutive RGB frames during a sample fall sequence and
+their corresponding HOG frames are shown in “Fig. 1”. In the
+proposed method ﬁrstly computer vision based algorithms are
+applied on the sequence of frames. These algorithms consist of
+resizing the image frames to uniform size, RGB to grayscale
+conversion of image and histogram of oriented gradients
+feature extraction. After performing these pre-processing steps
+on the series of frames deep learning based algorithms are
+used for feature and extraction and ﬁnal classiﬁcation of image
+sequences into fall/non-fall categories. This paper purposes a
+computer vision based solution for fall detection. The model
+design represented in “Fig. 2” is described in detail in the
+following text.
+a) Reading Model Input: All the videos in datasets were
+downloaded in a repository. Each video is converted into
+frames using functions provided in OpenCV . Each frame is
+then resized to 224x224 and then gray-scaled. The series of
+frames in each video is then read stack by stack with the
+stack size of 20 and a sliding window of size 1. Each stack
+will act as a single instance of model input, that is, input of
+size 224x224x20.
+b) Pre-processing of Input Frame stack: Before passing
+the input to the neural network model, the histogram of ori-
+ented gradient is generated on each frame to perform another
+level of pre-processing. It will highlight the shape of the object
+in the image, remove unwanted information from the frame. In
+the base paper model [2] the optical ﬂow features are extracted
+at this stage instead of the histogram of oriented gradients.
+Optical Flow requires high processing as compared to the
+histogram of oriented gradients since optical ﬂow calculation
+involves all the 3 channels of the frame, RGB(Red, Green
+and Blue) for the computation whereas histogram of oriented
+gradients can be calculated using a single grayscale channel
+only. Now the input is ready to be passed through the neural
+network layers for feature extraction and classiﬁcation.
+c) Feature Extractor: Now the video sequences will be
+passed through the feature extractor to reﬁne the features. For
+the purpose of feature extractor, generic VGG-16 [12] deep
+convolutional neural network architecture is used because has
+shown promising results with other human activity recognition
+datasets. Multiple convolution layers with different number of
+ﬁlters (64, 128 and 512) have been used. Each ﬁlter has a size
+of 3x3. The layers are arranged in the increasing order of ﬁlter
+size and max pool layers in between are helping in redu
+--- PAGE 4 ---
+4 ---
+(a)
+(b)
+Fig. 1: Consecutive (a) RGB and (b) HOG frames (left to right) displaying a person tending to fall
+Fig. 2: The model takes video as input, extract raw RGB frames from video and then extract HOG features for each frame
+in sequence. These pre-processed frames are passed to deep neural network feature extractor and stacked in the size of 20 for
+performing ﬁnal classiﬁcation. Each stack of 20 frames along with their extracted features will result in a fall or non-fall class.
+4
+
+
+--- PAGE 5 ---
+5 ---
+C. Dataset
+In this work two publicly used datasets are used, namely,
+UR Fall Detection Dataset and Multiple Cameras Fall Dataset.
+The description of these two datasets is as follows:
+• UR Fall Detection Dataset [14]: This dataset has total 70
+videos comprising of 30 video sequences of fall and 40
+video sequences of activities of daily life (non-fall). The
+frame size of each frame in video is 224x224. All the
+fall videos are captured in the same room but changing
+background in terms of placement of objects in video
+frames. All the non-fall videos are captured in 5 different
+rooms thus different backgrounds. Different persons are
+involved in capturing fall and non-fall samples. Along
+with RGB video sequences, depth information of the
+video sequences is also available. All the videos are
+available in MP4 downloadable format.
+• Multiple Cameras Dataset[15]: This dataset contains total
+22 fall videos having 22 fall scenarios and 2 non-fall
+videos having 20 scenarios captured using 8 IP cameras.
+The frame size of each frame in video is 480x480. The
+falls are captured from different angles in the room. All
+the falls in this dataset are captured in same but recorded
+from different angles. Various scenarios are captured such
+as falling from front, back and sideways. Falls in this
+dataset are useful in training the model for different fall
+scenarios in terms of fall postures and orientation. All the
+videos are available in A VI format and zipped in a single
+downloadable zip ﬁle.
+Total fall scenarios: 22x8 = 178
+Total non-fall scenarios: 20x8 = 160
+a) Experimental Setup: The project work was simulated
+using google colab python 3.7 notebook along with GPU.
+GPU is used for training and testing of proposed models
+because of high processing power required for processing
+images and feature extraction, classiﬁcation using deep neural
+network. The GPU has accelerated the processing thus helped
+in generating the results faster. The system conﬁguration of an
+online google colab platform on which experiments are done
+has been listed in “Table II”.
+TABLE II: System Conﬁguration
+Type Conﬁguration
+Processor Intel Xenon
+Speed 2.3 GHz
+RAM Size 13 GB
+Number of Processors 2
+GPU size K80
+GPU Memory 12 GB
+Conﬁguration 64 bit
+IV . RESULTS
+a) Input Pre-processing Results: In the proposed model
+after frame extraction, the pre-processing involves resizing of
+the frame to uniform size of 224x224. The image is then
+converted to grayscale since HOG features can be extracted
+from just one gray-scaled channel. HOG extraction algorithm
+is applied to the gray-scaled frame. The various stages of frame
+are shown in “Fig. 3”.
+(a)
+ (b)
+ (c)
+Fig. 3: Raw RGB frame extracted from video is shown in
+(a). It has 3 channels but for simplicity these 3 channels can
+be merged to 1 channel before processing the frame further.
+Therefore, RGB frame is converted to Grayscale frame which
+is shown in (b). The Grayscale frame has to be processed
+to obtained HOG frame. The HOG frame obtained from
+Grays
+--- PAGE 6 ---
+6 ---
+accuracy of 92.8%. Whereas for Multiple Cameras dataset
+HOG model has outperformed Optical Flow model. With this
+dataset HOG model has shown the accuracy of 97.4% but
+optical ﬂow model has shown accuracy of 96.1%. HOG model
+has outperformed in the cases of varying brightness across
+the different sections of image frame. Because of applying
+normalization across localized gradients during HOG feature
+extraction, it has neutralized the impact of varying brightness.
+V. C ONCLUSION AND FUTURE WORK
+A new system for vision-based fall detection has been
+designed and implemented. The proposed system is based on
+Histogram of Oriented Gradients (HOG) features in a series
+of frames in videos. This system has been compared against
+the existing vision-based solution for fall detection, which is
+based on capturing optical ﬂow in video frames. HOG based
+solution can be encouraged over optical ﬂow based solution
+because HOG feature computations are relatively simple, and
+require less processing power while ensuring good accuracy
+for fall detection.
+The proposed model can be improved further by including
+depth information, since it will help to eliminate the false
+cases. Also, this system of fall detection can be extended
+further to other applications such as injury detection after the
+fall by doing processing of pre and post fall scenario frames.
+REFERENCES
+[1] Haider Mshali, Tayeb Lemlouma, Maria Moloney, Damien Magoni,
+(2018)“A survey on health monitoring systems for health smart homes.”
+International Journal of Industrial Ergonomics, V olume 66, 2018, Pages
+26-56
+[2] N ´u˜nez-Marcos, A., Azkune, G., and Arganda-Carreras, I.
+(2017).“Vision-Based Fall Detection with Convolutional
+NeuralNetworks”. Wireless Communications and Mobile Computing,
+2017.
+[3] Sagar Chhetri, Abeer Alsadoon, Thair Al-Dala’in, P. W. C. Prasad,
+Tarik A. Rashid, Angelika Maag (2020).“Deep learning for vision-based
+fall detection system: Enhanced optical dynamic ﬂow” Computational
+Intelligence.
+[4] Kun Wang, Guitao Cao, Dan Meng, Weiting Chen and Wenming Cao,
+(2016) “Automatic fall detection of human in video using combination
+of features”, 2016 IEEE International Conference on Bioinformatics and
+Biomedicine (BIBM), 2016, pp. 1228- 1233.
+[5] F. Harrou, N. Zerrouki, Y . Sun, and A. Houacine,(2016) “Statistical
+control chart and neural network classiﬁcation for improving human
+fall detection,” in Proceedings of the 8th International Conference on
+Modelling, Identiﬁcation and Control, ICMIC 2016, pp. 1060–1064,
+Algeria.
+[6] E. Auvinet, F. Multon, A. Saint-Arnaud, J. Rousseau, and J. Meunier,
+“Fall detection with multiple cameras: An occlusion resistant method
+based on 3-D silhouette vertical distribution,” IEEE Transactions on
+Information Technology in Biomedicine, vol. 15, no. 2, pp. 290–300,
+2011.
+[7] S. Gasparrini, E. Cippitelli, S. Spinsante, and E. Gambi,(2013) “A depth-
+based fall detection system using a Kinect sensor,” Sensors, vol. 14, no.
+2, pp. 2756–2775, 2014.
+[8] R. Planinc an

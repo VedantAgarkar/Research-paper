@@ -1,0 +1,633 @@
+--- PAGE 1 ---
+1 ---
+Applied Intelligence (2024) 54:8982–9007
+https://doi.org/10.1007/s10489-024-05645-1
+Deep learning for computer vision based activity recognition and fall
+detection of the elderly: a systematic review
+F. Xavier Gaya-Morey 1,2,3 · Cristina Manresa-Yee 1,2,3 · José M. Buades-Rubio 1,2,3
+Accepted: 25 June 2024 / Published online: 8 July 2024
+© The Author(s) 2024
+Abstract
+As the proportion of elderly individuals in developed countries continues to rise globally, addressing their healthcare needs,
+particularly in preserving their autonomy, is of paramount concern. A growing body of research focuses on Ambient Assisted
+Living (AAL) systems, aimed at alleviating concerns related to the independent living of the elderly. This systematic review
+examines the literature pertaining to fall detection and Human Activity Recognition (HAR) for the elderly, two critical tasks for
+ensuring their safety when living alone. Speciﬁcally, this review emphasizes the utilization of Deep Learning (DL) approaches
+on computer vision data, reﬂecting current trends in the ﬁeld. A comprehensive search yielded 2,616 works from ﬁve distinct
+sources, spanning the years 2019 to 2023 (inclusive). From this pool, 151 relevant works were selected for detailed analysis.
+The review scrutinizes the employed DL models, datasets, and hardware conﬁgurations, with particular emphasis on aspects
+such as privacy preservation and real-world deployment. The main contribution of this study lies in the synthesis of recent
+advancements in DL-based fall detection and HAR for the elderly, providing insights into the state-of-the-art techniques
+and identifying areas for further improvement. Given the increasing importance of AAL systems in enhancing the quality
+of life for the elderly, this review serves as a valuable resource for researchers, practitioners, and policymakers involved in
+developing and implementing such technologies.
+Keywords Human activity recognition · Fall detection · Ambient assisted living · Deep learning · Computer vision · Elderly
+F. Xavier Gaya-Morey, Cristina Manresa-Y ee and José M. Buades-
+Rubio contributed equally to this work
+B F. Xavier Gaya-Morey
+francesc-xavier.gaya@uib.es
+Cristina Manresa-Y ee
+cristina.manresa@uib.es
+José M. Buades-Rubio
+josemaria.buades@uib.es
+1 Group of Computer Graphics, Computer Vision and AI
+(UGIVIA), Universitat de les Illes Balears (UIB), Carretera
+de V alldemossa, km 7.5, Palma 07122, Illes Balears, Spain
+2 Research Institute of Health Sciences (IUNICS), Universitat
+de les Illes Balears (UIB), Carretera de V alldemossa, km 7.5,
+Palma 07122, Illes Balears, Spain
+3 Department of Mathematics and Computer Science,
+Universitat de les Illes Balears (UIB), Carretera de
+V alldemossa, km 7.5, Palma 07122, Illes Balears, Spain
+1 Introduction
+The global population is experiencing rapid growth, accom-
+panied by a signiﬁcant increase in life expectancy, particu-
+larly in developed countries. Bloom and Luca [ 1] note that
+life expectancy in China and I
+--- PAGE 2 ---
+2 ---
+Deep learning for computer vision based activity recognition... 8983
+by the elderly, falls represent a particularly prevalent and
+perilous occurrence. The World Health Organization high-
+lights alarming statistics on falls, identifying them as the
+second leading cause of unintentional injury deaths world-
+wide. Each year, an estimated 684,000 individuals succumb
+to fall-related injuries globally, with an additional 37.3 mil-
+lion falls severe enough to necessitate medical attention
+[2]. Apart from the physical harm incurred by the elderly,
+the economic ramiﬁcations are substantial, with fall-related
+treatment costs comprising a signiﬁcant portion of healthcare
+expenditures in various countries such as the USA, Australia,
+EU15 and the United Kingdom [ 3].
+Automated fall detection for the elderly is feasible through
+data collected from wearable or environmental devices,
+such as accelerometers, gyroscopes, and cameras. Further-
+more, Human Activity Recognition (HAR) holds promise for
+diverse applications, ranging from automatic life-logging to
+identifying patterns indicative of illness [ 4, 5]. Vision data
+from cameras is increasingly utilized for fall detection and
+HAR tasks due to its numerous advantages over wearable
+devices or other sensors. These advantages include the abil-
+ity to detect multiple events simultaneously, suitability for
+various subjects, environments, and tasks, as well as ease of
+installation and visual veriﬁcation of data [ 6].
+From an algorithmic standpoint, Deep Learning (DL) has
+revolutionized digital image processing, emerging as the
+state-of-the-art approach in numerous domains [ 7]. Over
+recent years, a plethora of DL architectures have been devel-
+oped and evaluated for computer vision tasks, prompting the
+exploration of suitable models for HAR and fall detection
+among older adults.
+In this study, we conduct a Systematic Literature Review
+(SLR) focusing on DL-based HAR and fall detection using
+vision data for elderly care. Our review strictly adheres to
+the guidelines outlined for conducting SLRs in Software
+Engineering by Kitchenham and Charters [ 8], providing a
+structured methodology and rigorous analysis. The document
+is structured as follows: we ﬁrst delve into the background
+of the study, encompassing previous reviews and deﬁning
+key concepts; we then enumerate the review questions; next,
+we elaborate on the review methods, detailing data sources,
+search strategy, study selection, quality assessment, and data
+extraction; subsequently, we analyze the resulting studies
+comprehensively to address the review questions; the dis-
+cussion section synthesizes our ﬁndings and addresses the
+review questions; ﬁnally, we present the conclusions derived
+from the SLR.
+2 Background
+In accordance with the guidelines provided by Kitchenham
+and Charters [ 8], it is imperative to summarize previous
+reviews prior to conducting the SLR, thereby substantiat-
+ing its necessity. Hence, we brieﬂy outline related reviews
+and surveys 
+--- PAGE 3 ---
+3 ---
+8984 G . MF .X a v i e re ta l .
+Table 1 Comparison of previous reviews with ours
+Work Y ear System Focus Task Data AAL
+DL Elderly CV FD HAR RGB Depth IR Privacy HW Deployment
+Ours 2024 ✓✓ ✓✓ ✓ ✓ ✓ ✓ ✓ ✓✓ ✓
+[9] 2023 ✓✓ ✓ ✓ ✓ ✓ ✓
+[10] 2023 ✓✓✓
+[11] 2023 ✓✓ ✓ ✓ ✓
+[12] 2022 ✓✓ ✓ ✓ ✓ ✓
+[13] 2022 ✓✓ ✓ ✓ ✓ ✓
+[14] 2022 ✓✓ ✓✓ ✓ ✓ ✓ ✓
+[15] 2022 ✓✓ ✓ ✓ ✓ ✓ ✓
+[16] 2021 ✓✓ ✓ ✓ ✓ ✓
+By columns, important aspects taken into account in this review, and whether they are addressed or not by each review. From left to right: if the
+review is systematic; focuses on the exploration of DL solutions; targets elderly people as the users of the system; centers on the use of vision data;
+explores the Fall Detection and the Human Activity Recognition tasks; explores the use of RGB, depth or infrared data; takes privacy as a critical
+concern; describes the hardware used in the found studies; and if it studies the deployment of the FD and HAR systems in real environments
+previous reviews often overlooked the importance of study-
+ing DL-related nuances, such as the signiﬁcance of training
+datasets, architectural considerations, and feature extraction
+methods. In our review, we meticulously categorize and elu-
+cidate these nuances through a comprehensive taxonomy of
+identiﬁed techniques.
+Another notable observation is the limited attention given
+to HAR in several previous reviews, with some omitting
+the task altogether. As a result, our review unveils a greater
+number of studies dedicated to fall detection and HAR in
+the elderly. Additionally, our analysis delves deeper into the
+intricacies of these tasks, providing a more comprehensive
+understanding.
+Moreover, only a few reviews explored applications within
+AAL systems and the associated privacy implications. Hard-
+ware speciﬁcations, beyond the prevalent use of Kinect
+cameras, were rarely examined, and the effective deploy-
+ment of fall detection or HAR systems was not thoroughly
+explored. In contrast, our review emphasizes these aspects,
+which are pivotal in facilitating the transference to society.
+Finally, it is worth noting that, apart from [ 13], none of
+the previous reviews adhered to a systematic review process.
+By rigorously following the systematic review methodol-
+ogy outlined by Kitchenham and Charters [ 8], our study
+ensures a robust and unbiased selection and analysis of rel-
+evant studies. We conducted a comprehensive search across
+various databases, employing well-deﬁned search strings
+aligned with our research questions. Each study underwent
+careful quality assessment, and strict exclusion criteria were
+applied to ensure the inclusion of only the most relevant and
+high-quality literature. This systematic approach minimizes
+potential biases and ensures that our review is based on a
+well-rounded selection of literature.
+3 Review questions
+As outlined in [8], specifying the research questions is a crit-
+ical aspect of any systematic review, as they guide the entire
+methodology: from the search process ident
+--- PAGE 4 ---
+4 ---
+Deep learning for computer vision based activity recognition... 8985
+such as visual veriﬁcation and simultaneous subject recog-
+nition, and DL has become the state-of-the-art approach in
+computer vision, conducting an in-depth analysis of the most
+prevalent methods with these characteristics is crucial for
+informing future research in this domain. Furthermore, three
+research subquestions are included regarding common data
+types (e.g., RGB, depth, thermal, etc.), DL architectures (e.g.,
+CNN, RNN, etc.), and datasets found in the reviewed litera-
+ture. These subquestions aim to delve deeper into the solution
+choices at different design steps, which are closely related to
+various requirements such as privacy preservation, result sta-
+bility, and inference speed.
+The second research question, RQ2, emerges as a sig-
+niﬁcantly unexplored area, as highlighted in Table 1 of the
+Background section. Many previous reviews have focused
+on the recognition phase of previous studies, enumerating
+common methods, processing steps, and datasets. However,
+the effective deployment in real-world scenarios is pivotal
+for the transfer of such methods to society, and this aspect
+remains largely unexplored. Works with implementations in
+real environments, whether through the use of assistive robots
+or camera-based setups, are expected to be found among
+the selected studies. Therefore, it is desirable to explore
+their design choices, setups, and encountered challenges in
+greater depth. Additionally, privacy is a particularly concern-
+ing aspect to consider when dealing with users, especially
+when utilizing visual data from cameras, and the approaches
+to addressing it are of interest for future research. For these
+reasons, RQ2.1 and RQ2.2 delve into common hardware
+choices and privacy preservation strategies.
+4 Review methods
+In this section, we provide a detailed description of the sys-
+tematic review protocol followed, based on the guidelines
+outlined by Kitchenham and Charters [8]. Firstly, we list and
+analyze the primary data sources used, providing visualiza-
+tion of the distribution of studies among these sources. Next,
+we deﬁne the search strategy, which encompasses search
+terms, synonyms, and time restrictions. Following this, we
+establish criteria for inclusion and exclusion of studies, fol-
+lowed by the design of a quality assessment checklist to
+identify and remove low-quality studies. Finally, in the data
+extraction and synthesis stage, we deﬁne how information
+from each primary study is obtained and outline the speciﬁc
+attributes considered of interest.
+4.1 Data sources
+For this systematic review, we selected ﬁve primary data
+sources: SCOPUS, Web of Science (WOS), IEEE Xplore
+Digital Library, ACM Digital Library, and PubMed.
+SCOPUS and WOS were chosen as comprehensive digi-
+tal libraries covering a wide range of disciplines, while IEEE
+Xplore focuses on engineering and technology, ACM Digi-
+tal Library specializes in computer science, and PubMed is
+cente
+--- PAGE 5 ---
+5 ---
+8986 G . MF .X a v i e re ta l .
+• Ambient Assisted Living: “monitoring” OR “assist*
+living” OR “AAL” OR “smart home” OR “activit* of
+daily life” OR “activit* of daily living” OR “ADL”
+• Target collective (elderly people): “elder*” OR “old*
+people” OR “senior”
+• Kind of data used (Computer Vision): “vision” OR
+“rgb” OR “video” OR “image” OR “skeleton” OR
+“depth” OR “camera” OR “gesture”
+Initially, we included studies published from 2013 onwards
+in the search. However, upon further examination, we
+observed that the majority of relevant studies were published
+recently. Consequently, we decided to limit the review to the
+last ﬁve years. Figure 2 displays the accumulated relevant
+studies from 2013 to 2023. As depicted, only 19 relevant
+articles were found during the ﬁrst six years, while 151 were
+discovered in the last ﬁve. This trend underscores the increas-
+ing signiﬁcance of DL-based strategies for HAR and fall
+detection. By focusing on studies published in the last ﬁve
+years, we aim to gain a deeper analysis of recent trends.
+4.3 Study selection
+After collecting studies from various sources, limiting
+by year, and removing duplicates, exclusion criteria were
+applied to eliminate non-relevant studies. The exclusion cri-
+teria were as follows:
+• Deep Learning : Studies not utilizing DL were consid-
+ered irrelevant for this review. Including this criterion
+in the exclusion criteria rather than in the query strings
+enabled the inclusion of more relevant studies, since
+many studies did not directly reference DL but instead
+used the name of a speciﬁc model.
+• Language: Studies not in English or Spanish were
+excluded.
+• Data Type : Studies using data types other than RGB,
+depth, or IR were excluded. This includes both videos
+Fig. 2 Accumulated publications from 2013 to 2023 (both included)
+after study selection and quality assessment
+and images. Skeleton data was also included, but only if
+computed from the other three types of data. Studies using
+sensory data along with visual data were also included,
+allowing for multimodal approaches.
+• Accessibility: Studies not accessible for various reasons,
+such as being part of paid content (e.g., book chap-
+ters), source website down, or retracted content, were
+excluded.
+• Redundancy: In cases where a journal article extended
+a work already presented in a conference, the conference
+proceedings publications were omitted, as the journal
+article represented an extension of the same work.
+• Task: Studies focused on tasks other than HAR or fall
+detection, such as velocity estimation, gait trend, level of
+tiredness, etc., were excluded. However, studies that did
+not directly perform HAR or fall detection but presented
+a new dataset for these tasks were included.
+• Target Collective: Studies not centered on elderly people
+were excluded. Merely mentioning the elderly as one of
+the beneﬁciaries of the work was insufﬁcient; the study
+had to either use data from elderly people or have them
+in mind when designing the 
+--- PAGE 6 ---
+6 ---
+Deep learning for computer vision based activity recognition... 8987
+were retained for analysis among the relevant studies, as they
+serve as a standard search strategy to address publication
+bias, which can lead to systematic bias in systematic reviews
+unless special efforts are made to address this issue [ 8].
+4.4 Quality assessment
+Given the absence of a universally agreed-upon deﬁnition of
+study “quality,” the proposed guidelines in [8] were adhered
+to, primarily focusing on bias and validity as measures of
+quality. Speciﬁcally, the following aspects were taken into
+account:
+• Reproducibility: Assessing whether the work can be
+replicated. This can be achieved by disclosing the dataset
+used, using external datasets, and either publishing the
+code used for the model or providing sufﬁcient details to
+recreate the model.
+• Comparison with Other Works : Evaluating whether
+the performance of the model is compared with the state-
+of-the-art. It’s essential to ensure that comparisons are
+made under fair conditions, meaning that the models
+should be trained and tested on the same data to avoid
+introducing bias.
+• Use of External Datasets : Considering whether the
+model is tested on external datasets to mitigate possible
+bias from the data and facilitate comparison with other
+models for the same task. Additionally, using external
+datasets allows other studies to utilize the results without
+the need to retrain the model on different data.
+These aspects were included in the list of ﬁelds during
+the data extraction phase (last three ﬁelds), as discussed in
+Section 4.5. Moreover, these quality aspects were also used
+as exclusion criteria, as previously mentioned in Section 4.3.
+In addition to these aspects, the type of study, either con-
+ference proceedings or journal articles, was also considered
+as a quality indicator, with journal articles typically being
+longer and more mature.
+4.5 Data extraction and synthesis
+From each study remaining after applying the exclusion cri-
+teria, various data points were extracted to summarize the
+content and establish taxonomies for various aspects of inter-
+est. All data were compiled into a table, with each entry
+containing the following ﬁelds:
+• Title
+• Author/s
+• Type (journal article or conference proceedings)
+• Publication year
+• Task (HAR or fall detection)
+• Data type (RGB, depth, IR or skeleton)
+• Auxiliary sensor data type (accelerometers, gyroscopes,
+etc.)
+• Camera used
+• Dataset (name of external dataset/s or “custom”)
+• DL model/s and task (skeleton joints estimation, feature
+extraction, classiﬁcation, etc.)
+• Other ML models or computer vision techniques used
+• System integration in a robot (yes/no) and which one
+• System integration in a framework (yes/no)
+• How is privacy preserved? (depth or IR only, low resolu-
+tion, etc.)
+• Reproducible (yes/no)
+• Test with external datasets
+• Comparison with other approaches
+The complete list of relevant studies is provided in
+Tables 4 and 3, which display only b
+--- PAGE 7 ---
+7 ---
+8988 G . MF .X a v i e re ta l .
+Table 3 Full list of relevant
+studies examined in this
+systematic review
+Ref. Y ear Task CV Data Ref. Y ear Task CV Data
+[17] 2023 FD D [ 18] 2022 FD RGB
+[19] 2023 FD RGB [ 20] 2022 FD RGB/D/IR
+[21] 2023 FD RGB [ 22] 2022 FD RGB-D
+[23] 2023 FD RGB [ 24] 2022 FD & HAR RGB
+[25] 2023 FD RGB [ 26] 2022 FD & HAR RGB
+[27] 2023 FD RGB [ 28] 2022 FD & HAR RGB
+[29] 2023 FD RGB [ 30] 2022 FD & HAR RGB
+[31] 2023 FD RGB [ 32] 2022 FD & HAR RGB
+[33] 2023 FD RGB [ 34] 2022 FD & HAR RGB
+[35] 2023 FD RGB [ 36] 2022 HAR D
+[37] 2023 FD RGB [ 38] 2022 HAR D
+[39] 2023 FD RGB [ 40] 2022 HAR D
+[41] 2023 FD RGB [ 42] 2022 HAR RGB
+[43] 2023 FD & HAR D [ 44] 2022 HAR RGB
+[45] 2023 FD & HAR IR [ 46] 2022 HAR RGB
+[47] 2023 FD & HAR RGB [ 48] 2022 HAR RGB
+[49] 2023 FD & HAR RGB [ 50] 2022 HAR RGB
+[51] 2023 FD & HAR RGB [ 52] 2022 HAR RGB
+[53] 2023 FD & HAR RGB [ 54] 2022 HAR RGB
+[55] 2023 FD & HAR RGB [ 56] 2022 HAR RGB
+[57] 2023 FD & HAR RGB [ 58] 2022 HAR RGB/D
+[59] 2023 FD & HAR RGB [ 60] 2022 HAR RGB-D
+[61] 2023 FD & HAR RGB [ 62] 2021 FD RGB
+[63] 2023 FD & HAR RGB [ 64] 2021 FD RGB
+[65] 2023 FD & HAR RGB [ 66] 2021 FD RGB
+[67] 2023 FD & HAR RGB [ 68] 2021 FD RGB
+[69] 2023 FD & HAR RGB [ 70] 2021 FD RGB
+[71] 2023 HAR RGB [ 72] 2021 FD RGB
+[73] 2023 HAR RGB [ 74] 2021 FD RGB
+[75] 2023 HAR RGB [ 76] 2021 FD RGB
+[77] 2023 HAR RGB [ 78] 2021 FD RGB
+[79] 2023 HAR RGB [ 80] 2021 FD RGB
+[81] 2023 HAR RGB/D [ 82] 2021 FD RGB
+[83] 2023 HAR RGB-D [ 84] 2021 FD RGB
+[85] 2023 HAR RGB-D [ 86] 2021 FD RGB
+[87] 2022 FD D [ 88] 2021 FD RGB
+[89] 2022 FD RGB [ 90] 2021 FD RGB
+[91] 2022 FD RGB [ 92] 2021 FD RGB
+[93] 2022 FD RGB [ 94] 2021 FD RGB
+[95] 2022 FD RGB [ 96] 2021 FD RGB
+[97] 2022 FD RGB [ 98] 2021 FD RGB/D
+[99] 2022 FD RGB [ 100] 2021 FD & HAR RGB
+[101] 2022 FD RGB [ 102] 2021 FD & HAR RGB
+[103] 2022 FD RGB [ 104] 2021 FD & HAR RGB
+[105] 2022 FD RGB [ 106] 2021 FD & HAR RGB
+[107] 2022 FD RGB [ 108] 2021 FD & HAR RGB
+[109] 2022 FD RGB [ 110] 2021 HAR D
+[111] 2022 FD RGB [ 112] 2021 HAR D
+123
+
+--- PAGE 8 ---
+8 ---
+Deep learning for computer vision based activity recognition... 8989
+Table 3 continued Ref. Y ear Task CV Data Ref. Y ear Task CV Data
+[113] 2021 HAR D [ 114] 2020 HAR RGB
+[115] 2021 HAR D [ 116] 2020 HAR RGB
+[117] 2021 HAR D [ 118] 2020 HAR RGB-D
+[119] 2021 HAR IR [ 120] 2020 HAR RGB-D
+[121] 2021 HAR RGB [ 122] 2019 FD IR
+[123] 2021 HAR RGB [ 124] 2019 FD RGB
+[125] 2021 HAR RGB [ 126] 2019 FD RGB
+[127] 2021 HAR RGB [ 128] 2019 FD RGB
+[129] 2021 HAR RGB [ 130] 2019 FD RGB
+[131] 2021 HAR RGB [ 132] 2019 FD RGB
+[133] 2021 HAR RGB/D [ 134] 2019 FD RGB
+[135] 2021 HAR RGB/D [ 136] 2019 FD RGB
+[137] 2020 FD RGB [ 138] 2019 FD RGB
+[139] 2020 FD RGB [ 140] 2019 FD RGB
+[141] 2020 FD RGB [ 142] 2019 FD RGB
+[143] 2020 FD RGB [ 144] 2019 FD RGB, IR
+[145] 2020 FD RGB [ 146] 2019 FD RGB-D
+[147] 2020 FD RGB [ 148] 2019 HAR D
+[149] 2020 FD RGB [ 150] 2019 HAR D
+[151] 2020 FD RGB [ 152] 2019 HAR D
+[153] 2020 FD RGB [ 154] 2019 HAR D
+[155] 2020 FD RGB-D [ 156] 2019 HAR RGB
+[157] 2020 FD RGB-D [ 158] 2019 HAR RGB
+[159] 2020 FD & HAR IR [ 160] 2019 HAR RGB
+[161] 2020 FD & HAR RGB [ 162] 2019 HAR RGB
+[163] 2020 HAR RGB [ 164] 2019 HAR RGB
+[165] 2020 HAR RGB [ 166] 2019 HAR RGB
+[167] 2020 HAR RGB
+The tasks of the studies may involve FD (fall detection), HAR (Human Action Recognition), or both (FD,
+HAR). The CV data column indicates the type of computer vision data used: RGB, D (depth), or IR (infrared).
+Data types are separated by commas if the study requires all of them or by slashes if only one is necessary
+into systems or applications capable of alerting medical per-
+sonnel [41, 49].
+Only 27 out of 151 studies (approximately 18%) address
+both tasks simultaneously. This disparity arises from the
+emphasis placed on fall detection compared to other activi-
+ties (such as walking or standing up), as well as the limited
+availability of data concerning fall scenarios, often resulting
+in an imbalanced problem. However, some studies manage
+to address both tasks. For instance, in [ 24, 67, 104], both
+tasks are computed using the UP-FALL dataset [168], which
+includes ﬁve types of falls and six common activities. This
+balanced dataset allows for the preservation of the importance
+of accurately detecting falls amidst other activities. A similar
+approach is adopted in [ 106], where a custom dataset with
+egocentric videos is utilized. Nevertheless, there are studies
+that treat falls as just another task to recognize [ 30, 47, 161].
+5.2 RQ1.1: data type
+Among the studies collected, three types of vision data were
+considered: RGB, depth, and infrared (IR). The distribution
+of these data types is illustrated in Fig. 5. RGB data were the
+most prevalent for fall detection and HAR among the elderly
+(132 studies), followed by depth data (30 studies), with IR
+data being the least utilized (6 studies). This discrepancy can
+primarily be attributed to the accessibility of common cam-
+eras compared to specialized ones equipped with depth or
+infrared sensors. Additionally, RGB cameras o
+--- PAGE 9 ---
+9 ---
+8990 G . MF .X a v i e re ta l .
+Fig. 4 Distribution of studies by target task: fall detection, HAR or both
+eras are more commonly used than infrared ones, although
+they are often employed to extract skeleton joints rather than
+directly performing fall detection and HAR. Speciﬁcally,
+67% of studies utilizing depth data computed skeleton joints
+before classiﬁcation [38, 152, 152], while the remaining 33%
+did not [ 20, 148, 155].
+Skeleton poses and sequences emerged as prevalent data
+types across the reviewed studies, with 67 studies incorpo-
+rating skeleton data in some form. Given the human-centric
+nature of HAR and fall detection tasks, skeletal data represent
+logical features, offering efﬁcient information compression
+while maintaining interpretability. Skeletons are typically
+represented as ordered sets of coordinates of body land-
+marks, either in 2D [ 24, 61, 107]o r3 D[ 22, 38, 152]
+positions, depending on whether they were estimated from
+RGB or depth data, respectively. When skeleton estima-
+Fig. 5 Distribution of studies by data type used. Note that more than
+one data type was used in some studies
+tion is performed on videos, the result is a sequence of
+skeleton poses with an added temporal dimension, enabling
+exploration of pose evolution over time intervals. 35 studies
+employed the evolution of one or more body landmarks for
+fall or HAR recognition [ 49, 107], while the remaining 32
+studies performed recognition using static poses exclusively
+[42, 118].
+In addition to vision data, some studies utilized sensor data
+to enhance system performance, employing different mod-
+els or strategies for classiﬁcation and subsequently fusing the
+results. Fourteen studies, listed in Table4, utilized at least one
+of ﬁve types of sensor data, including Inertial Measurement
+Unit (IMU) 2, audio, barometer, luminosity, radar, electro-
+cardiogram (ECG), GPS, and network trafﬁc. IMU data was
+the most commonly used, featured in 10 of the 14 studies,
+particularly for fall detection (in 6 out of 10 studies using
+IMUs), owing to its effectiveness in identifying abrupt move-
+ments and subsequent immobility [64, 149]. Barometer, GPS,
+radar, luminosity, and ECG data were consistently employed
+in conjunction with IMU data. Barometer and luminosity
+data served to acquire auxiliary or redundant information to
+enhance recognition consistency [74, 149]. ECG data in [47]
+was utilized to identify inconsistencies in recognition and
+trigger speciﬁc further computations. In [ 85], four types of
+data (IMU, audio, radar, and GPS), along with visual data,
+were used for federated learning, where independent models
+were trained using different data modalities.
+Regarding data fusion, no instances of early fusion were
+found. Instead, intermediate (7 studies) and late (5 studies)
+fusion methods were prevalent. Late fusion involved using
+a model for each data modality to produce a classiﬁcation
+result, with the ﬁnal classiﬁcation determined using either
+voting [74, 89] or weigh
+--- PAGE 10 ---
+10 ---
+Deep learning for computer vision based activity recognition... 8991
+Table 4 Studies using
+multi-modal approaches and
+type of fusion with visual data
+Ref. Y ear Task Sensors Fusion type
+[85] 2023 HAR IMU, Audio, Radar, GPS Intermediate
+[47] 2023 HAR, FD IMU, ECG None
+[77] 2023 HAR Network trafﬁc Intermediate
+[69] 2022 HAR, FD CSI Late
+[89] 2022 FD IMU Late
+[44] 2022 HAR IMU Late
+[99] 2022 FD IMU Intermediate
+[54] 2022 HAR IMU Intermediate
+[60] 2022 HAR IMU, Radar Intermediate
+[127] 2021 HAR Audio None
+[64] 2021 FD IMU Intermediate
+[74] 2021 FD IMU, Luminosity Late
+[149] 2020 FD IMU, Barometer Late
+[148] 2019 HAR Audio Intermediate
+Table 5 DL models utilized in
+the reviewed studies, tasks they
+are employed for, input data they
+process, and number of studies
+in which they are featured
+Model Studies
+Ref. Name Task Input data N
+[169] OpenPose 2D Skeleton RGB Image 25
+[170] AlphaPose 2D Skeleton RGB Image 10
+[171] MediaPipe 2D Skeleton RGB Image 4
+[172] PoseNet 2D Skeleton RGB Image 3
+[173] MoveNet 2D Skeleton RGB Image 2
+[174] RMPE 2D Skeleton RGB Image 1
+[175] PoseFlow 2D Skeleton RGB Image 1
+Baidu AI 2D Skeleton RGB Image 1
+[176] FastPose 2D Skeleton RGB Image 1
+[177] MobileNet 2D Skeleton, HAR, FD RGB Image 7
+[178] DeepHAR 2D Skeleton, HAR, FD RGB Image 1
+[179] PoseConv3D 3D Skeleton Depth Image 1
+[180] STN 3D Skeleton RGB-D Image 1
+[181] Autoencoder FD Different features 3
+[182] GAN FD Different features 2
+[183] Siamese CNNs FD RGB or Optical Flow Video 1
+[97] FallNet FD RGB Video 1
+[184] DeepFall FD RGB, Depth or IR Video 1
+[185] Sep-TCN FD Skeleton sequence 1
+[186] DCF-Net Features RGB Image 1
+[187] SqueezeNet Features RGB Image 1
+[188] EfﬁcientNet Features RGB Image 1
+[189] C3D Features RGB Video 1
+[190] R-CNN Features (OD, OS), FD RGB Image 7
+[191] YOLO Features (OD), HAR, FD RGB Image 26
+[67] MSSkip Features (OS) RGB Image 1
+[192] PointRend Features (OS) RGB Image 1
+[193] LiteFlowNet Features (Optical Flow) RGB Video 1
+[194] Slowfast Features, HAR RGB Video 3
+123
+
+--- PAGE 11 ---
+11 ---
+8992 G . MF .X a v i e re ta l .
+Table 5 continued Model Studies
+Ref. Name Task Input data N
+[195] InceptionV3 Features, HAR RGB or Depth Image 1
+CNN Features, HAR, FD Image, Video or different features 52
+[196] LSTM Features, HAR, FD Skel. sequence or Video features 29
+[197] VGG Features, HAR, FD RGB or Depth Image 13
+[198] ResNet Features, HAR, FD RGB or Depth Image or Skel. Pose 12
+[199] GCN Features, HAR, FD Skel. sequence or Video features 9
+RNN Features, HAR, FD Skel. sequence or Video features 7
+[200] I3D Features, HAR, FD RGB Video 5
+[201] GRU Features, HAR, FD Skel. sequence or Video features 4
+[202] Transformer HAR IR Image (8x8) 2
+[203] TANet HAR RGB Video 2
+[204] TPN HAR RGB Video 2
+[205] iCAN HAR Bounding Boxes sequence 1
+[206] Xception HAR RGB Image 1
+[207] TSN HAR RGB Video 1
+[208] VST HAR RGB Video 1
+[209] TimeSformer HAR RGB Video 1
+[210] Glimpse Clouds HAR Skeleton sequence 1
+[211] AIA HAR Video features and Bounding Boxes 1
+MLP HAR, FD Different features 5
+[212] AlexNet HAR, FD Feature Image 1
+[28] ARFD-Net HAR, FD Skeleton sequence 1
+Abbreviations are used for Fall Detection (FD), Object Detection (OD), and Object Segmentation (OS).
+Models of to the same family are grouped together, including R-CNN, LSTM, YOLO, VGG, ResNet, RNN,
+CNN, and GCN
+models, such as 2D or 3D skeleton poses and optical ﬂow.
+A taxonomy of the identiﬁed DL models, based on differ-
+ent characteristics, is presented in Figure 6, offering a total
+count for each category. There is considerable diversity in
+the utilization of these models, regarding datasets used for
+evaluation, data types, and methodology. As demonstrated
+in the next section, in Table 6, a wide range of datasets was
+employed across the analyzed studies, with many utilizing
+custom datasets. Additionally, prominent datasets like URFD
+and UP-FALL offer various data types, including RGB
+recordings, depth, skeletons, accelerometers, etc., which may
+lead to data differences even when studies are evaluated on
+the same dataset. The methodology for training and testing
+DL methods also varies across studies, with some employ-
+ing k-fold cross-validation, leave-one-out cross-validation,
+or no cross-validation at all. Consequently, due to the lack of
+standardized conditions for a fair comparison, quantitative
+metric results were not included in Table 5.
+As mentioned in Section 5.2, many studies utilize skele-
+ton joints as features for fall detection and HAR. To estimate
+these joints, various DL models are employed, with Open-
+Pose [ 169] and AlphaPose [ 170] being the most prevalent
+(appearing in 25 and 10 studies, respectively). OpenPose
+utilizes a non-parametric representation (referred to as Part
+Afﬁnity Fields) to detect skeleton joints from all humans in
+the image simultaneously, while AlphaPose performs human
+detection ﬁrst and then predicts the skeleton joints for each
+individual. Subsequently, multiple models are used for fall
+detection and HAR with these skeleton joints:
+• Recurrent Netw

@@ -1,0 +1,301 @@
+--- PAGE 1 ---
+1 ---
+Measurement: Sensors 24 (2022) 100422
+Available online 7 September 2022
+2665-9174/© 2022 The Authors. Published by Elsevier Ltd. This is an open access article under the CC BY license ( http://creativecommons.org/licenses/by/4.0/).
+Deep Learning driven automated person detection and tracking model on 
+surveillance videos 
+S. Sivachandiran a,*, K. Jagan Mohan b, G. Mohammed Nazer c 
+a Department of Computer Science & Engineering, Annamalai University, Tamil Nadu, India 
+b Department of Information Technology, Annamalai University, Tamil Nadu, India 
+c Department of Computer Science, RAAK College of Arts and Science, Puducherry, India   
+ARTICLE INFO  
+Keywords: 
+Object detection 
+Object tracking 
+Surveillance videos 
+Deep learning 
+Hyperparameter optimizer 
+ABSTRACT  
+Recently, person detection and tracking in a video scene of a surveillance system were grabbing higher interest 
+because of its extensive range of applications in gender classification, abnormal event recognition, person 
+identification, human gait characterization, individual counting in a dense crowd, and fall detection for older 
+people, etc. Several methodologies were implied for person detection for surveillance applications. This paper 
+presents a new DL driven automated person detection and tracking (DLD-APDT) model on surveillance videos. 
+The major goal of the proposed DLD-APDT model is to identify people and track them in the videos. To 
+accomplish this, the proposed DLD-APDT model initially performs frame conversion process where the input 
+video is converted into a set of frames. In addition, the proposed DLD-APDT model employs EfficientDet model as 
+object detector, i.e., persons and track them. EfficientDet is a recently developed object detector that makes use 
+of different optimization and backbone tweaks, like bi-directional feature pyramid network (BiFPN) and a 
+compound scaling approach. Moreover, root means square propagation (RMSProp) optimizer is applied to 
+optimally choose the hyperparameters related to the EfficientNet model which helps in accomplishing enhanced 
+performance. The experimental validation of the DLD-APDT model takes place using two training datasets 
+namely PascalVOC and PenFudan datasets. The simulation results reported the enhanced detection and tracking 
+performance of the DLD-APDT technique over recent approaches.   
+1. Introduction 
+Person recognition is regarded as an appropriate subset of the 
+generic image related detection task with several probable application 
+zones like human-robot interaction, security, or surveillance, currently 
+the social security in an epidemic context. Person recognition is a 
+difficult task which was broadly discovered for side-mounted, recti-
+linear-lens cameras [1,2]. Implementation of such systems to overhead 
+fisheye (OF) cameras is not unimportant because of the severe geometric 
+distortions and radial geometry in the captured images. In spite of 
+important development in the past 2 years [3], fish
+--- PAGE 2 ---
+2 ---
+Measurement: Sensors 24 (2022) 100422
+2
+pedestrian detectors, and the final valuation can be performed by 
+averaging the separate per view ones [8,9]. 
+Al Atrash [10] established 2 methods to detect and count people’s 
+faces. These techniques were dependent upon Faster-RCNN and SSD that 
+are approaches utilized to object recognition. It can utilize these tech-
+niques for Face detection and calculating these faces. These approaches 
+were DNNs that are trained on object recognition tasks. During this case, 
+it can be trained Faster-RCNN and SSD techniques on Wider-Face dataset 
+that is collected of faces from a variety of criteria compared to expres-
+sion, pose, occlusion, illumination, and scale. In Ref. [11], the authors 
+projected a Kalman filter (KF) based on CNN to online pedestrian 
+recognition from the video. Primary, the single shot multi-box detector 
+was executed as CNN detector that integrates the pedestrian aspect ra-
+tios. The fusion elements were executed for improving the detector 
+robustness to medium and far scale pedestrians. Next, the bounding box 
+propagates based on the forecast in KF. At last, the place and confidence 
+of bounding boxes were refined by KF. 
+Wang and Lan [12] presented a new infrared pedestrian recognition 
+network from a per-pixel forecast manner. The presented network has 3 
+parts containing neck, head, and backbone: i) The backbone increases 
+the receptive domain of networks and resolves the network degradation 
+issue produced by network deepening; ii) The neck enhances feature 
+illustration by fusing multiscale feature data; iii) With planning several 
+cascaded heads, pixel-by-pixel forecast of multiscale pedestrian was 
+attained. The authors in Ref. [13] developed a novel hybrid 2D and 3D 
+convolutional related RNN (HCRN) to video-related person re-id task. 
+Especially, the 3D convolution element explores the local short-term fast 
+varying motion data, but the recurrent layer leverages the global 
+long-term spatial-temporal data. According to HCRN, it can be planned a 
+scale-fusion structure for making entire utilize of features of the distinct 
+scales to enhance the efficiency of video based person re-id. In Ref. [14], 
+the authors attempt for improving classifier procedure with several 
+approaches. A particularly adapted CNN framework has been utilized 
+together with LSTM and time distribution from experimental. The con-
+volutional neural layer for 2D data from the structure is utilized. 
+This paper presents a new DL driven automated person detection and 
+tracking (DLD-APDT) model on surveillance videos. The proposed DLD- 
+APDT model initially performs frame conversion process where the 
+input video is converted into a set of frames. In addition, the proposed 
+DLD-APDT model employs EfficientDet model as object detector, i.e. 
+persons and track them. EfficientDet is a recently developed object de-
+tector that makes use of different optimization and backbone tweaks, 
+like bi-directional feature pyra
+--- PAGE 3 ---
+3 ---
+Measurement: Sensors 24 (2022) 100422
+3
+bi-directional features. 
+Aiming at enhancing efficiency and accuracy, we want to improve a 
+family of model which could meet a wider range of restraints. Here, a 
+crucial problem is scaling up a benchmark EfficientDet mechanism. 
+Fig. 2 depicts the framework of EfficientDet approach. Earlier studies 
+mainly scale up a benchmark detector by using larger BBNs (for 
+example, AmoebaNet or ResNeXt), stacking more FPN layers, or using 
+larger input images. Usually, this method is ineffectual because it em-
+phasizes only a limited or single scaling dimension. The current study 
+exhibits outstanding performance in image categorization by equally 
+scaling up each dimension of network input, width, and depth resolu-
+tion. Based on the study, we present a new compound scaling technique 
+for detecting objects that make use of a φ compound coefficient to 
+equally scale up each dimension of resolution, backbone, BiFPN, and 
+Fig. 3. Precision-recall review of DLD-APDT algorithm in PascalVOC dataset.  
+Fig. 4. ROC analysis of DLD-APDT technique under PascalVOC dataset.  
+S. Sivachandiran et al.                                                                                                                                                                                                                         
+
+--- PAGE 4 ---
+4 ---
+Measurement: Sensors 24 (2022) 100422
+4
+class/box network. In contrast, object detector has considerably larger 
+scaling dimension when compared to image classification model, hence 
+grid search for each dimension is cost-consuming. Thus, we employ a 
+heuristic-based scaling model, however following the major concept of 
+equally scaling up each dimension. 
+BBN — we reutilize the same depth or width scaling coefficient of 
+EfficientNet-B0 to B6 so we simply reutilize the ImageNet-pretrained 
+checkpoint. 
+BiFPN network — we rise BiFPN depth Dbifpn (#layers) linearly 
+because depth should be rounded to smaller integers. For BiFPN width 
+Wbifpn (#channel), rapidly raise BiFPN width Wbifpn (#channel). Select 
+the optimal value 1.35 as the BiFPN width scaling factor. In the 
+following, BiFPN width and depth were scaled by using the below 
+expression: 
+Wbifpn= 64⋅(1.35φ), Dbifpn = 3+ φ (1) 
+Box/class predictive networks— it can be fixing the width to be often 
+similar to the BiFPN (viz., Wpred = Wbifpn), however, increase the depth 
+(#layers) linearly using the subsequent formula: 
+Dbox= Dclass = 3+ ⌊φ/3⌋ (2) 
+Input image resolution- features level3-7 are utilized in BiFPN, the 
+input resolution should be divisible by 27 = 128, hence we rise resolu-
+tion linearly by the following expression: 
+Rinput= 512+ φ⋅128 (3) 
+Following Eqs. (1)–(3) with diverse φ, it is designed EfficientDet-D0 
+(φ= 0) to D7 (φ= 7), where D7 and D7x have a similar head and BiFPN, 
+but D7 employs high resolution and D7x employs large BBN and addi-
+tional feature levels (from P3 to P8). Especially, the compound scaling is 
+heuristic-based and mightn’t be optimum, but shows that the scaling 
+model could considerably enhance efficacy when compared to other 
+single-dimension scaling models. 
+2.2. Hyperparameter tuning: RMSProp optimizer 
+In this work, the RMSProp optimizer is applied to optimally choose 
+the hyperparameters related to the EfficientNet model which helps in 
+accomplishing enhanced performance. The RMSprop optimizer is 
+similar to the gradient descent (GD) technique with momentum [16]. 
+The RMSprop optimizing restricts the oscillation from the upright way. 
+Thus, it improves our rate of learning and this technique is take sub-
+stantial steps from the horizontal way and converges rapidly. The 
+variance amongst RMSprop and GD is on how the gradient is computed. 
+Table 1 
+Overall analysis of DLD-APDT approach with various 
+measures under PascalVOC dataset.  
+Measures Values 
+Precision 92.95 
+Recall 61.86 
+FPPI 0.047 
+FPPW 0.071 
+Average Precision 69.94  
+Fig. 5. Overall analysis of DLD-APDT approach under PascalVOC dataset.  
+Fig. 6. Precision-recall interpretation of DLD-APDT algorithm under PenFudan dataset.  
+S. Sivachandiran et al.                                                                                                                                                                                                                         
+
+--- PAGE 5 ---
+5 ---
+Measurement: Sensors 24 (2022) 100422
+5
+It can be computing the running average with respect to means square as 
+demonstrated in Eq. (4): 
+v(w, t)= γv(w, t  1)+(1  γ)(∇Qi(w))2 (4)  
+In Eq. (4), γ refers the forgetting factor 
+w := w  n̅̅̅̅̅̅̅̅̅̅̅̅̅
+v(w, t)
+√ ∇Qi(w) (5) 
+Eq. (5) depicts the upgrade of parameters. 
+3. Results and discussion 
+The experimental validation of the DLD-APDT model is trained using 
+two datasets namely Pascal VOC [17] and PenFudan [18] dataset. Fig. 3 
+provides a clear precision-recall curve of the DLD-APDT model attained 
+under PascalVOC dataset. The figure implied that the DLD-APDT model 
+has shown effectual outcome on the applied datasets. 
+The person detection and tracking performance of the DLD-APDT 
+model obtained under the PascalVOC dataset are illustrated in Fig. 4. 
+The figure highlighted that the DLD-APDT method has shown an effec-
+tual outcome with maximum ROC values. 
+Table 1 and Fig. 5 provide an overall person detection performance 
+of the DLD-APDT model on the applied PascalVOC dataset. The results 
+indicated that the DLD-APDT method has obtained improved results 
+with the maximum precn, recal, and average precn of 92.95%, 61.86%, 
+and 69.94%. It also attained minimal False Positive Per Image (FPPI) 
+and False Positive Per Window (FPPW) values of 0.047 and 0.071 
+respectively. 
+Fig. 6 offers a clear precision-recall curve of the DLD-APDT approach 
+reached in PenFudan dataset. The figure shows the DLD-APDT algorithm 
+has revealed effective outcome on the applied datasets. 
+The person detection and tracking performance of the DLD-APDT 
+methodology gained under the PenFudan dataset are showcased in 
+Fig. 7. The figure examined that the DLD-APDT method has out-
+performed effectual outcomes with maximal ROC values. 
+Table 2 and Fig. 8 offer an overall person detection performance of 
+the DLD-APDT algorithm on the applied PenFudan dataset. The out-
+comes referred that the DLD-APDT system has gained higher outcomes 
+with the maximal precn, recal, and average precn of 86.46%, 90.54%, and 
+88.76%. It also achieved minimal FPPI and FPPW values of 0.141 and 
+0.134 correspondingly. 
+During the testing process, the result analysis of the DLD-APDT 
+model is tested using two videos namely video 1 [19] and video 2 
+Fig. 7. ROC analysis of DLD-APDT technique under PenFudan dataset.  
+Table 2 
+Overall analysis of DLD-APDT approach with various 
+measures under PenFudan dataset.  
+Measures Values 
+Precision 86.46 
+Recall 90.54 
+FPPI 0.141 
+FPPW 0.134 
+Average Precision 88.76  
+Fig. 8. Overall analysis of DLD-APDT approach under PenFudan dataset.  
+S. Sivachandiran et al.                                                                                                                                                                                                                         
+
+--- PAGE 6 ---
+6 ---
+Measurement: Sensors 24 (2022) 100422
+6
+[20]. Fig. 9 shows the sample person detection and tracking results 
+offered by the DLD-APDT model on test video 1. The figure implied that 
+the DLD-APDT model has effectually detected and tracked the persons 
+present in the input frames. 
+Fig. 10 depicts the sample person detection and tracking outcomes 
+obtainable by the DLD-APDT approach on test video 2. The figure 
+exposed that the DLD-APDT approach has effectively identified and 
+tracked the persons present from the input frames. 
+For demonstrating the better outcomes of the DLD-APDT model, a 
+comparative analysis with existing models is made in Table 3 [21]. 
+Fig. 11 provides a comparative study of the DLD-APDT method with 
+recent DL algorithms interms of precn. The figure indicated that the 
+EspiNetV2 model has shown ineffectual outcomes with lower precn value 
+of 62.79%. Meanwhile, the Faster R–CNN and YOLOv3 methodologies 
+Fig. 9. Sample person detection on test video 1.  
+Fig. 10. Sample person detection on test video 2.  
+S. Sivachandiran et al.                                                                                                                                                                                                                         
+
+--- PAGE 7 ---
+7 ---
+Measurement: Sensors 24 (2022) 100422
+7
+have shown slightly enhanced detection performance with closer precn 
+values of 85.71% and 85.65% correspondingly. However, the presented 
+DLD-APDT method has demonstrated superior performance with 
+maximal precn of 92.95%. 
+Fig. 12 demonstrates a comparison analysis of the DLD-APDT algo-
+rithm with recent DL models interms of recal. The figure indicated that 
+the EspiNetV2 system has shown ineffectual outcomes with lower recal 
+value of 59.85%. Also, the Faster R–CNN and YOLOv3 models have 
+exposed somewhat maximal detection performance with closer recal 
+values of 60.21% and 60.17% correspondingly. Eventually, the pre-
+sented DLD-APDT algorithm has outperformed superior performance 
+with higher recal of 61.86%. These results and discussion assured that 
+the DLD-APDT model has demonstrated better people detection and 
+tracking performance. 
+4. Conclusion 
+In this article, a new DLD-APDT model was enhanced for effectual 
+person detection and tracking on surveillance videos. The proposed 
+DLD-APDT model initially performs frame conversion process where the 
+input video is converted into a set of frames. Followed by, the proposed 
+DLD-APDT model utilized EfficientDet model to detect persons and track 
+them. Finally, the RMSProp optimizer is applied to optimally choose the 
+hyperparameters related to the EfficientNet model which helps in 
+accomplishing enhanced performance. The experimental validation of 
+the DLD-APDT model takes place using two training datasets namely 
+PascalVOC and PenFudan datasets. The simulation results reported the 
+enhanced detection and tracking performance of the DLD-APDT tech-
+nique over current approaches. Hence, the DLD-APDT model can be 
+utilized as an effectual person detector in real time environment. In 
+future, metaheuristics based hyperparameter optimizers can be applied 
+to enhance the detection efficiency of the DLD-APDT model. 
+CRediT authorship contribution statement 
+S. Sivachandiran: Manuscript Updation, Grammar correction. K. 
+Jagan Mohan: Conceptualization, Methodology. G. Mohammed 
+Nazer: Writing – review & editing. 
+Declaration of competing interest 
+The authors declare that they have no known competing financial 
+interests or personal relationships that could have appeared to influence 
+the work reported in this paper. 
+References 
+[1] Z. Xu, J. Zhuang, Q. Liu, J. Zhou, S. Peng, Benchmarking a large-scale FIR dataset 
+for on-road pedestrian detection, Infrared Physics & Technology 96 (2019) 
+199–208. 
+[2] K. Thaker, Multispectral Deep Neural Network for Low Light Object Detection 
+(Doctoral Dissertation), 2021. 
+[3] Z. Cui, C. Xu, W. Zheng, J. Yang, Context-dependent diffusion network for visual 
+relationship detection, in: Proceedings of the 26th ACM International Conference on 
+Multimedia, 2018, October, pp. 1475–1482. 
+[4] X. Du, M. El-Khamy, V.I. Morariu, J. Lee, L. Davis, Fused Deep Neural Networks for 
+Efficient Pedestrian Detection, 2018 arXiv preprin

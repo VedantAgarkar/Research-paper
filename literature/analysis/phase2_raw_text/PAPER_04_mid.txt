@@ -1,0 +1,664 @@
+--- PAGE 1 ---
+1 ---
+Sensors-15800-2016 1 
+1  
+Abstract— Fall detection for elderly and patient is a very 
+important service that has the potential of increasing autonomy of 
+elders while minimizing the risks of living alone. It ha s been an 
+active research topic due to the fact that health care industry  has 
+a big demand for products an d technology of fall detection  
+systems. Owing to the recent rapid advancement in sensing and 
+wireless communication technologies, fall detection system s have 
+become possible. They allow  detecting fall events for the elderly, 
+monitoring them, and consequently providing  necessary help 
+whenever needed . This paper describes the ongoing work of 
+detecting falls in independent living senior apartments using force 
+sensors and 3-axis accelerometers concealed under intelligent tiles. 
+The force sensors permit detecting elders' falls, locating, tracking 
+and recognizing human activities (walking, standing, sitting, lying 
+down, falling, and the transitions between them). However, the 
+detection accuracy on real data contains false alarms coming from 
+falling and lying postures. To solve this issue, we propose the 
+fusion between the force sensor measurements and the 
+accelerometer sensor decisions . As a consequence, the system 
+accuracy is satisfactory and the results show that the proposed 
+methods are efficient , and they can be easily used in a real elder 
+tracking and fall detection system. 
+Index Terms —  Elderly fall detection ; parameters selection; 
+postures; sensing floor; signal detection and processing. 
+I. INTRODUCTION 
+OWADAYS, aging population shows a drastic increasing 
+during the past decade; it’s one of the greatest social and 
+economic challenges of the 21 st century [1]. Advances in 
+medicine and public health services have improved the overall 
+longevity of people, and it is expected that over the next 50 
+years, the proportion of people aged more than 60 years is 
+expected to be doubled from 10% to 22% [2]. Those people 
+prefer growing old at home and saving their independent 
+lifestyles that often come with high risks. According to the 
+statistics of Centers for Disease Control and Prevention (CDC), 
+one out of three adults age 65 and older falls each year  in the 
+United States, and 61% of these falls occur at homes that cause 
+Manuscript submitted on August 23, 2016. This work is supported by the 
+Lille University - Science and Technology, the INRIA  Research Center in 
+Nancy Grand Est, the Lebanese University – Azm Center for Biotechnology 
+Research, and the Université de Technologie et de Sciences Appliquées Libano-
+Française (ULF).  
+*M. Daher is with the Lille University - Science and Technology, CRIStAL, 
+UMR 9189, 59650 Villeneuve d'Ascq, France (e-mail: mohamad.daher@univ-
+lille1.fr) 
+A. Diab is with Lebanese University, Azm research center in biotechnology, 
+EDST, Lebanon (e-mail: ahmaddiab@ul.edu.lb). 
+10,000 deaths. Yet obtaining a quick assistance after a fal l 
+reduces the risk of hospita
+--- PAGE 2 ---
+2 ---
+Sensors-15800-2016 2 
+sensing floors to the non-intrusive advantage for elder due to 
+their invisibility, as well as both in terms of user privacy and  
+tile perception. So elder can get profi t of his normal life and a 
+hidden monitoring system. 
+A. State of the art  
+Sensing floors are floors equipped with sensors for various 
+practical applications. The use of floor -sensors in ambient 
+intelligence contexts began in the late 1990’s, with projects like 
+the ORL active floor [ 9] by Addl esee et al., the Magic carpet 
+[10] by Paradiso et al., and the Smart floor [ 11] by Orr and 
+Abowd, where they provided information for reasoning about 
+the observed space. These floors were later on integrated into 
+smart environments, aimed at delivering assistance services like 
+continuous diagnosis of users’ health. These smart 
+environments also integrated assistive robotic technologies 
+with sensing networks. Examples of such environments include 
+the Gator Tech Smart House made by the University of Florida 
+[12], the Aware Home introduced by the Geo rgia Institute of 
+Technology [13], the Robotic Room system [14, 15] developed 
+by the University of Tokyo, and the ActiSen activity- aware 
+sensor network [1 6] jointly developed by researchers from 
+several US universities. Further advan ces were brought by 
+research o n human footprint biometrics [17, 1 8, 19], which 
+allowed sensing floors to recognize humans by extracting 
+features from footprints and human gait.  Also Braun et al. 
+introduced a floor with capacitive sensors, called CapFloor 
+[20], that can localize humans using low -intensity electric 
+fields, and which was used for fall detection. Ropponen et al. 
+used a floor with a low-frequency RFID location system, based 
+on a matrix of quad antennae under the floor surface [21]. This 
+floor was used for tracking people [22], a nd for detecting 
+human falls [23]. The Institute for Biomedical Technology and 
+Technical Medicine (MIRA), University of Twente-
+Netherlands, proposes a method to assess foot placement during 
+walking using an ambulatory measurement system consisting 
+of orthopedic sandals equipped with force/moment sensors and 
+inertial sensors [24].  Moreover, The Department of Intelligent 
+Mechanical Systems Engineering, Kochi University of 
+Technology, presents a wearable ground reaction force (GRF) 
+sensor system and its application to measure the extrinsic gait 
+variability [25]. In 2014, T. Liu et al. developed develop a 
+wireless sensor system for lower limb dynamics analysis using 
+wearable three-dimensional gait analysis system [26]. In 2015,  
+D. Li et al. introduced an inductive sensor for real time 
+measurement of plantar normal and shear forces distribution on 
+diabetes patient's foot that can provide useful information for 
+physicians and diabetes patients to take actions in preventing 
+foot ul ceration [27].  Finally, some s ystems are already 
+commercially available today, like the SensFloor [2 8,29] (a 
+floor networ
+--- PAGE 3 ---
+3 ---
+Sensors-15800-2016 3 
+can see an example of format of the real data sent by a tile as in 
+the table 1. 
+TABLE 1 
+FORMAT OF DATA PACKAGE CONTAINING PRESSURE MEASUREMENTS 
+Information Load Data 
+Sensor 
+type 
+Tile 
+ID 
+msg 
+ID Timestamp S1 S2 S3 S4 
+Gauge 45 4648 1.455E+12 1920 919 2174 212 
+ 
+Tile is equipped by an embedded computational components 
+permit to measure pressure, as well as memorize, compute and 
+transmit data. The  sensors are queried for measurement data 
+with a frequency around 50 Hz. 
+The tiles have also embedded 3- axis accelerometers that 
+detect and localize hard human falls. However, the problem 
+persists for soft falls that are difficult to detect using 
+accelerometers. One can see the format of the accelerometer 
+data sent by a tile in the table 2.  
+TABLE 2  
+FORMAT OF DATA PACKAGE CONTAINING ACCELEROMETER MEASUREMENTS 
+Information Accelerometer Data 
+Sensor 
+type 
+Tile 
+ID 
+msg 
+ID Timestamp X Y Z 
+Lsm 18 15786 1.45562E+12 -46 18 -1072 
+ 
+Besides being equipped with a set of sensors, each tile also 
+has an on-board processing unit, as well as a wireless and wired 
+connection, which also provides electric power. For general 
+purposes, the tiles can also communicate with other entities to 
+allow them, for instance, to provide navigation aid for mobile 
+robots. Further, each tile can be used as a weighing scale.  
+Moreover, the tiles provide feedback about the weight placed 
+on them, using the LEDs and a color code. They can be also 
+used as Tetris game and a visual guidance for elders at night. 
+Consequently, we can implement a large number of 
+functionalities, including weight measurement [ 7], fall 
+detection, extraction and tracking of footsteps, recognition of 
+daily activities, activities' transition, localization and tracking 
+people, as well as fall detection using the force sensors.  
+We focus on detecting all types of fall, and differentiating 
+between the main Activities of Daily Living (ADL)  (walking, 
+sitting, standing, and falling) equally the transitions among 
+them. The following diagram shows the main ADL states and 
+the transitions among them “Fig. 3”. 
+ 
+Fig. 3.  State diagram of the main ADL with the transitions among them. 
+B. Characteristics of all postures  
+The work contribution starts by identifying the characteristics 
+of different kinds of posture based on the load forces exerted on 
+the floor and other information (the tiles proximities and the 
+duration). Regarding the scenarios of all occurrences, we 
+observe the characteristics of each activity and we can note the 
+following: 
+ Walking: the load forces exerted on the floor are high and 
+move on neighbor tiles within a short time period. 
+ Standing: the load forces exerted on the floor are high and 
+they are fixed on the same tiles for a time period.  
+ Sitting: the load forces exerted on the floor are split among 
+less than 2 linear tiles and they are fixed on the same tiles 
+for a time period. 
+ Falling: the load forces exerted on t
+--- PAGE 4 ---
+4 ---
+Sensors-15800-2016 4 
+the other hand, the second threshold (threshold2) distinguishes  
+between the unknown postur e and the sitting/falling /lying 
+down. Then, the sitting was differenced from falling/lying 
+down based on the number of linear tiles exerted by load forces 
+(tiles' proximity). See the characteristics of all postures 
+defined in the secti on III.B. 
+Note that the threshold1 and the threshold2 are estimated to 
+3/4 and 1/4, respectively, of the maximum value of the load 
+forces exerted on tiles. Since , we found when observing the 
+forces exert ed on the tiles that the maximal  values were 
+obtained when the person is walking or standing up, so we 
+choose the threshold 75%. Whereas these values are lower in 
+other postures because the load force is distributed on different 
+tiles, so we choose the threshold 25%.  
+The detailed flow chart of the algorithm is shown in “Fig. 4”. 
+ 
+Fig. 4.  Flow chart diagram of the algorithm. 
+This system has shown high accuracy to locate elder and 
+estimate the main Activities Daily Living (ADL).  
+Unfortunately, the pressure sensor is insensitive to lying down  
+posture, and it generate a false alarm of falling since more than 
+three linear tiles are exerted by load forces for the both postures. 
+An alarm from the force sensor will signify that someone was 
+falling, even the person was lying down. Therefore, we propose 
+to fuse force sensors and accelerometers to differentiate 
+between falling and lying down postures. 
+B.  Extracting data from the accelerometer 
+The accelerometer is used to enforce the differentiation 
+between the f alling and the lying down posture . Firstly, the 
+database tables are fragmented into fall and non -fall fragments 
+to obtain two different classes, and then we proceed to do the 
+windowing of each signal in each class. From each window, we 
+extract some useful parameters and then select the most  
+pertinent of them in order to be  used to differentiate  between 
+the two states: falling and non -falling. The accelerometer data 
+processing is shown in “Fig. 5”. 
+ 
+Fig. 5. Accelerometer data processing. 
+1)   Data fragmentation: The start and the end of each fall action 
+have been annotated based on the pictures and the videos taken 
+from RGB-D cameras fixed on the wall. Similarly, for each 
+normal activity case, suitable start and end times have been 
+chosen so that the delimited time span contains activities as  
+similar as possible to falls, i.e. with highly varying signals.  
+2) Windowing: We divide each signal into smaller time 
+segments called windows of fixed length and with a fixed 
+overlap. Good values for both window size and overlap have 
+been found through preliminary experiments as 50 samples and 
+25 samples, which correspond to 1 second and 0.5 second 
+respectively. 
+3)   Features extraction: Features or parameters extraction is the 
+process by which relevant characteristics or attributes are 
+identified from the collected data. Features have to be 
+cau
+--- PAGE 5 ---
+5 ---
+Sensors-15800-2016 5 
+into detail coefficients, we calculate the variances on the se 
+details and then used these variances for classification [40]. 
+b) Non-linear parameters 
+i) Time reversibility: A time series is reversible if the 
+probabilistic properties are unchanging with respect to time 
+reversal. The time irreversibility is a good indication of 
+nonlinearity. The time reversibility (TR) characteristic of a 
+signal x is then calculated as followi ng (for more details see 
+[36]): 
+     𝑇𝑇𝑇𝑇(𝜏𝜏) =
+1
+𝑁𝑁−𝜏𝜏 ∑ (𝑥𝑥(𝑑𝑑) − 𝑥𝑥(𝑑𝑑 − 𝜏𝜏))3𝑁𝑁
+𝑑𝑑=𝜏𝜏+1                              (2)         
+where N is the signal length and 𝜏𝜏 is the time delay. 
+ii) Lyapunov Exponent:  The Lyapunov Exponent (LE) 
+studies the stability and the sensibility on initial conditions of 
+the system. It measures the rate of trajectory separation between 
+adjacent tracks in phase space [41 ,42]. In our study, we have 
+used the “(2)” to calculate LE described in [41]: 
+𝜆𝜆 = lim
+𝑡𝑡→∞
+ lim
+∥∆𝑑𝑑0∥→0
+�
+1
+𝑡𝑡� log(∥ ∆𝑑𝑑𝑡𝑡∥ /  ∥ ∆𝑑𝑑0∥                             (3) 
+where ∥ ∆𝑑𝑑0∥  represents the Euclidean distance between two 
+states of the system to an arbitrary time  𝑡𝑡0, and ∥ ∆𝑑𝑑𝑡𝑡∥
+ corresponds to the Euclidean distance between the two states 
+of the system at a time later t. 
+     
+iii) Sample Entropy: To identify the regularity of signals, 
+the Sample Entropy (SE) is used. In our work, we have used the 
+Sample Entropy described in [38]. They indicated that a least 
+predictable time series have higher sample entropy. 
+Considering a time series x which represents a signal of length 
+N and patterns aj (0, … ,𝑚𝑚 − 1) of length m, with m < N, and 
+𝑎𝑎𝑎𝑎(𝑖𝑖) = 𝑥𝑥(𝑖𝑖 + 𝑎𝑎); (𝑖𝑖 = 0
+, … ,𝑚𝑚 − 1; 𝑎𝑎 = 0
+, … ,𝑁𝑁 − 𝑚𝑚). The 
+time series x in a time t = ts, x (ts,..., ts+m−1) as a match for a 
+given pattern aj, if  |𝑥𝑥(𝑡𝑡𝑡𝑡 + 𝑖𝑖) − 𝑎𝑎𝑎𝑎(𝑖𝑖)| ≤ 𝑇𝑇  𝑓𝑓
+𝑓𝑓
+𝑇𝑇 𝑒𝑒𝑎𝑎
+𝑒𝑒ℎ 0 ≤ 𝑖𝑖 <
+𝑚𝑚. Sample Entropy is then computed as follows: 
+𝑆𝑆𝑆𝑆𝑚𝑚,𝑟𝑟 (𝑥𝑥) =  �
+− log �
+𝐶𝐶𝑚𝑚
+𝐶𝐶(𝑚𝑚−1)
+�: 𝐶𝐶𝑚𝑚 ≠ 0 ∧ 𝐶𝐶(𝑚𝑚−1) ≠ 0  
+    − log �
+𝑁𝑁−𝑚𝑚
+𝑁𝑁−𝑚𝑚−1�: 𝐶𝐶𝑚𝑚 = 0 ∨  𝐶𝐶(𝑚𝑚−1) = 0
+     (4) 
+where the four parameters N , m, r and Cm represent, 
+respectively, the length of the time series, the length of 
+sequences to be compared, the tolerance for accepting, and the 
+number of pattern matches (within a margin for r ) that is 
+constructed for each m . The value of m  is determined by the 
+method of the false nearest neighbors (FNN); the value of r 
+equals 0.2 according to the literature [38]. 
+4)  Features selection: The number of parameters  in a dataset 
+has a direct impact on the dataset’s descriptive power. The more 
+features a dataset has, the more expressive it is. However, 
+finding meaningful relationships among the instances and the 
+class can be more difficult because the feature space grows 
+exponentially with the number  of features. On the other hand, 
+by selecting only the features that best describe the input data 
+and discarding redundant features, the size of the dataset is 
+reduced and it is very helpful i
+--- PAGE 6 ---
+6 ---
+Sensors-15800-2016 6 
+∑ 𝑑𝑑(𝑃𝑃𝑖𝑖 )) . The parameter that has the higher Score value is the 
+most discriminant. HCM is computed as the follows: 
+𝑆𝑆𝑖𝑖 = ∑ ∑ |𝑁𝑁+ − 𝑁𝑁−|+∞
+𝑡𝑡ℎ𝑒𝑒
+𝑟𝑟𝑒𝑒ℎ𝑜𝑜𝑜𝑜𝑑𝑑                                                     (6)           
+w
+here 𝑁𝑁+ and 𝑁𝑁− are respectively the number of instances 
+belong the first and the second class, that are above the 
+threshold [25]. 
+e) HCM-SFS: HCM can only examine the discriminative 
+ability of each individual feature. Hence, features with low 
+scores will be disregarded, even if they are complementary to 
+the top features and might be very useful  when they have 
+combined with others parameters than were considered each 
+one lonely. In the other hand, SFS yields the discriminative 
+capacity of multiple features but it also suffers from the nesting 
+effect; a parameter added in a given step cannot be removed 
+during the next step. Hence, we introduce the HCM -SFS 
+method which comb ines the two previous methods HCM and 
+SFS. Relevant features selected by HCM are afresh passed to 
+SFS for pick out the most pertinent features group of them . 
+Consequently, we get rid from the problem of choosing features 
+individually presented in HCM and a lso from nesting problem 
+of SFS. 
+5)  Signal change detection:  is the ability to detect that a change 
+occurred on the characteristics of a signal and making some 
+inference about the actual time of change. Most detection 
+algorithms are based on the theory o f statistical detection and 
+hypothesis testing  [47]. In our application, we developed a 
+simple algorithm to detect the characteristic change of a signal 
+and notice that a person is falling down after he/she was 
+walking, sitting, or standing. Identifying the likely time that a 
+fall may have occurred is called change point identification. 
+V. EXPERIMENTS 
+We evaluate o ur approach by running experiments with 
+humans performing the f ive preceded activities. Results show 
+that our proposed system can differentiate among the different 
+ADL postures and can detect all types of  falls with a g ood 
+accuracy.  
+A. Pressure sensors experiments 
+To illustrate this procedure, a program was developed using 
+Matlab which shows the different information and decisions 
+depending on the video sequence (several sequences have been 
+realized but only one is presented here). Six postures are shown 
+in the six figures below. The unknown posture mean there is no 
+person on the floor. 
+Each figure contains four pictures that represent: 
+(a): the video snapshot taken for a subject 
+(b): the exerted force on a tile for a period of time 
+(c): the cartography of the apartment represented as image. 
+The white cells are cells that are identified as occupied, while 
+the dark cells have identified as free (due to the absence of 
+pressure on the tile). 
+(d): the posture estimated by our system with the trajectory 
+followed by the person. 
+ 
+Fig. 6. Unknown posture. 
+ 
+Fig. 7. Walking posture. 
+ 
+Fig. 8. Sitting postur
+--- PAGE 7 ---
+7 ---
+Sensors-15800-2016 7 
+ 
+Fig. 9. Standing up posture. 
+ 
+Fig. 10. Falling posture. 
+ 
+Fig. 11. Lying down posture. 
+ 
+One can  see that by using simple pressure sensors all 
+estimated postures are correct comparing with the video 
+snapshots, unless the lying down posture is estimated as falling. 
+To solve this issue, we propose to fuse between the force 
+sensors measurement and the accelerometer decisions. 
+B. Accelerometer experiments 
+Firstly, the proposed method is tested  to select the 
+discriminative parameters on synthetic data and  evaluate its 
+efficiency compared to well-known methods in literature. After 
+that, we will show the result s of parameters' extraction and 
+selection, and then the change detection on real data. Note, that 
+the accelerometer is used to enforce the differentiation between 
+the falling and the lying down posture. 
+1) Features selection Experiments on synthetic data 
+A synthetic database is generated with a Gaussian noise, 
+composed of 200 observations that are divided into two classes 
+each of 30 parameters around the value (0) for the first class, 
+and around the value (0±∆) for the second class, where "∆" is 
+the difference between the two classes . Our aim is to test the 
+efficiency of HCM regarding its accuracy to select relevant 
+parameters and its time delay. Our method shows a good  
+accuracy in relevant parameters selection. For a difference 
+value between two classes (∆) greater than 0.4, the error rate is 
+around 1% whic h is clearly lower than ReliefF  (30%) and F -
+score (12%) as shown in the “Fig. 12”. 
+ 
+Fig. 12. Comparison of ReliefF, F-score, and HCM Error Rates. 
+We also have been noticed that the time latency of HCM (0.03 
+s) is less than the ones of ReliefF (0.05 s) and F-score (0.045 s). 
+This characteristic allow s this method to be used in some 
+applications where the time is critical. These results are taken 
+from a machine Intel® Core™ i5 -3317U CPU @ 1.70 GHz (4 
+CPUs), ~ 1.7 GHz with 4 GB RAM. 
+Since HCM identifies only the discriminative ability of 
+individual feature, and SFS suffers from the nesting effect , we 
+integrated the HCM-SFS method that determines the distinctive 
+capacity of multiple features with better accuracy than SFS, 
+especially for a low difference classes value ( ∆<04). For 
+example, the error rate is decreasing from 72% to 28% for a 
+(∆= 0.1) “Fig. 13”. 
+This is the author's version of an article that has been published in this journal. Changes were made to this version by the publisher prior to publication.
+The final version of record is available at  http://dx.doi.org/10.1109/JSEN.2016.2625099
+Copyright (c) 2016 IEEE. Personal use is permitted. For any other purposes, permission must be obtained from the IEEE by emailing pubs-permissions@ieee.org.
+
+--- PAGE 8 ---
+8 ---
+Sensors-15800-2016 8 
+ 
+Fig. 13. Comparison of SFS and HCM-SFS Error Rates. 
+2) Experiments on real data 
+We try here to discriminate between falling and non -falling 
+states using the accelerometer signals. We took a signal when a 
+person is walking, standing, si tting, falling, and lying down. 
+After that, we extract some useful parameters from the original 
+signals that can be used in our system in order to improve the 
+performance. Some extracted parameters are shown in the “Fig. 
+14” in fu nction of the number of windows. This signal is 
+normalized before being drawn. 
+ 
+Fig. 14. Some Extracted Parameters (1: TR, 2: DFA, 3-7: Wavelet Packet 
+decomposition parameters, 8: MPF, 9-18 Decil, 19: SE, and 20: LE). 
+It is clear that most of extracted parameters have a high peak 
+in case of fall. Thus, we took one of the most relevant 
+parameters and then we developed a simple algorithm to detect 
+the change in falling cases. “Fig. 15” shows the signal in (a) , 
+and the fall detection with a good accuracy in (b). 
+ 
+Fig. 15. Signal change detection when a fall occurs. 
+Therefore, using a simple accelerometer data, we can easily 
+differentiate between falling and non-falling states. 
+C. Experiments of fusion between the force sensors and the 
+accelerometer decisions 
+We show that the force sensors signals can be used to 
+differentiate among walking, standing, sitting, unknown states, 
+but they confuse between falling and lying down postures. In 
+addition, we show also that accelerometer signals can easily 
+differentiate between the falling and non -falling states. Hence, 
+by using the data fusion of the force and accelerometer sensors, 
+we can differentiate among walking, standing, sitting, 
+unknown, falling and lying down states. The complete process 
+flow chart of the system is shown in the “Fig. 16”. 
+ 
+Fig. 16.  Flow chart diagram of the system. 
+To end up, the proposed system permit finally to locate and 
+track elder, recognize their activities, and detect fall cases. 
+VI. RESULTS AND DISCUSSIONS 
+Ten different sequences with six different subjects were 
+tested to show the accuracy and the efficiency of the prop osed 
+system. “Table 3” shows  the sensitivity results  for different 
+ADL postures. 
+This is the author's version of an article that has been published in this journal. Changes were made to this version by the publisher prior to publication.
+The final version of record is available at  http://dx.doi.org/10.1109/JSEN.2016.2625099
+Copyright (c) 2016 IEEE. Personal use is permitted. For any other purposes, permission must be obtained from the IEEE by emailing pubs-permissions@ieee.org.
+
+--- PAGE 9 ---
+9 ---
+Sensors-15800-2016 9 
+TABLE 3 
+SENSITIVITY FOR DIFFERENT ADL POSTURES 
+Real postures Estimated postures Sensitivity 
+60 Unknown 60 Unknown 100% 
+150 Walking 148 Walking + 2 Standing Up 98.7% 
+65 Standing 
+Up 
+60 Standing Up + 3 sitting + 2 
+Unknown 
+92.3% 
+42 Sitting 40 Sitting + 2 Unknown 95.2% 
+34 Falling 32 Falling + 1 Sitting + 1 Walking 94.1% 
+20 Lying down 18 Lying down + 1 Sitting + 1 
+Falling 
+90% 
+   
+The first colum n describes the real postures of the six subjects in the ten 
+sequences. The second column shows the estimated postures of the proposed 
+methods. The third column shows the sensitivity or the True Positive Ratio 
+(TPR = TP / ( TP+FN)) of the proposed system , where TP and FN are 
+respectively the numbers of valid and invalid estimated postures, 100% 
+indicating that all real postures were truly estimated. 
+Thus, one can see that the proposed methods are accurate (the 
+system sensitivity is greater than 90% for all estimated 
+postures). To prove this accuracy, a supplementary multimedia 
+file has been attached to this paper showing the precision of the 
+postures estimation. In addition, for a sequence example 
+(walking – sitting – falling - standing up - walking), the mass 
+center localization is drawn in the “Fig. 17” to validate the  
+estimation. 
+ 
+Fig. 17.  Localization of the mass center of a person. 
+Furthermore, by extracting some meaningful features from 
+the collected data and selecting only the pertinent ones, the size 
+of the dataset is reduced and becomes more efficient. The 
+efficiency appears by improving the computational speed and 
+the prediction accuracy of the proposed system. 
+On the other hand, most of existing fall detection systems use 
+wearable sensors mounted on the person or a camera- based 
+systems that are uncomfortable to the elderly. Moreover, most 
+of prevailing sensing floors are used to track , locate and detect 
+human fall cases. Whereas, the idea behind this work is to 
+provide a system that not only tracks, locates and detects elders’ 
+falls, but also  recognizes their activities (walking, standing, 
+sitting, lying down, falling, and the transitions between them), 
+using a set of non -intrusive sensors that grants privacy and 
+comfort to the elders.  
+Indeed, the large-scale deployments of the proposed system 
+require a large number of sensors and are expensive.   However, 
+due to the recent rapid advancement in information and 
+communication technologies, sensors will be cheaper in the 
+near future to reduce the cost of the system installation. 
+Finally, as a perspective, we will try to use an automated 
+thresholding method that calculates optimal and adaptive 
+thresholds to use them in the force sensor algorithm. 
+VII. CONCLUSION 
+This paper proposes a fine elder tracking, activities 
+recognition, and fall detection system using a set of non -
+intrusive sensors. The proposed system uses the fusion between 
+pressure sensors and accelerometers hidden under the smart 
+tiles.  
+First, we
+--- PAGE 10 ---
+10 ---
+Sensors-15800-2016 10 
+[9] M.D. Addlesee, A. Jones, F. Livesey , and F. Samaria. “The ORL active 
+floor”. In: Personal Communications, IEEE 4.5 (1997), pp. 35 –41. issn: 
+1070-9916. doi: 10.1109/98.626980. 
+[10] J. Paradiso, et al. "The magic carpet: physical sensing for immersive 
+environments." CHI'97 Extended Abstracts on Hu man Factors in 
+Computing Systems. ACM, 1997. 
+[11] R. J. Orr and G. D. Abowd. “The smart floor: a mechanism for natural 
+user identification and tracking”. In: CHI’00 Extended Abstracts on 
+Human Factors in Computing Systems,  pp. 275-276. ACM, 2000. 
+[12] S. Helal, et al. "The gator tech smart house: A programmable pervasive 
+space." Computer 38.3 (2005): 50-60. 
+[13] CD. Kidd, et al. "The aware home: A living laboratory for ubiquitous 
+computing research."  Cooperative buildings. Integrating information, 
+organizations, and architecture. Springer Berlin Heidelberg, 1999. 191 -
+198. 
+[14] T.S.T. MORI, "Robotic room: Its concept and realization."  Intelligent 
+Autonomous Systems: IAS-5 (1998): 415. 
+[15] S. Tomomasa, T. Harada, and T. Mori. "Environment-type robot system" 
+RoboticRoom" featured by behavior media, behavior contents, and 
+behavior adaptation."  Mechatronics, IEEE/ASME Transactions on  9.3 
+(2004): 529-534. 
+[16] D. De, et al. "ActiSen: Activity -aware sensor network in smart 
+environments." Pervasive and Mobile Computing 8.5 (2012): 730-750. 
+[17] K. Nakajima, et al. "Footprint -based personal recognition."  Biomedical 
+Engineering, IEEE Transactions on 47.11 (2000): 1534-1537. 
+[18] M. Razeghi, and M.E. Batt. "Foot type classification: a critical review of 
+current methods." Gait & posture 15.3 (2002): 282-291. 
+[19] T. Kuragano, A. Yamaguchi, and S. Furukawa.  "A method to measure 
+foot print similarity for gait analysis."  Computational Intelligence for 
+Modelling, Control and Automation, 2005 and International Conference 
+on Intelligent Agents, Web Technologies and Internet Commerce, 
+International Conference on. Vol. 2. IEEE, 2005. 
+[20] A. Braun, H. Heggen, and R. Wichert. "CapFloor –a flexible capacitive 
+indoor localization system."  Evaluating AAL Systems Through 
+Competitive Benchmarking. Indoor Localization and Tracking. Springer 
+Berlin Heidelberg, 2011. 26-35. 
+[21] A. Ropponen, H. Rimminen, and R. Sepponen. "Robust system for indoor 
+localisation and identification for the health care environment."Wireless 
+Personal Communications 59.1 (2011): 57-71. 
+[22] H. Rimminen, J. Lindström, and R. Sepponen. "Positioning accuracy and 
+multi-target separation with a human tracking system using near field 
+imaging." International Journal on Smart Sensing and Intelligent 
+Systems 2.1 (2009): 156-175. 
+[23] H. Rimminen, et al. "Detection of falls among the elderly by a floor sensor 
+using the electric near field."  IEEE transactions on information 
+technology in biomedicine: a publication of the IEEE Engineering in 
+Medicine and Biology Society 14.6 (2010): 1475-1476. 
+[24] H. M. Schepers, et al. "A
+--- PAGE 11 ---
+11 ---
+Sensors-15800-2016 11 
+also the Lebanese University in 2011. Since 2010, he is an 
+academic advisor at the ULF. 
+ 
+Ahmad Diab received the degree in 
+Biomedical Engineer from the Islamic 
+University of Lebanon, Khalde, Lebanon, 
+in 2010, a nd the M.Sc. degree in Medical 
+and Industrial Processing and System from 
+the Lebanese University, Tripoli, Lebanon, 
+in 2011. Also he received his Ph.D. degree 
+from the University of Technology of 
+Compiègne, Compiègne, France and Reykjavik University, 
+Reykjavik, Iceland in 2014. 
+He is currently an associate Professor and Research Engineer 
+at Azm center for research in biotechnology and its application, 
+Lebanese University. 
+ 
+Maan El Badaoui El Najjar  received the 
+computer engineering degree from 
+ESISAR – INP Grenoble- France in 1999. 
+He graduated from ENSIEG – INP 
+Grenoble in 2000 (Master of Science 
+degree in Control System). He received the 
+Ph.D. degree in Perception and Control 
+Systems from the Uni versity of 
+Technology of Compiegne in 2003. In November 2011, he 
+obtained the Habilitation à Diriger des Recherche s from the 
+University of Lille. 
+He joined the University of Lille in 2005 as a permanent 
+associate Professor. Since 2014, he is Full Professor at the 
+University of Lille. He is also with the CRIStAL Laboratory 
+UMR 9189, a joint research unit between CNRS, University of 
+Lille and Ecole Centrale de Lille. He is also the head of the 
+DiCOT Team “Diagnostic, Control and Observation for fault 
+Tolerant Systems” of the CRIStAL Laboratory.  
+The research of Prof. El Badaoui El Najjar has been focused 
+on Multi-sensors fusion, Multi -robots systems, and Fault 
+tolerant systems. 
+ 
+François Charpillet  received his 
+engineering degree from École Nationale 
+Supérieure d’Électricité et de Mécanique 
+(ENSEM) of the National Polytechnic 
+Institute of Lorraine (INPL) in 1982. He 
+received the M.S. and Ph.D. degree in 
+computer science from Henri Poincaré 
+University, Nancy, France, in 1982  and 
+1985 respectively. 
+After a period as an engineer at Direction des Constructions 
+Navales (DCN) in Paris, he joined the University of Lorraine 
+and LORIA Lab as an assistant professor in 1987. In 1988, he 
+got a research position at Inria Nancy - Grand-Est Research 
+Center.  
+Prof. Charpillet is today Director of Research at Inria. From 
+1998 to 2014, he has been the leader of LORIA team MAIA, 
+which was a joint research group with Inria, CNRS and 
+University of Lorraine. This group was interested in Artificial 
+Intelligence focusing on autonomous agents and multi -agent 
+systems. Since 2015, he is the scientific leader of the new Inria 
+team Larsen, focusing on Long Term Robotics, Human- robot 
+interaction and Active and Distributed sensing. His current 
+research interests concern multi -robot cooperation, human -
+robot- environment interaction, activity recognition, active 
+sensing and ambient Intelligence. 
+ 
+Mohamad Ali Khalil received an 
+engineering degree in electrical and 
+electricity 

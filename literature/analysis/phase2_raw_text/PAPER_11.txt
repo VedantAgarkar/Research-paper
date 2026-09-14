@@ -1,0 +1,1460 @@
+
+--- PAGE 1 ---
+Trustworthy fall detection: A responsible AI approach for real-time video 
+monitoring of the elderly
+Mona M. Moussa *
+ , Rasha Shoitan
+ , Nahed Tawfik
+Computers and Systems Department, Electronics Research Institute, Cairo, 12622, Egypt
+ARTICLE INFO
+Keywords:
+Fall detection
+Responsible AI
+Explainable AI
+Decentralized learning
+Federated learning
+AI-enabled healthcare
+ABSTRACT
+Falls among older adults represent a serious public health problem, particularly for individuals living alone or in 
+assisted-care environments, where delayed intervention can lead to severe injuries or death. Although numerous 
+fall-detection systems have been proposed, many existing approaches suffer from limitations, including high 
+computational complexity, limited interpretability, reliance on centralized video storage, and reduced general-
+ization across diverse environments. These challenges motivate the development of lightweight, explainable, and 
+trustworthy fall-detection framework for healthcare applications. To address these limitations, this paper pro-
+poses a vision-based fall detection framework that integrates MobileNetV2 for efficient spatial feature extraction 
+and a Gated Recurrent Unit (GRU) for temporal motion modeling. In addition, a federated learning strategy is 
+employed to support collaborative training across distributed data sources without requiring centralized 
+collection of raw video recordings, thereby reducing reliance on centralized storage while enabling learning from 
+heterogeneous environments. During deployment, a sliding-window inference strategy is adopted to achieve 
+reliable and low-latency fall detection. Model transparency is further supported through Grad-CAM++ visual 
+explanations, while Fairlearn is used to assess performance fairness across different fall types and user groups. 
+Experimental results on the combined CAUCAFall and Le2i datasets demonstrate that the proposed framework 
+achieves an accuracy of 97.14%, a precision of 99.26%, a recall of 96.75%, and an F1-score of 97.99%. Although 
+the achieved accuracy is 2.46 percentage points lower than the highest reported accuracy (99.60%), the 
+competing method employs a substantially more complex multi-stage architecture. In contrast, the proposed 
+framework adopts a lightweight MobileNetV2–GRU architecture while integrating explainability through Grad- 
+CAM++, fairness evaluation using Fairlearn, and decentralized collaborative learning. Furthermore, the pro-
+posed framework achieves an inference throughput of approximately 93 FPS on the experimental platform used 
+in this study, demonstrating high computational efficiency.
+1. Introduction
+Falls among older adults represent a serious public health concern, 
+especially for elderly individuals who live alone or reside in assisted- 
+care and nursing facilities. Many older adults prefer to remain inde-
+pendent by living in their own homes, while others rely on institutional 
+care due to age-related health conditions. In both situations, regular 
+monitoring is crucial, as older adults are more susceptible to falls and 
+related injuries. However, providing constant manual supervision for 
+every individual is often impractical, costly, and time-consuming, 
+particularly in long-term care settings. When assistance is delayed 
+after a fall, the risk of severe injury, long-term disability, or death in-
+creases significantly. This issue is further compounded by the high 
+frequency of falls among older adults worldwide, making it not only an 
+individual safety concern but also a major public health problem 
+(Giovannini et al., 2022). Falls are common and recurring events in this 
+age group and are recognized as the sixth leading cause of morbidity and 
+mortality among older adults (Chen et al., 2025; El Sayed et al., 2023). 
+According to the World Health Organization (WHO), more than 500,000 
+fatal falls occur globally each year, most of which involve individuals 
+aged 65 years and older (World Health Organization, 2021). Addition-
+ally, nearly one-third of older adults experience at least one fall each 
+year, and about 10% of these incidents result in serious injuries, such as 
+fractures or intracranial trauma (Kakara et al., 2025). These statistics 
+underscore the significant health burden posed by falls among the 
+elderly population (Kalache et al., 2007; Yang et al., 2025).
+* Corresponding author.
+E-mail address: mona_moussa@eri.sci.eg (M.M. Moussa). 
+Contents lists available at ScienceDirect
+Intelligent Systems with Applications
+journal homepage: www.journals.elsevier.com/intelligent-systems-with-applications
+https://doi.org/10.1016/j.iswa.2026.200722
+Received 6 March 2026; Received in revised form 10 August 2026; Accepted 18 August 2026  
+Intelligent Systems with Applications 31 (2026) 200722 
+Available online 19 August 2026 
+2667-3053/© 2026 The Authors. Published by Elsevier Ltd. This is an open access article under the CC BY license ( http://creativecommons.org/licenses/by/4.0/ ). 
+--- PAGE 2 ---
+Given the serious impact of falls on the health and safety of older 
+adults, rapid detection and assistance are essential to reduce the risk of 
+severe injuries. Automated monitoring systems provide a practical so-
+lution by continuously observing individuals, and promptly sending 
+alerts to family members or nursing staff in case of detecting fall in-
+cidents. This rapid response can significantly improve outcomes by 
+ensuring that help is provided as quickly as possible. To achieve this 
+goal, researchers have developed various fall-detection approaches. 
+Some methods rely on wearable sensors (Yao et al., 2026), while others 
+use vision-based techniques to monitor individuals and enhance their 
+safety without requiring constant human supervision (Apicella & 
+Snidaro, 2021; Batumalai et al., 2025; Liu et al., 2025). Wearable 
+sensor methods, particularly those employing inertial measurement 
+units (IMUs), have attracted considerable research interest due to their 
+compact size, low cost, and high detection accuracy (Krupitzer et al., 
+2019). Despite these advantages, their adoption among older adults 
+remains limited, as such devices often cause discomfort and require 
+frequent recharging of batteries, which can negatively affect user 
+compliance. Moreover, wearable sensors are susceptible to various 
+sources of noise, including improper device placement and dynamic 
+interactions between the body and the sensor, which can lead to 
+increased false alarm rates. In addition, these systems are often associ-
+ated with higher installation and maintenance costs and are sensitive to 
+environmental conditions and interference (Fei et al., 2023; 
+Wickramasinghe et al., 2017).
+By contrast, computer vision–based fall-detection methods overcome 
+many of the limitations of wearable systems by enabling non-intrusive 
+monitoring without requiring older adults to wear specialized devices. 
+By analyzing video data, these approaches can capture rich contextual 
+information about body posture and movement, which supports more 
+reliable fall detection in real-world settings (Yu et al., 2025). For this 
+reason, video-based non-contact fall detection has attracted increasing 
+attention as an effective alternative, offering continuous real-time 
+monitoring without active user involvement (Chen et al., 2024; Huang 
+et al., 2024; Liu et al., 2025; Newaz & Hanada, 2024; Newaz et al., 
+2023; Yang et al., 2024). This is particularly important for older 
+adults with cognitive impairments, such as dementia, for whom wearing 
+and maintaining sensor-based devices may be difficult. In addition, the 
+widespread availability of cameras allows vision-based systems to take 
+advantage of existing surveillance infrastructure, enabling scalable 
+deployment not only in smart homes but also in hospitals, nursing fa-
+cilities, and other public or institutional environments. At the same time, 
+recent advances in deep learning have significantly improved the ac-
+curacy of vision-based models by enhancing their ability to learn 
+spatiotemporal patterns from video data. As a result, the performance 
+gap between camera-based and sensor-based fall-detection systems have 
+been substantially reduced (Swarubini et al., 2025).
+Building on these advances, many vision-based fall-detection 
+methods have been proposed. These methods use different learning 
+strategies to analyze video data and detect fall events. Existing ap-
+proaches can be broadly divided into several categories. Some methods 
+use end-to-end spatio-temporal models, such as 3D convolutional net-
+works or transformer-based architectures, to directly learn motion pat-
+terns from video sequences. Other approaches rely on object detection 
+frameworks, often based on YOLO models, to localize the human body, 
+after which postural changes are inferred from bounding-box geometry, 
+motion patterns, or additional pose estimation modules to indicate a fall. 
+Another group of methods focuses on pose or skeleton-based analysis, 
+where body joint trajectories are modeled using recurrent networks, 
+graph convolutional networks, or attention mechanisms.
+Despite promising results on benchmark datasets, many of these 
+methods still present important limitations. Several approaches rely on 
+complex multi-stage pipelines or computationally intensive architec-
+tures, resulting in increased computational cost and reduced computa-
+tional efficiency. Other methods depend on centralized training with 
+sensitive video data, increasing reliance on centralized storage and 
+motivating the need for decentralized learning frameworks. In addition, 
+many existing models lack interpretability and fairness analysis, making 
+their decisions difficult to understand and potentially biased in health-
+care applications. These limitations motivate the development of light-
+weight, explainable, fair, and decentralized fall-detection frameworks 
+that support collaborative training while reducing the need for 
+centralized storage of raw video data.
+Compared with existing fall-detection approaches, this paper pro-
+poses an integrated algorithm for reliable and trustworthy elderly fall 
+detection that directly addresses several limitations of prior work. 
+Rather than relying on multi-stage and computationally demanding 
+pipelines involving separate human detection, pose estimation, or 
+complex transformer-based models, the proposed framework adopts a 
+lightweight end-to-end design based on MobileNetV2 (Sandler et al., 
+2018) and a GRU network. This design enables accurate and computa-
+tionally efficient fall detection while maintaining a lightweight archi-
+tecture. Unlike approaches that rely on fixed-length temporal 
+segmentation or short-term motion cues, the proposed GRU-based 
+temporal modeling captures motion dynamics across consecutive 
+frames, improving robustness to slow and gradual falls. Furthermore, 
+while many existing methods depend on centralized training and access 
+to raw video data, the proposed framework incorporates federated 
+learning to support collaborative model training across distributed data 
+sources through model aggregation rather than raw data exchange. This 
+decentralized training strategy reduces reliance on centralized storage 
+and supports deployment across diverse healthcare and assisted-living 
+environments. To further promote trust and transparency, the pro-
+posed method incorporates Grad-CAM++ (Chattopadhay et al., 2018) to 
+provide interpretable visual explanations of model decisions, allowing 
+caregivers and practitioners to understand which discriminative image 
+areas influence fall detection outcomes.
+Moreover, a fairness evaluation is conducted to assess performance 
+consistency across different fall scenarios and user groups, addressing 
+ethical considerations that are often overlooked in existing fall-detection 
+systems. Overall, this work presents a lightweight, explainable, and 
+trustworthy fall-detection framework for elderly monitoring. By 
+combining efficient spatial and temporal modeling with decentralized 
+training, explainability, and fairness assessment, the proposed frame-
+work addresses key challenges related to computational complexity, 
+centralized data management, interpretability, and equitable perfor-
+mance. Consequently, it provides a promising approach for healthcare 
+and assisted-living applications.
+Accordingly, the main contributions of this paper are summarized as 
+follows: 
+1. A lightweight fall detection framework is proposed that combines 
+MobileNetV2 for efficient spatial feature extraction with a GRU 
+network for capturing temporal motion dynamics, enabling accurate 
+and computationally efficient fall recognition.
+2. A decentralized federated learning strategy is introduced to enable 
+collaborative model training across multiple data sources without 
+transferring raw video data, reducing storage burden and supporting 
+model generalization across diverse environments.
+3. An explainability component using Grad-CAM++ is incorporated, 
+which provides visual insights into the spatial regions influencing the 
+model’s decisions, improving interpretability, trustworthiness, and 
+transparency.
+4. A fairness evaluation using Fairlearn is conducted to assess potential 
+performance disparities across different subgroups, supporting 
+responsible, unbiased, and equitable AI deployment.
+5. A practical sliding-window inference mechanism is developed to 
+improve computational efficiency while preserving high detection 
+accuracy.
+6. Comprehensive experiments are evaluated on multi-view datasets to 
+validate the effectiveness, robustness, and ethical alignment of the 
+proposed fall detection framework.
+M.M. Moussa et al.                                                                                                                                                                                                                             Intelligent Systems with Applications 31 (2026) 200722 
+2 
+--- PAGE 3 ---
+2. Related work
+Existing fall-detection research can be broadly categorized based on 
+the sensing modality and modeling strategy used. Early studies explored 
+sensor-based approaches, while more recent work has focused on vision- 
+based methods, driven by advances in deep learning and the widespread 
+availability of cameras.
+2.1. Sensor-based fall detection
+Some studies relied on non-visual sensors to detect falls. For 
+example, Patel et al. (2026) proposed a human fall detection system that 
+leveraged ultrasonic sensors and a hybrid deep learning model. The 
+authors integrated the Recurrent Neural Networks (RNN), Long 
+Short-Term Memory (LSTM), and Bidirectional LSTM (BLSTM) to clas-
+sify time-series sensor data. This system was embedded within a 
+Space-Air-Ground Integrated Network (SAGIN) framework, enabling 
+real-time alerts. Similarly, Khan et al. (2025) proposed an explainable 
+machine-learning-based fall detection and alert system that integrated 
+smartphone sensor data with a cloud-based framework. This approach 
+used inertial data captured from smartphone accelerometers and gyro-
+scopes processed through a Gradient Boosted Decision Tree (GBDT) 
+model to classify falls. Also, the method provided explainability via 
+SHapley Additive exPlanations (SHAP) to clarify how individual fea-
+tures influence predictions. While such sensor-based approaches could 
+achieve good accuracy under controlled conditions, their real-world 
+deployment remains challenging due to device availability, user 
+compliance, battery requirements, and sensitivity to noise, limitations 
+that are particularly pronounced among older adults.
+2.2. Vision-based methods
+To overcome the limitations of wearable sensors, more recent studies 
+have focused on vision-based fall detection, enabled by advances in deep 
+learning and the widespread availability of cameras. These methods 
+analyze video data and do not require users to wear any devices.
+2.2.1. Appearance features and spatio-temporal modeling methods
+Many vision-based approaches rely on appearance features and 
+motion patterns extracted from RGB video. Several methods used object 
+detection frameworks, particularly YOLO-based models, to detect and 
+track individuals and infer falls from changes in body orientation and 
+bounding-box motion. Zheng et al. (2024) proposed an improved 
+YOLOv8 framework in which the C2f module in the backbone network is 
+replaced with the FasterNet module, while a deformable convolution 
+module was introduced in the neck section, and a triplet attention 
+mechanism was incorporated during multi-scale feature fusion. On the 
+other hand, Khekan et al. (2025) proposed a human fall detection 
+framework using an improved YOLOv8 model. The model was trained 
+and evaluated on the CAUCAFall dataset, which comprised video se-
+quences representing various fall types and daily activities in uncon-
+strained indoor environments. Furthermore, Chen et al. (2022) proposed 
+an elderly fall-detection model based on YOLOv5s. The method replaced 
+standard 3 × 3 convolutions with Asymmetric Convolution Blocks (ACB) 
+to better extract horizontal, vertical, and rotational features. It inte-
+grated a spatial attention module (SAM) to focus on important positional 
+cues, and removed the small-scale 76 × 76 detection layer to prioritize 
+richer semantic features. In addition, Zaghden et al. (2025) introduced a 
+deep learning–based fall detection framework that enhances YOLOv8 
+with attention mechanisms to improve feature representation and 
+detection accuracy. Furthermore, Sanjalawe et al. (2025) proposed a 
+video-based system combining YOLOv8 for spatial human detection and 
+Time-Space Transformers (TST) for temporal motion analysis. Using the 
+CUCAFall and DiverseFALL10500 datasets, the model detects falls by 
+integrating YOLOv8’s real-time object detection with TST’s ability to 
+capture motion across frames. Although these methods are effective, 
+they are often sensitive to occlusions, camera viewpoint changes, and 
+complex backgrounds.
+Other studies directly learn spatio-temporal patterns from video se-
+quences. In Nú˜nez-Marcos and Arganda-Carreras (2024), Marcos et al. 
+proposed a vision-based fall detection framework that leveraged a 
+transformer, specifically a Uniformer backbone combining self-attention 
+with efficient computation to directly learn fall patterns from raw RGB 
+video frames. The model processed short video clips in a sliding-window 
+to classify whether a fall had occurred. The authors used two publicly 
+available benchmark datasetss; UP-Fall dataset and the UR Fall dataset. 
+Similarly, Alam et al. (2025) proposed a vision-based human fall 
+detection system using transfer learning with a 3D CNN to capture 
+spatio-temporal information from video sequences. A pretrained 3D 
+CNN model (trained on Sports-1M) is used as a fixed feature extractor, 
+where input videos are segmented into 16-frame clips through the 
+network to extract features; these features are then classified using a 
+support vector machine (SVM). In a related study, Zou et al. (2021)
+introduced a spatio-temporal fall-detection approach that analyzed 
+spatial localization and temporal motion patterns. A 3D CNN is inte-
+grated with an SSD-based object detection framework to generate con-
+strained movement tubes, which track a person through a sequence of 
+refined bounding boxes and help mitigate background interference. The 
+3D CNN encodes both appearance and motion cues, while additional 
+layers perform tube anchor generation, classification, and regression. In 
+Fu (2025), Fangping Fu proposed a vision-based fall detection system 
+that exploited 3D sparse convolutional neural networks (3D-SCNN). A 
+dynamic key-frame selection preprocessing stage is incorporated using 
+jitter buffers to adaptively select salient frames. To preserve feature 
+continuity before fed to the sparse 3D-CNN model, overlapping 
+spatio-temporal cubes are constructed. An alternative approach pre-
+sented by Gaya-Morey et al. (2023) proposed an explainable deep 
+learning framework for human activity recognition tailored to elderly 
+people. This approach leveraged backbone models such as TimeSformer, 
+TANet, and TPN for video-based HAR and integrated explainable AI 
+(XAI) techniques to generate space and time-aligned explanations that 
+make decisions more understandable to caregivers and end users.
+Despite their strong performance on benchmark datasets, these 
+methods often require high computational resources. Their accuracy can 
+also decrease in real-world conditions due to occlusions, lighting 
+changes, cluttered backgrounds, and camera viewpoint variations. 
+These factors make real-time deployment on low-power devices 
+challenging.
+2.2.2. Pose and skeleton-based approaches
+Another major research direction focuses on human pose or skeleton 
+analysis, where fall detection is performed by modeling body joint tra-
+jectories. Romaissa et al. (2020) addressed elderly fall detection by 
+leveraging human body geometry extracted from video sequences, 
+where angular and distance features are calculated between the head 
+centroid and the body’s hip center. These features are used to train both 
+a two-class SVM and an LSTM network for distinguishing falls from 
+normal activities. Related work by Bach et al. (2026) proposed a 
+vision-based fall detection method based on YOLOv8n-pose for human 
+pose estimation, it incorporated Dynamic Cross-Stage Partial Fusion 
+(DyC2F) blocks to enhance feature representation. The temporal dy-
+namics of human motion are captured using an LSTM module that 
+processes keypoint trajectories. Whereas, Kong et al. (2025) presented a 
+vision-based fall detection system that combined deep learning-based 
+pose estimation with geometric feature analysis. The method applied 
+the YOLOv11 object- and pose-detection model to extract 17 key body 
+landmarks from video frames, it computed nine geometric pose angle 
+features (e.g., center of mass and joint angles), and trained an SVM 
+classifier to detect transitions from upright to lying posture. On the other 
+hand, Tran et al. (2025) proposed a fall-detection system that combined 
+MediaPipe key-point extraction and either an LSTM network or a 
+K-Nearest Neighbor (KNN) classifier. The method identifies human falls 
+M.M. Moussa et al.                                                                                                                                                                                                                             Intelligent Systems with Applications 31 (2026) 200722 
+3 
+--- PAGE 4 ---
+in real time by analyzing skeletal motion patterns derived from 
+key-point sequences.
+Tîrziu et al. (2025) proposed a vision-based fall detection system that 
+integrated the YOLOv11 object detection and pose estimation model 
+with an AI-based voice interaction module. The system was analyzed, 
+including video input from a dual-camera setup, skeletal keypoints for 
+posture evaluation, and falls based on dynamic changes in body pose. It 
+engaged a voice assistant to verify the user’s condition and reduce false 
+alarms. An alternative framework is presented by McCall et al. (2024)
+for identifying and forecasting fall risks utilizing a transformer model 
+trained on 2D poses extracted through an off-the-shelf pose extractor, 
+incorporating transfer learning techniques. Initially, the transformer is 
+trained on a large dataset containing 2D poses of general actions. Sub-
+sequently, the method froze the majority of its layers and fine-tuned only 
+the last few layers using relatively smaller datasets for fall detection and 
+prediction tasks. Gao et al. (2023) proposed a fall-detection approach 
+that integrated human pose estimation with a compact convolutional 
+architecture. The method first extracted skeletal keypoints using 
+OpenPose and labeled them in the input images. These keypoints are 
+then combined with the original visual information and fed into a 
+modified MobileNetV2 network to classify fall and non-fall events. 
+However, Wang and Lin (2024) presented a camera-based monitoring 
+system that protects privacy by replacing elderly individuals’ images 
+with 2D avatars while enabling accurate fall detection. Using YOLOv8 
+for real-time person detection and pose estimation, combined with a 
+residual causal CNN for motion analysis.
+In addition, several approaches perform fall detection using only 
+joint or skeleton representations, without processing full human images, 
+thereby enhancing privacy by minimizing the exposure of identifiable 
+visual details. Abdo et al. (2023) proposed a three-stage deep learning 
+framework for vision-based fall detection. This method combined YOLO 
+for human detection, OpenPose for skeleton extraction, and a Spa-
+tial–Temporal Graph Convolutional Network (ST-GCN) for classifying 
+fall vs. non-fall events. Whereas, Castro et al. (2023) proposed two 
+vision-based fall-detection systems that use 2D and 3D human pose 
+estimation combined with an LSTM network enhanced by an attention 
+mechanism. Using OpenPose (2D) and FrankMocap (3D), the authors 
+extract body-joint coordinates from video frames. While pose-based 
+methods offer interpretability and structured motion representation, 
+their performance heavily depends on accurate key-point detection and 
+degrades under occlusions, poor lighting, or partial body visibility.
+Pose-based methods offer better privacy and clearer interpretation of 
+body motion, as they do not rely on full human images. However, their 
+performance strongly depends on accurate pose estimation. Occlusions, 
+poor lighting, and partial body visibility can lead to missing or incorrect 
+joint detection, which reduces detection accuracy and robustness.
+3. Proposed method
+In this work, we introduce a lightweight fall detection framework 
+that combines MobileNetV2 for spatial feature extraction, a GRU 
+network for temporal motion modeling, and Grad-CAM++ for model 
+explainability. The framework further incorporates a federated learning 
+strategy to enable decentralized training across distributed data sources 
+without sharing raw video data. MobileNetV2 generates compact spatial 
+representations with high computational efficiency, while the GRU 
+captures motion dynamics across consecutive frames to accurately 
+distinguish falls from daily activities. The federated learning framework 
+supports collaborative model training across multiple camera sources 
+while reducing reliance on centralized storage of personal video data 
+and improving generalization across diverse environments. Grad- 
+CAM++ is incorporated to provide clear and intuitive visual explana-
+tions of the model’s decisions, supporting transparency, trustworthiness, 
+and responsible AI principles. Fairness evaluation is also integrated to 
+ensure that the system performs consistently across different user groups 
+and fall types. The overall system workflow proceeds as follows: 
+1. Video streams are captured from surveillance cameras.
+2. MobileNetV2 extracts spatial features from individual frames.
+3. The GRU processes the sequence of extracted features to learn tem-
+poral motion patterns.
+4. During training, federated learning aggregates locally trained models 
+from multiple clients while keeping the raw video data on the local 
+devices.
+5. Fairness and explainability components assess the model’s reliability 
+and responsible behavior.
+6. During testing, a sliding-window mechanism classifies each video 
+segment as fall or non-fall, and a fall alert is triggered when two 
+consecutive windows are detected as falls.
+The following subsections describe each module in detail, along with 
+the federated training process and the proposed inference strategy.
+3.1. Spatial feature extraction with MobileNet
+MobileNetV2 serves as the spatial feature extraction backbone in the 
+proposed fall detection framework, providing a lightweight and 
+computationally efficient architecture for extracting spatial features 
+from video frames. Its core building blocks are inverted residual blocks 
+with linear bottlenecks, where each block first expands the input 
+channels using a 1 × 1 convolution, applies a 3 × 3 depthwise convo-
+lution to capture spatial patterns separately on each channel, and then 
+projects the features back to a compact representation using another 1 ×
+1 convolution (pointwise) (Sandler et al., 2018). The use of depthwise 
+separable convolutions—splitting the spatial filtering (depthwise) and 
+channel combination (pointwise)—dramatically reduces the number of 
+parameters and floating-point operations compared to standard convo-
+lutions, enabling faster inference with minimal loss of accuracy. Mobi-
+leNetV2 contains 17 inverted residual blocks, plus initial and final 
+convolutions, totaling 53 layers, including all expansion, depthwise, and 
+projection layers. Each block preserves essential feature information 
+while keeping computations low, generating compact and informative 
+spatial feature maps that encode body posture and scene context. These 
+features are then passed to the temporal GRU module, which models 
+motion dynamics across consecutive frames to accurately distinguish 
+falls from normal daily activities.
+3.2. Temporal modeling with GRU
+Since, MobileNet only processes each frame independently and does 
+not connect information across frames, it can miss important temporal 
+patterns in videos. Actions like falling happen over several frames, and 
+analyzing a single frame alone is often insufficient to accurately detect 
+the action. To address this limitation, the proposed technique adds a 
+GRU after MobileNet to capture the temporal dependencies between 
+consecutive frames.
+In this approach, each video frame It, where t denotes the current 
+frame index in the video sequence, is first passed through MobileNet to 
+extract a feature vector xt=fMobileNet(It), which encodes spatial informa-
+tion such as body posture and orientation. The sequence of features x1, 
+x2, ...,xT, where T represents the total number of frames in the video, are 
+then fed into a GRU, which is a type of RNN designed to capture long- 
+term dependencies efficiently. The GRU architecture consists of a hid-
+den state ht and two gating mechanisms: the update gate zt and the reset 
+gate rt. These gates control how information is passed along the 
+sequence, enabling the GRU to remember relevant temporal information 
+while ignoring irrelevant details. At each time step, the GRU updates its 
+hidden state using the following equations (Dey & Salemt, 2017): 
+zt = σ(Wzxt+ Uzht  1)(update gate)
+rt = σ(Wrxt+ Urht  1)(reset gate)
+̃ht = tanh(Whxt+ Uh(rt⊙ ht  1))(candidate hidden state)
+ht =(1  zt)⊙ ht  1+ zt⊙̃ht (final hidden state at time step t)
+M.M. Moussa et al.                                                                                                                                                                                                                             Intelligent Systems with Applications 31 (2026) 200722 
+4 
+--- PAGE 5 ---
+Where: σ = sigmoid function, ⊙= element-wise multiplication and 
+W and U = weight matrices
+During training, the GRU updates its parameters through Back-
+propagation Through Time (BPTT), using the loss between predicted 
+and true labels to learn temporal patterns that distinguish abrupt fall 
+movements from gradual or routine daily activities.
+To support efficient inference, the model operates on the video 
+stream using a sequential, non-overlapping sliding-window approach. 
+Each window consists of 20 consecutive frames (F1, F2, …,F20), from 
+which five frames are uniformly sampled (e.g., F1, F5, F10, F15, F20). 
+These sampled frames provide a compact temporal summary while 
+reducing computational overhead and redundancy. During inference, 
+each sampled sequence is passed through the GRU, where the hidden 
+state ht evolves based on learned motion patterns. Sudden posture 
+change, such as rapid descent or collapse, lead to substantial updates in 
+ht, while smoother motions such as bending or walking produce gradual 
+state transitions. The reset gate rt helps discard stale information when 
+motion abruptly changes, while the update gate zt determines how much 
+new information should override existing memory, enabling the 
+network to track the motion trajectory effectively.
+After processing each window, the final hidden state is passed to the 
+classifier to produce a prediction Pw ∈ {fall, non-fall}. To minimize false 
+alarms caused by short transitional movements, a decision rule is 
+applied whereby a fall is confirmed only if two consecutive windows are 
+both predicted as fall: 
+Fall =
+{
+1, if Pt = fall and Pt  1 = fall
+0, otherwise 
+3.3. Federated learning for decentralized training
+In video-based elderly monitoring applications, multiple cameras 
+may be deployed to enable continuous observation and timely fall 
+detection. Traditionally, video streams are transmitted to a centralized 
+server for data processing and model training. However, transferring 
+and storing continuous high-resolution video from multiple devices can 
+create significant challenges related to data management, bandwidth 
+consumption, and storage requirements. Furthermore, in healthcare and 
+assisted-living facilities where numerous individuals are monitored 
+simultaneously, these challenges become increasingly pronounced. 
+Centralized processing also requires large volumes of video data to be 
+collected and maintained at a single location, increasing reliance on 
+centralized storage and potentially limiting scalability across diverse 
+deployment environments. In addition, handling large video datasets 
+may increase network traffic, storage costs, and compliance re-
+quirements associated with managing personal healthcare data. These 
+challenges motivate the development of decentralized learning frame-
+works that support collaborative model training without requiring 
+centralized collection of raw video recordings.
+To address these limitations, the proposed system adopts a simulated 
+federated learning framework (Mammen, 2021), enabling collaborative 
+training of fall detection models across multiple video sources while 
+reducing reliance on centralized storage of sensitive video data. The 
+architecture comprises one central server and five client nodes, each 
+representing a distinct camera view or dataset partition, as shown in 
+Fig. 1. Each client trains a local model on its data and transmits only 
+updated parameters to the central server for aggregation. This decen-
+tralized training strategy eliminates the need to transfer raw video data 
+to a central repository and enables learning from diverse distributed 
+data sources. The federated learning workflow consists of the following 
+main steps: 
+Step 1: Global Model Initialization:
+The central server initializes a global fall detection model and shares 
+the initial parameters with all client nodes. 
+Step 2: Model Distribution:
+The initialized model parameters are distributed to five clients — 
+each representing a unique data source. 
+• Four clients correspond to distinct camera views from the Le2i 
+dataset.
+• One client represents the CAUCA dataset, treated as a single entity 
+due to its consistent environment and camera configuration.
+Step 3: Local Training:
+Each client trains the model locally using its own dataset segment. 
+Raw video data remain on the client device, reducing reliance on 
+centralized storage and lowering data transmission requirements. 
+Step 4: Model Updates:
+Clients send only the updated model parameters (weights) to the 
+Fig. 1. The proposed federated learning workflow.
+M.M. Moussa et al.                                                                                                                                                                                                                             Intelligent Systems with Applications 31 (2026) 200722 
+5 
+--- PAGE 6 ---
+central server after local training. 
+Step 5: Aggregation:
+The central server aggregates the received model updates using a 
+weighted averaging method (e.g., FedAvg) to update the global model. 
+Step 6: Iteration:
+Steps 2–5 are repeated until convergence is achieved, improving 
+model performance across diverse environments.
+It should be noted that the proposed federated learning framework 
+does not incorporate differential privacy mechanisms and therefore does 
+not provide formal privacy guarantees. While raw video data remain on 
+local devices and are not transmitted to the central server, potential 
+privacy threats such as gradient inversion, membership inference, and 
+model reconstruction attacks may still exist. Consequently, the federated 
+learning component should be viewed as a decentralized training 
+strategy rather than a formally privacy-preserving mechanism.
+3.4. Explainability
+Misclassifications in fall detection systems for elderly monitoring can 
+lead to serious real-world consequences. False positives, when a system 
+incorrectly identifies a fall, may cause unnecessary alarms, caregiver 
+fatigue, and inefficient use of emergency resources, whereas false neg-
+atives, when a true fall is missed, can delay medical response and in-
+crease the risk of injury or fatal outcomes. These limitations arise 
+because deep learning models often behave as black boxes, providing 
+accurate outputs without revealing the reasoning behind their 
+predictions.
+To overcome this challenge, the proposed research integrates XAI 
+techniques within the proposed fall detection framework based on 
+MobileNetV2 and a GRU network. Although this hybrid architecture 
+achieves strong detection accuracy, its underlying reasoning remains 
+opaque. Therefore, Grad-CAM++ is applied to enhance interpretability 
+by visually highlighting the image regions that most influence the 
+model’s fall or non-fall predictions.
+In the proposed model, Grad-CAM++ generates Class Activation 
+Maps (CAMs) that assign importance scores to different spatial regions 
+in the final convolutional layers of MobileNetV2. Grad-CAM ++ uses the 
+last convolutional layer because it captures high-level semantic features 
+while preserving spatial information, unlike earlier layers that focus 
+only on low-level details (Chattopadhay et al., 2018).
+The generated heatmaps are then overlaid on the original video 
+frames to indicate which body parts or movements contributed most to 
+the classification decision. This visualization provides valuable trans-
+parency, allowing developers and caregivers to verify that the system 
+bases its predictions on relevant visual cues, thereby improving trust, 
+accountability, and safety in elderly fall detection applications. The 
+Grad-CAM++ process within the proposed MobileNetV2–GRU frame-
+work, as shown in Fig. 2, proceeds as follows: 
+1. Forward propagation: Each video frame I is passed through the 
+MobileNetV2 backbone to extract feature maps from the last con-
+volutional layer. These feature maps are denoted as Ak, where k re-
+fers to one specific feature map inside a convolutional layer. Also, the 
+pre-softmax score (logit) for the target class c (yc) is computed.
+2. Gradient computation: For each feature-map channel k and spatial 
+location (i, j), the partial derivative of yc with respect to the activa-
+tion Ak
+i,j is computed. 
+∂yc
+∂Ak
+i,j 
+Then, compute higher-order derivatives 
+Fig. 2. Grad-CAM++ based visual explanation of the proposed fall detection model decisions.
+M.M. Moussa et al.                                                                                                                                                                                                                             Intelligent Systems with Applications 31 (2026) 200722 
+6 
+--- PAGE 7 ---
+∂2yc
+(
+∂Ak
+i,j
+)2, ∂3yc
+(
+∂Ak
+i,j
+)3 
+3. Weight calculation: Grad-CAM++ computes pixel-wise impor-
+tance weights using the positive partial derivatives of the gradients, 
+allowing multiple relevant regions to contribute to the explanation. 
+These pixel-wise weights for each spatial location are calculated as: 
+αkc
+i,j =
+∂2yc
+ 
+∂Ak
+i,j
+)2
+2 ∂2yc
+ 
+∂Ak
+i,j
+)2 +∑
+a,bAk
+a,b
+∂3yc
+(
+∂Ayk
+a,b
+)3 
+These α coefficients capture location-specific importance, allowing 
+the method to highlight multiple spatial regions that contribute to the 
+class. 
+4. Channel weights (wc
+k): Aggregate the pixel-wise contributions for 
+each channel and this retains only the positive contributions (via 
+ReLU), aligning the visualization with features that support the 
+predicted class. 
+wc
+k =
+∑
+i
+∑
+j
+αkc
+i,j × ReLU
+(
+∂yc
+∂Ak
+i,j
+)
+5. Class activation map generation: A weighted combination of the 
+feature maps produces the heatmap highlighting the most influential 
+regions for the predicted class. This produces a coarse heatmap at the 
+feature-map resolution, highlighting the spatial areas most relevant 
+to class c. 
+Lc
+Grad  CAM ++ = ReLU
+(∑
+k
+wc
+kAk
+)
+6. Visualization and interpretation: Map the heatmap Lc
+Grad  CAM++ to 
+the same dimensions as the input frame I and then overlay it to 
+visually indicate the important regions.
+4. Experiments and results
+This section details the experimental setup and the datasets 
+employed in the study, followed by an evaluation of the proposed 
+model’s performance across its components. The findings are further 
+compared with state-of-the-art models to highlight the strengths of our 
+approach.
+4.1. Datasets
+4.1.1. CAUCAFall
+The CAUCAFall dataset, developed by Guerrero et al. (2022), pro-
+vides a diverse and realistic collection of fall and non-fall activities 
+recorded in an uncontrolled home environment. It features ten partici-
+pants, five men and five women, who vary in age, height, weight, and 
+clothing style. The recordings were captured using a standard RGB 
+camera at 23 frames per second and a resolution of 1080 × 960 pixels, 
+resulting in approximately 8 GB of video data. Each subject performed 
+five types of falls—forward, backward, left-side, right-side, and from a 
+sitting position—and five daily living activities, including walking, 
+hopping, object retrieval, sitting, and kneeling. The videos reflect nat-
+ural variability in lighting (daylight, artificial, and night conditions), 
+occlusions, background motion, and differences in camera angles, dis-
+tances, and room textures, making the dataset highly representative of 
+real-world home scenarios. Fig. 3(a) shows sample frames from the 
+CAUCAFall dataset, illustrating different body postures and fall stages 
+captured in a realistic home environment.
+4.1.2. Le2i
+The Le2i fall detection dataset (L. D. V. Tuyen, 2022) provides 221 
+video sequences, containing 131 simulated falls and 90 Activities of 
+Daily Living (ADL). Each sequence is recorded with a fixed camera at a 
+frame rate of 25 fps and a resolution of 320 × 240 pixels. Different actors 
+perform the activities in four environments: home, office, coffee room, 
+and lecture room. Out of the total videos, 191 are accompanied by 
+manual annotations that supply ground-truth details on fall locations 
+and body positions across the image frames. Fig. 3(b) presents sample 
+frames from the Le2i dataset, recorded in controlled indoor settings 
+across different rooms.
+4.2. Experimental setup
+The proposed model is trained and evaluated using videos from two 
+benchmark fall detection datasets, CAUCAFall and Le2i, with an 80:20 
+train–test split. Rather than using each dataset independently, both 
+datasets are integrated into a simulated federated learning framework to 
+create a heterogeneous client distribution. The Le2i dataset, which in-
+cludes recordings from four different indoor rooms, is assigned to four 
+clients, while one client represents the CAUCAFall dataset, which con-
+tains videos captured under different recording conditions. This client 
+partition introduces diversity in scene characteristics, including back-
+ground, lighting, camera viewpoints, and recording environments, 
+allowing the model to learn from heterogeneous data sources rather than 
+from a single dataset. It should be noted that this client configuration 
+represents a proof-of-concept simulation and does not reflect a real- 
+world federated deployment with independently collected non-IID 
+data from geographically distributed institutions or homes.
+Within this federated setup, the proposed architecture combines 
+MobileNetV2 as a lightweight feature extraction backbone with a GRU 
+layer to capture temporal dependencies between frames. The Mobile-
+NetV2 component is initialized with pre-trained weights to improve 
+convergence and feature quality, while the GRU layer consists of one 
+layer with a hidden size of 256. Model training is optimized using the 
+Adam optimizer with a learning rate of 1 × 10⁻⁴ and Cross-Entropy Loss 
+as the objective function. During federated training, each client conducts 
+one local epoch in every communication round. The global model is then 
+updated through 20 rounds of parameter aggregation, with a batch size 
+of 4 employed for local training. All experiments were conducted on a 
+laptop equipped with an 11th Generation Intel Core i7 processor 
+running at 2.3 GHz, 32 GB of RAM, and an NVIDIA GeForce RTX 3060 
+Laptop GPU with 6 GB of dedicated VRAM. The computational perfor-
+mance and inference latency reported in this study are therefore specific 
+to this hardware configuration. Performance on resource-constrained 
+edge devices, such as Raspberry Pi systems, embedded processors, and 
+mobile AI accelerators, was not evaluated in the current study.
+4.3. Simulation results
+4.3.1. Federated learning convergence analysis
+Fig. 4 present the test set accuracy and loss of the proposed model 
+after each federated training round. Training is performed on long video 
+sequences (approximately 200 frames each), from which 20 frames are 
+sampled for participation in the training phase. The federated learning 
+process is conducted over 20 communication rounds, with each client 
+performing one local training epoch per round using a batch size of 4 
+and a learning rate of 1 × 10⁻⁴. After each round, the locally updated 
+model weights are sent to the central server, where they are aggregated 
+and averaged to form the updated global model. The global model is 
+M.M. Moussa et al.                                                                                                                                                                                                                             Intelligent Systems with Applications 31 (2026) 200722 
+7 
+--- PAGE 8 ---
+then evaluated on the test set at the server side to compute the corre-
+sponding accuracy and loss values for that round. As shown in Fig. 4, the 
+accuracy curve displays a steady upward trend, indicating progressive 
+improvement of the global model as knowledge from distributed clients 
+is integrated. The accuracy stabilizes after approximately the 15th 
+round, suggesting convergence, while the loss curve continues to 
+decrease smoothly, confirming effective optimization. Among all 
+rounds, the model obtained at round 19 achieves the highest accuracy 
+and lowest loss, and is therefore selected as the best-performing global 
+model. The relatively small number of communication rounds required 
+for convergence demonstrates the efficiency of the proposed federated 
+learning framework and helps reduce communication overhead during 
+training. Moreover, the smooth behavior of both curves reflects the 
+robustness of the proposed MobileNetV2–GRU architecture and the 
+stability of the chosen hyperparameters, even under non-identically 
+distributed client data.
+To further assess the effectiveness of the proposed federated learning 
+strategy, an additional experiment is conducted using a centralized 
+training configuration in which all samples from the CAUCA Fall and 
+Le2i datasets are pooled and used to train the same MobileNetV2–GRU 
+architecture. Fig. 5 compares the accuracy and loss obtained under 
+centralized and federated learning settings. As expected, centralized 
+Fig. 3. Sample frames from the two datasets used in this study: (a) CAUCAFall and (b) Le2i.
+Fig. 4. Training accuracy and loss of the proposed model across 20 federated training rounds.
+Fig. 5. Performance comparison between centralized and federated learning using the same MobileNetV2–GRU architecture and training data.
+M.M. Moussa et al.                                                                                                                                                                                                                             Intelligent Systems with Applications 31 (2026) 200722 
+8 
+--- PAGE 9 ---
+training achieves slightly higher performance, outperforming the 
+federated model by 3.73 percentage points in terms of final accuracy. 
+This difference can be attributed to the availability of all training sam-
+ples at a single location, allowing the model to directly optimize over the 
+complete data distribution. Nevertheless, the federated model maintains 
+competitive performance while enabling decentralized training across 
+multiple clients. Although federated learning introduces a modest 
+reduction in accuracy, it eliminates the need to continuously transfer 
+and centrally store large volumes of raw video recordings. Instead, only 
+model parameters are exchanged between clients and the server, sub-
+stantially reducing centralized storage requirements and data trans-
+mission overhead. Furthermore, keeping video data at the source 
+supports decentralized data management, minimizes exposure of sen-
+sitive personal recordings to centralized repositories, and reduces the 
+risk of unauthorized access, disclosure, or misuse of video data. There-
+fore, the observed performance gap represents a reasonable trade-off 
+between predictive performance and the practical advantages of 
+decentralized model training in healthcare and assisted-living 
+environments.
+While the convergence results demonstrate the effectiveness of the 
+proposed federated learning strategy under the considered experimental 
+conditions, it should be noted that the federated learning configuration 
+employed in this study represents a proof-of-concept simulation rather 
+than a fully deployed real-world federated environment. The five clients 
+are created by partitioning the publicly available CAUCA Fall and Le2i 
+datasets into separate local datasets. While this setup demonstrates the 
+feasibility of decentralized training and model aggregation, it does not 
+fully capture practical deployment challenges such as geographically 
+distributed homes, heterogeneous camera hardware, varying network 
+conditions, client dropout, and naturally occurring non-identically 
+distributed (non-IID) data. Therefore, the reported results should be 
+interpreted as an initial validation of the proposed federated learning 
+framework. Future work will investigate deployment across distributed 
+healthcare environments to further assess scalability, communication 
+efficiency, and robustness.
+4.3.2. Computational and deployment analysis
+To assess the inference efficiency of the proposed framework, a 
+detailed time-cost analysis is conducted on a representative test video 
+containing 4204 frames with a duration of 140.13 s. Table 1 presents the 
+latency breakdown of the main computational components. Mobile-
+NetV2 feature extraction requires 36.22 ms and accounts for 96.8% of 
+the total inference time, representing the primary computational cost of 
+the framework. In contrast, the GRU temporal modeling module re-
+quires only 0.93 ms (2.5% of total inference time), while the fully con-
+nected classification layer contributes 0.20 ms (0.5%). It can be noticed 
+that the GRU introduces negligible computational overhead because it 
+operates on compact feature representations generated by MobileNetV2 
+rather than directly on raw image frames. Furthermore, the relatively 
+short temporal sequence used in this work substantially reduces the 
+computational burden of temporal modeling
+Beyond inference efficiency, the communication overhead associ-
+ated with federated training is also an important deployment consider-
+ation. The proposed federated learning framework requires the 
+exchange of model parameters rather than raw video data. The final 
+MobileNetV2–GRU model has a disk footprint of approximately 13.5 
+MB. During each communication round, every client downloads the 
+global model and uploads the locally updated model, resulting in 
+approximately 27 MB of communication per client per round. Across the 
+20 federated training rounds used in this study, the total communication 
+cost is approximately 540 MB per client. Although federated learning 
+introduces communication overhead through model exchange, this cost 
+is incurred only during training and remains substantially lower than 
+continuously transmitting and centrally storing raw video recordings. It 
+should be noted that the current study assumes full client participation 
+throughout all federated training rounds. Consequently, the impact of 
+client dropout and communication failures on model convergence and 
+performance is beyond the scope of the present work and was not 
+evaluated.
+4.3.3. False alarm analysis
+False fall alarms may occur in activities that visually resemble falls, 
+such as picking up objects from the floor or kneeling as illustrated in 
+Fig. 6. In these cases, the system may temporarily classify the movement 
+as a fall due to the rapid downward motion of the upper body or a 
+sudden change in posture. However, when the individual returns to an 
+upright position, the prediction stabilizes, and the false alarm ceases. To 
+further minimize these errors, the system confirms a fall event only 
+when two consecutive windows are both classified as falls. This rule 
+significantly enhances detection reliability by filtering out short or 
+ambiguous actions that do not correspond to real fall events. Never-
+theless, some daily activities, such as kneeling or bending for a pro-
+longed period, may extend across more than two windows, occasionally 
+leading to false alarms, as their motion patterns closely resemble 
+genuine falls. These cases highlight the difficulty of differentiating be-
+tween intentional and accidental downward movements in video-based 
+systems. Despite these limitations, the proposed temporal decision 
+strategy effectively reduces the frequency and persistence of false 
+alarms, maintaining a strong balance between sensitivity to actual falls 
+and robustness against normal daily activities.
+To quantitatively assess the impact of false detections during 
+continuous monitoring, an additional false alarm analysis is conducted 
+using long-duration video sequences from the realistic fall dataset of 
+Baldewijns et al. (2016). During the 7 h and 34 min of continuous 
+monitoring, the proposed framework generates three false alarms, cor-
+responding to approximately 0.40 false alarms per hour. Most false de-
+tections occur in challenging scenarios, including kneeling, bending, 
+and walking activities that occasionally resemble fall-like body postures 
+or motion patterns as shown in Fig. 7. Although false alarms may oc-
+casionally require additional verification by caregivers, they are 
+generally preferable to missed fall events, which may leave an injured 
+individual unattended for an extended period. These results provide an 
+initial assessment of the framework's behavior under continuous moni-
+toring conditions and demonstrate its ability to maintain a relatively low 
+false-alarm rate while preserving high sensitivity to fall events. How-
+ever, the current evaluation is conducted on benchmark data rather than 
+real-world residential deployments. Therefore, further validation 
+through long-term monitoring in healthcare and assisted-living envi-
+ronments remains necessary to fully assess false-alarm rates and prac-
+tical deployment performance.
+4.3.4. Explainability analysis
+To enhance the interpretability of the proposed model, several XAI 
+methods are examined, including GradCAM (Aminudin et al., 2025), 
+GradCAM++ (Chattopadhay et al., 2018), EigenCAM (Rahman et al., 
+2022), EigenGradCAM (Tang et al., 2024), Feature Explanation Map 
+(FEM) (Pan et al., 2020), FinerCAM (Zhang et al., 2025), HiResCAM 
+(Draelos & Carin, 2020), and XGradCAM (Fu et al., 2020). As presented 
+in Fig. 8, GradCAM++ produces the most accurate and meaningful 
+visualization results. Compared with the original GradCAM, which 
+generates broader and less focused activation maps, GradCAM++ pro-
+vides sharper localization and clearer attention on the regions associated 
+with the falling action. This improvement results from its weighted 
+Table 1 
+Inference latency breakdown of the proposed MobileNetV2–GRU framework.
+Component Latency (ms) % of Inference
+MobileNetV2 36.22 96.8
+GRU 0.93 2.5
+FC Classifier 0.20 0.5
+Total Inference 37.43 100
+M.M. Moussa et al.                                                                                                                                                                                                                             Intelligent Systems with Applications 31 (2026) 200722 
+9 
+--- PAGE 10 ---
+gradient computation, which enables the identification of multiple 
+discriminative areas simultaneously. Such behavior is particularly 
+beneficial for video-based fall detection, where movements involve 
+several body parts. GradCAM++ also demonstrates stable and consis-
+tent explanations across consecutive frames, maintaining focus on the 
+human motion rather than the background. In contrast, EigenCAM and 
+HiResCAM often highlight irrelevant areas, while FEM produces scat-
+tered activations. Based on these observations, GradCAM++ is selected 
+as the most suitable XAI technique, as it delivers clear, consistent, and 
+contextually relevant visual interpretations of the model’s decisions.
+4.3.5. Fairness evaluation
+When a model is unfair or biased, it may misclassify certain groups 
+more frequently, leading to unequal safety outcomes, such as delayed 
+detection for one gender or fall type. So, this raises the importance of 
+responsible AI when designing AI applications to guarantee the model 
+output is explainable and fair. So, in this paper, the model performance 
+predictions are evaluated to ensure that the system performs equitably 
+across all users, regardless of factors such as gender, age, or fall direc-
+tion. Therefore, by assessing fairness alongside accuracy, developers can 
+identify hidden biases, improve model reliability, and promote trust and 
+accountability in the proposed model. To support this objective, Fair-
+learn (an open source library) (Fairlearn) is used in the proposed system 
+to assess the fairness of the model. The fairness is evaluated through two 
+aspects: gender (male and female) and fall direction (back, front, side, 
+and from a chair). Fig. 9 presents the Fairlearn evaluation of model 
+performance across the fall directions. It can be noticed that Fairlearn 
+results show consistent F1, recall, and precision across all fall directions, 
+indicating that the model performs fairly and accurately without bias 
+toward any specific fall type (Beya et al., 2015).
+Moreover, the model predictions are evaluated across the gender of 
+the fallen persons, and the results are shown in Fig. 10. The results show 
+nearly identical F1, recall, and precision scores for male and female 
+subjects, indicating that the fall detection model performs equitably 
+across genders without observable bias.
+Furthermore, Fig. 11 presents the combined fairness evaluation of 
+the proposed fall detection model across both gender and fall types. This 
+figure examines the interaction between the two factors to determine 
+whether performance disparities appear in specific combinations, such 
+as female-side or male-chair falls. The results show that the model 
+Fig. 6. Example of false fall alarms generated during two daily activities: (a) picking up an object and (b) kneeling.
+Fig. 7. Representative false alarm cases during continuous monitoring, including kneeling, bending, and walking activities. The lower row shows the corresponding 
+Grad-CAM++ visualizations.
+M.M. Moussa et al.                                                                                                                                                                                                                             Intelligent Systems with Applications 31 (2026) 200722 
+10 
+--- PAGE 11 ---
+maintains consistently high F1, recall, and precision values across all 
+gender–fall type pairs, confirming that it performs uniformly well 
+regardless of the subject’s gender or the nature of the fall. This combined 
+analysis provides stronger evidence of the model’s fairness and robust-
+ness, demonstrating that no intersectional bias arises when both de-
+mographic and behavioral variables are considered simultaneously. 
+Such findings further reinforce the reliability of the proposed system for 
+real-world use, where both gender diversity and variability in fall dy-
+namics are expected.
+To further evaluate the impact of fairness-aware partitioning, the 
+federated model was tested using random and fairness-aware data splits. 
+Random splits showed considerable performance variation, with accu-
+racies ranging from 64.87% to 97.37% (mean: 85.19% ± 12.9%). 
+Fairness-aware splits, evaluated across two runs, achieved 95.00% and 
+95.20%, both within the upper range of the random split results and 
+without comparable performance degradation. The 95.20% fairness- 
+aware model is selected as the final model and integrated with the 
+window-based fall detection mechanism, achieving an overall accuracy 
+of 97.14%. Although evaluated on a limited number of fairness-aware 
+runs, these results suggest that fairness-aware partitioning can reduce 
+the risk of performance drops caused by random splitting while main-
+taining detection accuracy.
+4.4. Comparison with the conventional methods
+Table 2 compares the proposed method with several existing fall- 
+detection approaches in terms of accuracy, precision, recall, and F1- 
+score. Overall, the proposed model demonstrates competitive perfor-
+mance compared with state-of-the-art methods while achieving a 
+favorable balance between accuracy, precision, recall, and F1-score. For 
+example, compared to Romaissa et al. (2020), it achieves notable gains 
+of +12.54% in accuracy, +9.26% in precision, +6.75% in recall, and 
++7.99% in F1-score, reflecting the strength of modeling full 
+spatio-temporal motion patterns rather than depending on handcrafted 
+posture features. Similarly, when compared with Tran et al. (2025), the 
+proposed method improves by +4.95% in accuracy, +17.26% in preci-
+sion, +12.75% in recall, and +14.99% in F1-score, demonstrating 
+robustness against key-point detection errors and occlusions.
+Furthermore, the proposed method shows clear advantages over 
+deep learning approaches trained on individual datasets, highlighting 
+the benefits of federated training across heterogeneous datasets. For 
+instance, compared to Alam et al. (2025), it improves accuracy by 
+3.47%, precision by 5.84%, and F1-score by 4.04%. In contrast, 
+compared to Oliu (2025), it shows a slight decrease of 1.36% in accu-
+racy; however, Marc Oliu’s higher accuracy of 98.50% comes at the 
+expense of lower precision, as the proposed method attains 99.26%, 
+minimizing false positives, a key factor for reducing alarm fatigue and 
+maintaining user trust. Additionally, training on the combined CAUCA 
+and Le2i datasets allows the model to learn generalizable representa-
+tions that perform consistently across diverse real-world scenarios, 
+rather than overfitting to a single dataset.
+When evaluated against Gao et al. (2023), which combines OpenPose 
+skeletal keypoint extraction with a lightweight MobileNetV2 architec-
+ture and achieves 98.6% accuracy on Le2i, the proposed method dem-
+onstrates comparable accuracy of 97.14%, with slightly higher precision 
+(99.26% vs. 98.65%) and slightly lower recall (96.75% vs. 97.7%). 
+While Mengqi Gao et al.’s two-stage approach performs well, it faces 
+limitations such as higher latency from sequential OpenPose extraction 
+and MobileNetV2 classification, strong dependence on OpenPose accu-
+racy, and reduced robustness in cluttered environments, which can 
+propagate errors.
+Similarly, compared to Zou et al. (2021), which uses movement tube 
+detection with 3D CNNs and achieves 97.23% accuracy on Le2i, the 
+proposed method shows a minimal decrease in accuracy (0.09 per-
+centage points). However, Song Zou’s approach suffers from high 
+computational cost, reliance on accurate frame-by-frame person 
+Fig. 8. Visualization results of different XAI methods used to interpret the 
+proposed fall detection model. (a) original frames (b) GradCAM++, (c) Grad-
+CAM, (d)EigenCAM, (e) EigenGradCAM, (f) FEM, (g) FinerCAM, (h)HiResCAM, 
+(i) XGradCAM.
+M.M. Moussa et al.                                                                                                                                                                                                                             Intelligent Systems with Applications 31 (2026) 200722 
+11 
+--- PAGE 12 ---
+detection, and sensitivity to partial occlusions. Against McCall et al. 
+(2024), evaluated on CAUCA Fall data with 97.95% accuracy, the pro-
+posed method reaches 97.14% accuracy; however, the lack of precision, 
+recall, and F1-score metrics in their report prevents a full multi-metric 
+comparison.
+In comparison with Wang et al. (Wang & Lin, 2024), which achieves 
+98.86% accuracy, 90.02% precision, and 90.50% F1-score on Le2i, the 
+proposed method shows slightly lower accuracy (97.14%) but substan-
+tially higher precision (99.26%) and F1-score (97.99%). This indicates 
+that, although Chang-Yueh Wang et al.’s method achieves higher overall 
+accuracy, the proposed method is more effective at minimizing false 
+positives and maintaining a better balance between precision and recall.
+Fig. 9. Fairlearn evaluation of model performance across fall directions.
+Fig. 10. Model fairness evaluation across gender groups using Fairlearn.
+Fig. 11. Combined evaluation of fairness across gender and fall type using F1 score, Recall, and Precision.
+M.M. Moussa et al.                                                                                                                                                                                                                             Intelligent Systems with Applications 31 (2026) 200722 
+12 
+--- PAGE 13 ---
+Finally, Zaghden et al. (2025) achieves the highest reported perfor-
+mance on CAUCA alone, with 99.6% accuracy, 99.72% precision, 
+99.93% recall, and 99.82% F1-score. The proposed method performs 
+slightly lower, with differences of 2.46, 0.46, 3.18, and 1.83 percentage 
+points, respectively. This performance gap may be attributed to differ-
+ences in architecture and optimization strategy. Their framework com-
+bines Faster R-CNN, OpenPose-based keypoint extraction, GAN-based 
+data augmentation, attention mechanisms, and a modified YOLOv8 
+detector, providing detailed posture and localization information that 
+may improve discrimination between falls and visually similar activities 
+such as kneeling or bending. However, these improvements are achieved 
+through a substantially more complex pipeline. In contrast, the proposed 
+framework employs a lightweight MobileNetV2–GRU architecture that 
+achieves competitive performance while maintaining high inference 
+efficiency, together with explainability through Grad-CAM++, fairness 
+evaluation using Fairlearn, and decentralized federated learning.
+4.5. Ablation study
+Ablation experiments are conducted to examine the impact of tem-
+poral configuration on both the training and inference stages of the 
+proposed fall detection model. Two complementary studies are per-
+formed: (1) an ablation study on training temporal context and (2) an 
+ablation study on window configuration and latency. Together, these 
+experiments aim to identify the temporal setup that best balances ac-
+curacy, responsiveness, and robustness.
+In the first study, the effect of temporal input length on model per-
+formance is evaluated using three configurations: Model 20, Model 40, 
+and the Full Model. Models 20 and 40 are trained using sliding windows 
+of 20 and 40 consecutive frames, respectively, while the Full Model is 
+trained on entire video sequences without segmentation. For fair com-
+parison, all models are tested using 20-frame sliding windows. As shown 
+in Table 3, Model 40 achieves a very high recall for the Fall class (0.99), 
+indicating that nearly all true fall events are detected; however, its 
+precision drops substantially (0.65), suggesting a high number of false 
+positives. In contrast, Model 20 demonstrates a more balanced perfor-
+mance, with a recall of 0.89 and a precision of 0.72 for the Fall class, 
+capturing shorter fall events effectively but missing longer temporal 
+patterns. The Full Model outperforms both window-based models across 
+all metrics, maintaining high precision and recall for both Fall and Not 
+Fall classes (precision: 0.92–0.99, recall: 0.97–0.98), even when evalu-
+ated on 20-frame windows. This indicates that exposure to complete 
+motion sequences during training enables the model to learn richer 
+temporal patterns and contextual cues, allowing it to accurately recog-
+nize partial motion sequences at inference.
+These results in Table 3 highlight the importance of incorporating 
+global temporal information during training. While longer sliding win-
+dows improve sensitivity, training on full video sequences provides the 
+best trade-off between precision and recall, yielding the most robust and 
+generalizable configuration across the evaluated benchmark datasets.
+To optimize both accuracy and computational efficiency, additional 
+experiments examine the influence of temporal inference settings on the 
+proposed fall detection system. Specifically, these studies explore how 
+window size, step size (number of frames processed per inference), and 
+the number of consecutive windows required to confirm a fall affect 
+performance. These parameters are carefully tuned to balance F1-score 
+with inference latency, defined as the number of frames needed to 
+produce a detection, which is critical for timely intervention. Window 
+size determines the temporal context the model observes, with larger 
+windows capturing longer motion sequences but introducing delays, 
+while step size controls prediction frequency, with smaller steps 
+enhancing responsiveness. Successive window confirmation is employed 
+to filter out transient misclassifications caused by brief non-fall move-
+ments, such as bending or sitting.
+The results in Table 4 reveal that a 20-frame window, processed 5 
+frames per step, and double confirmation for fall events achieve the 
+optimal balance between sensitivity and speed. In this configuration, a 
+fall is confirmed only after two consecutive positive windows, whereas 
+non-fall events require a single negative window, allowing the system to 
+respond faster to normal activity while maintaining reliability for fall 
+detection. This setup achieves a high F1-score of 0.98, with inference 
+latencies of 20 frames for non-fall and 40 frames for fall events. Smaller 
+windows reduce latency without sacrificing accuracy, whereas larger 
+windows introduce unnecessary delay, highlighting the importance of 
+carefully balancing temporal context and responsiveness.
+Together, these ablation studies underscore the value of global 
+temporal information during training and efficient short-window 
+inference during deployment. By integrating full-sequence training 
+with a 20-frame sliding-window inference strategy and a double- 
+confirmation mechanism, the system achieves a well-balanced synergy 
+of precision, robustness, and rapid decision-making. This configuration 
+enables the model to capture rich temporal patterns during training 
+while maintaining low-latency, high-confidence predictions during 
+deployment. Complementing these design choices, the system achieves 
+an inference throughput of approximately 93 FPS, demonstrating high 
+computational efficiency while maintaining accurate fall detection.
+Table 2 
+Quantitative performance comparison between the proposed model and state-of- 
+the-art methods.
+Authors Dataset Accuracy Precision Recall F1- 
+Score
+Wang et al. (Wang 
+& Lin, 2024)
+Le2i 98.86 90.02 - 90.50%
+Romaissa et al. 
+(2020)
+Le2i 84.60% 90.00% 90.00% 90.00%
+Oliu (Oliu, 2025) CAUCA 98.50% 97.55% 99.08 
+%
+-
+Alam (Alam et al., 
+2025)
+CAUCA 93.67% 93.42% - 93.95%
+Gao et al. (2023) Le2i 98.6% 98.65% 97.7% ​
+McCall et al. 
+(2024)
+CAUCA 97.95 - - -
+Zou et al. (2021) Le2i 97.23% - - -
+Zaghden et al. 
+(2025)
+CAUCA 99.6% 99.72% 99.93% 99.82%
+Tran et al. (2025) CAUCA 92.19% 82.00% 84.00% 83.00%
+Proposed method CAUCA & 
+Le2i
+97.14% 99.26% 96.75% 97.99%
+Table 3 
+Precision and recall of the proposed model for different temporal training 
+configurations.
+Model Class Precision Recall
+Model 20 Fall 0.72 0.89
+Not Fall 0.95 0.86
+Model 40 Fall 0.65 0.99
+Not Fall 0.99 0.79
+Model Full Fall 0.92 0.98
+Not Fall 0.99 0.97
+Table 4 
+Effects of temporal window settings on latency and accuracy.
+Window 
+size
+Frames 
+per 
+window
+Successive 
+windows to 
+decide fall
+Latency in 
+a non-fall 
+case
+Latency in 
+the fall 
+case
+F1 
+score
+40 10 2 40 80 0.978
+20 5 2 20 40 0.98
+40 10 1 40 40 0.974
+20 5 1 20 20 0.975
+M.M. Moussa et al.                                                                                                                                                                                                                             Intelligent Systems with Applications 31 (2026) 200722 
+13 
+--- PAGE 14 ---
+5. Conclusion
+This paper presents a lightweight and explainable fall detection 
+framework that integrates MobileNetV2 for spatial feature extraction, 
+GRU-based temporal modeling, Grad-CAM++ for visual interpret-
+ability, and federated learning for decentralized model training. The 
+proposed framework achieves competitive performance on the CAUCA 
+Fall and Le2i benchmark datasets while maintaining high inference ef-
+ficiency. Experimental results demonstrate the effectiveness of the 
+MobileNetV2–GRU architecture for distinguishing fall events from daily 
+activities, while Grad-CAM++ provides intuitive visual explanations 
+that enhance transparency and trust in the model’s predictions. 
+Furthermore, fairness evaluation confirms consistent performance 
+across different fall scenarios and user groups.
+The federated learning strategy enables collaborative model training 
+across distributed data sources without requiring centralized collection 
+of raw video recordings. Although centralized training achieves slightly 
+higher accuracy, the federated model maintains competitive perfor-
+mance while reducing reliance on centralized storage and transmission 
+of sensitive personal video data. Computational analysis further dem-
+onstrates the efficiency of the proposed framework, and continuous- 
+monitoring experiments provide an initial assessment of false alarms 
+under realistic operating conditions.
+Despite these promising results, several limitations remain. The 
+current evaluation relies on publicly available benchmark datasets, 
+while the federated learning framework is assessed through a proof-of- 
+concept simulation. Therefore, additional validation in real-world 
+healthcare and assisted-living environments is necessary to establish 
+the framework's suitability for practical clinical deployment. In addi-
+tion, false alarms may still occur during challenging daily activities 
+which can exhibit motion patterns similar to falls. Furthermore, while 
+federated learning reduces reliance on centralized storage of raw video 
+data, the proposed framework does not incorporate formal privacy- 
+preserving mechanisms and therefore does not provide formal privacy 
+guarantees. Future work will focus on large-scale validation in real 
+healthcare and assisted-living environments, investigating robustness 
+under heterogeneous deployment conditions, reducing false alarms 
+during daily activities, and integrating advanced privacy-enhancing 
+mechanisms within the federated learning framework. These di-
+rections will further strengthen the practical applicability, trustworthi-
+ness, and responsible deployment of AI-based fall detection systems.
+Funding
+This research did not receive any specific grant from funding 
+agencies in the public, commercial, or not-for-profit sectors.
+Credit author statement
+Mona M. Moussa: Conceptualization, Methodology, Software, 
+Investigation, Validation, Writing - review & editing. Rasha Shoitan: 
+Conceptualization, Methodology, Formal analysis, Investigation, Visu-
+alization, Writing - original draft, Writing - review & editing. Nahed 
+Tawfik: Conceptualization, Data curation, Formal analysis, Investiga-
+tion, Visualization, Writing - original draft, Writing - review & editing. 
+All authors contributed to the development of the work, reviewed and 
+approved the final manuscript, and agreed to be accountable for the 
+work.
+Declaration of competing interest
+The authors declare that they have no known competing financial 
+interests or personal relationships that could have appeared to influence 
+the work reported in this paper.
+Data availability
+Data will be made available on request.
+References
+Abdo, H. A., Amin, K. M., & Hamad, A. M. (2023). Human fall detection using spatial 
+temporal graph convolutional networks. International Journal of Computers and 
+Information (IJCI), 10(2), 80–98 [Online]. https://ijci.journals.ekb.eg/
+Alam, E., Sufian, A., Dutta, P., & Leo, M. (2025).“Human fall detection using transfer 
+learning-based 3D CNN,” 10.1007/978-3-031-81935-3_9.
+Aminudin, M. A. I., et al. (2025). Explainable deep learning framework for binary 
+corrosion image classification using grad-CAM. Sensors, 25(22), 7070. https://doi. 
+org/10.3390/S25227070. 2025, Vol. 25.
+Apicella, A., & Snidaro, L. (2021).“Deep neural networks for real-time remote fall 
+detection,”, pp. 188–201. 10.1007/978-3-030-68790-8_16.
+Bach, N. C., et al. (2026). A lightweight and efficient deep learning model for real-time 
+fall detection on edge device. Biomedical Signal Processing and Control, 113, Article 
+108942. https://doi.org/10.1016/J.BSPC.2025.108942
+Baldewijns, G., Debard, G., Mertes, G., Vanrumste, B., & Croonenborghs, T. (2016). 
+Bridging the gap between real-life data and simulated data by providing a highly 
+realistic fall dataset for evaluating camera-based fall detection algorithms. 
+Healthcare Technology Letters, 3(1), 6–11. https://doi.org/10.1049/htl.2015.0047
+Batumalai, P., Thazhakkattu Vasu, D., Selvakumar, K., & Choon Hian, G. (2025). 
+A bibliometric analysis of wearable sensors for fall-risk assessment in the elderly 
+population. Medicine, 104(35), Article e44118. https://doi.org/10.1097/ 
+MD.0000000000044118
+Beya, O., Hittawe, M., Sidibe, D., & Meriaudeau, F. (2015). Automatic detection and 
+tracking of animal sperm cells in microscopy images. In Proceedings of the 11th 
+international conference on signal-image technology & internet-based systems (SITIS) (pp. 
+155–159). IEEE. https://doi.org/10.1109/SITIS.2015.111. 
+Castro, F., Dentamaro, V., Gattulli, V., & Impedovo, D. (2023). Fall detection with LSTM 
+and attention mechanism (pp. 37–50). WAMWB @ MobileHCI.
+Chattopadhay, A., Sarkar, A., Howlader, P., & Balasubramanian, V. N. (2018). Grad-CAM 
+++: Generalized gradient-based visual explanations for deep convolutional 
+networks. In , 2018. Proceedings of the- IEEE winter conference on applications of 
+computer vision, WACV 2018 (pp. 839–847). https://doi.org/10.1109/ 
+WACV.2018.00097. -January.
+Chen, T., Ding, Z., & Li, B. (2022). Elderly fall detection based on improved YOLOv5s 
+network. IEEE Access, 10(10), 91273–91282. https://doi.org/10.1109/ 
+ACCESS.2022.3202293
+Chen, S., Chen, Y., Feng, M., Chen, S., Chen, Y., & Feng, M. (2024). Indoor infrared 
+sensor layout optimization for elderly monitoring based on fused genetic gray wolf 
+optimization (FGGWO) algorithm. Sensors, 24(16), 5393. https://doi.org/10.3390/ 
+S24165393. 2024, Vol. 24.
+Chen, Y., et al. (2025). Global, regional, and national burden of falls among older adults: 
+Findings from the Global Burden of Disease Study 2021 and Projections to 2040. NPJ 
+Aging, 11(1), 85. https://doi.org/10.1038/S41514-025-00275-4
+Dey, R., & Salemt, F. M. (2017). Gate-variants of Gated Recurrent Unit (GRU) neural 
+networks. Midwest Symposium on Circuits and Systems, 2017, 1597–1600. https://doi. 
+org/10.1109/MWSCAS.2017.8053243. -August.
+Draelos, R. L., & Carin, L. D. (2020). “Use HiResCAM instead of grad-CAM for faithful 
+explanations of convolutional neural networks,”, Accessed: Dec. 31, 2025. [Online]. 
+https://arxiv.org/pdf/2011.08891.
+El Sayed, A. E. H. I., Said, M. T., Mohsen, O., Abozied, A. M., & Salama, M. (2023). Falls 
+and associated risk factors in a sample of old age population in Egyptian community. 
+Frontiers in Public Health, 11, Article 1068314. https://doi.org/10.3389/ 
+FPUBH.2023.1068314
+Fairlearn. “Fairlearn: A Python package for assessing and improving fairness of AI 
+systems,”. [Online]. Available: https://fairlearn.org/ Accessed: Jan. 20, 2026.
+Fei, K., Wang, C., Zhang, J., Liu, Y., Xie, X., & Tu, Z. (2023). Flow-pose net: An effective 
+two-stream network for fall detection. The Visual Computer, 39(6), 2305–2320. 
+https://doi.org/10.1007/S00371-022-02416-2. 2022 39:6.
+Fu, R., Hu, Q., Dong, X., Guo, Y., Gao, Y., & Li, B. (2020). Axiom-based grad-CAM: 
+Towards accurate visualization and explanation of CNNs. In Proceedings of the 31st 
+British machine vision conference, BMVC 2020. https://doi.org/10.5244/c.34.146
+Fu, F. (2025). A video-based fall detection using 3D sparse convolutional neural network 
+in elderly care services. Machine Graphics and Vision, 34(1), 53–74. https://doi.org/ 
+10.22630/MGV.2025.34.1.3
+Gao, M., Li, J., Zhou, D., Zhi, Y., Zhang, M., & Li, B. (2023). Fall detection based on 
+OpenPose and MobileNetV2 network. IET Image Process, 17(3), 722–732. https://doi. 
+org/10.1049/ipr2.12667
+Gaya-Morey, F. X., Manresa-Yee, C., & Buades-Rubio, J. M. (2023). Explainable activity 
+recognition for the elderly. In Proceedings of the ACM international conference 
+proceeding series. https://doi.org/10.1145/3612783.3612790;PAGEGROUP:STRING: 
+PUBLICATION
+Giovannini, S., et al. (2022). Falls among older adults: Screening, identification, 
+rehabilitation, and management. Applied Sciences, 12(15), 7934. https://doi.org/ 
+10.3390/APP12157934. 2022, Vol. 12.
+Guerrero, J. C. E., Espa˜na, E. M., A˜nasco, M. M., & Lopera, J. E. P. (2022). Dataset for 
+human fall recognition in an uncontrolled environment. Data Brief, 45, Article 
+108610. https://doi.org/10.1016/J.DIB.2022.108610
+M.M. Moussa et al.                                                                                                                                                                                                                             Intelligent Systems with Applications 31 (2026) 200722 
+14 
+--- PAGE 15 ---
+Huang, H. H., et al. (2024). Exploring factors affecting the acceptance of fall detection 
+technology among older adults and their families: A content analysis. BMC Geriatrics, 
+24(1), 694. https://doi.org/10.1186/S12877-024-05262-0. 2024 24:1-.
+Kakara, R., Bergen, G., Burns, E., & Stevens, M. (2025). Nonfatal and fatal falls among 
+adults aged ≥65 years — United States, 2020–2021. MMWR Morbidity and Mortality 
+Weekly Report, 72(35), 938–943. https://doi.org/10.15585/MMWR.MM7235A1
+Kalache, A., et al. (2007). World Health Organisation Global Report on Falls Prevention in 
+Older Age. World Health Organization Accessed: Jan. 02, 2026. [Online]. https://r 
+esearch.manchester.ac.uk/en/publications/world-health-organisation-global-repor 
+t-on-falls-prevention-in-ol/
+Khan, A. S. et al., (2025). “Explainable machine learning for fall detection and alert 
+system: A cloud-integrated approach using smartphone sensors,” pp. 260–275, 10.1 
+007/978-3-032-11355-9_19.
+Khekan, A. R., Aghdasi, H. S., & Salehpour, P. (2025). Fast and high-precision human fall 
+detection using improved YOLOv8 model. IEEE Access, 13, 5271–5283. https://doi. 
+org/10.1109/ACCESS.2024.3470319
+Kong, V., Soeng, S., Thon, M., Cho, W. S., Nayyar, A., & Kim, T. K. (2025). PIFR: A novel 
+approach for analyzing pose angle-based human activity to automate fall detection 
+in videos. PLoS One, 20(6), Article e0325253. https://doi.org/10.1371/JOURNAL. 
+PONE.0325253
+Krupitzer, C., Sztyler, T., Edinger, J., Breitbach, M., Stuckenschmidt, H., & Becker, C. 
+(2019). Beyond position-awareness—Extending a self-adaptive fall detection system. 
+Pervasive and Mobile Computing, 58, Article 101026. https://doi.org/10.1016/J. 
+PMCJ.2019.05.007
+World Health Organization, (2022). “Le2i Fall Dataset.” Kaggle, 2022. [Online]. 
+Available: https://www.kaggle.com/datasets/tuyenldvn/falldataset-imvia Accessed: 
+Dec. 31, 2025.
+Liu, L., Sun, Y., Li, Y., & Liu, Y. (2025). A hybrid human fall detection method based on 
+modified YOLOv8s and AlphaPose. Scientific Reports, 15(1), 2636. https://doi.org/ 
+10.1038/s41598-025-86429-6. 2025 15:1-.
+Liu, X., Xu, F., Zhang, Z., & Sun, K. (2025). Fall-portent detection for construction sites 
+based on computer vision and machine learning. Engineering, Construction and 
+Architectural Management, 32(3), 1499–1521. https://doi.org/10.1108/ECAM-05- 
+2023-0458
+Mammen, P. M. (2021).“Federated learning: Opportunities and challenges,” arXiv 
+preprint arXiv:2101.05428, 10.48550/arXiv.2101.05428.
+McCall, S., et al. (2024). Computer vision based transfer learning-aided transformer 
+model for fall detection and prediction. IEEE Access, 12, 28798–28809. https://doi. 
+org/10.1109/ACCESS.2024.3368065
+Nú˜nez-Marcos, A., & Arganda-Carreras, I. (2024). Transformer-based fall detection in 
+videos. Engineering Applications of Artificial Intelligence, 132, Article 107937. https:// 
+doi.org/10.1016/j.engappai.2024.107937
+Newaz, N. T., & Hanada, E. (2024). A low-resolution infrared array for unobtrusive 
+human activity recognition that preserves privacy. Sensors, 24(3), 926. https://doi. 
+org/10.3390/S24030926
+Newaz, N. T., Hanada, E., Newaz, N. T., & Hanada, E. (2023). The methods of fall 
+detection: A literature review. Sensors, 23(11), 5212. https://doi.org/10.3390/ 
+S23115212. 2023, Vol. 23.
+Oliu, M. et al., (2025). “Fall detection: Leveraging depth information in Bayesian 
+networks misi @ milestone. dk”.
+Pan, D., Li, X., Li, X., & Zhu, D. (2020). Explainable Recommendation via interpretable 
+feature mapping and evaluation of explainability. In , 2021. Proceedings of the IJCAI 
+international joint conference on artificial intelligence (pp. 2690–2696). https://doi. 
+org/10.24963/ijcai.2020/373. -January.
+Patel, A. D., Jhaveri, R. H., Patel, A. D., & Bvuma, S. (2026). Human fall detection in 
+SAGIN environment using ultrasonic sensors and hybrid deep learning. Transactions 
+on Emerging Telecommunications Technologies, 37(1), Article e70321. https://doi.org/ 
+10.1002/ETT.70321. ;ISSUE:ISSUE:dOi.
+Rahman, A. N., Andriana, D., & MacHbub, C. (2022). Comparison between grad-CAM 
+and EigenCAM on YOLOv5 detection model. In Proceedings of the ISESD2022 - 2022 
+international symposium on electronics and smart devices. https://doi.org/10.1109/ 
+ISESD56103.2022.9980734
+Romaissa, B. D., Mourad, O., Brahim, N., & Yazid, B. (2020). Fall detection using body 
+geometry in video sequences. In Proceedings of the tenth international conference on 
+image processing theory, tools and applications (IPTA): 2020. IEEE. 
+Sandler, M., Howard, A., Zhu, M., Zhmoginov, A., & Chen, L. C. (2018). MobileNetV2: 
+Inverted residuals and linear bottlenecks. In Proceedings of the IEEE computer society 
+conference on computer vision and pattern recognition (pp. 4510–4520). https://doi. 
+org/10.1109/CVPR.2018.00474
+Sanjalawe, Y., Fraihat, S., Abualhaj, M., Al-E’mari, S. R., & Alzubi, E. (2025). Hybrid 
+deep learning for human fall detection: A synergistic approach using YOLOv8 and 
+time-space transformers. IEEE Access, 13, 41336–41366. https://doi.org/10.1109/ 
+ACCESS.2025.3547914
+Swarubini, P. J., Igasaki, T., & Ganapathy, N. (2025). Automated fall detection in smart 
+homes using multiple radars and machine learning classifiers. Studies in Health 
+Technology and Informatics, 323, 221–225. https://doi.org/10.3233/SHTI250082
+Tîrziu, E., et al. (2025). Real-time fall monitoring for seniors via YOLO and voice 
+interaction. Future Internet, 17(8), 324. https://doi.org/10.3390/FI17080324. 2025, 
+Vol. 17.
+Tang, D., et al. (2024). Reviewing CAM-based deep explainable methods in healthcare. 
+Applied Sciences, 14(10), 4124. https://doi.org/10.3390/APP14104124. 2024, Vol. 
+14.
+Tran, L., Minh, H. C., Thai, N., Huynh, H., & Nam, V. (2025).“Automate fall detection 
+using MediaPipe keypoint-extraction,”.
+Wang, C. Y., & Lin, F. S. (2024). AI-driven privacy in elderly care: Developing a 
+comprehensive solution for camera-based monitoring of older adults. Applied 
+Sciences (Switzerland), 14(10), 4150. https://doi.org/10.3390/app14104150
+Wickramasinghe, A., Shinmoto Torres, R. L., & Ranasinghe, D. C. (2017). Recognition of 
+falls using dense sensing in an ambient assisted living environment. Pervasive and 
+Mobile Computing, 34, 14–24. https://doi.org/10.1016/J.PMCJ.2016.06.004
+World Health Organization, (2021)., “Falls.” World Health Organization, Apr. 26, 2021. 
+[Online]. https://www.who.int/news-room/fact-sheets/detail/falls Accessed: Oct. 
+8, 2025.
+Yang, J., He, Y., Zhu, J., Lv, Z., & Jin, W. (2024). Fall detection method for infrared 
+videos based on spatial-temporal graph convolutional network. Sensors, 24(14), 
+4647. https://doi.org/10.3390/S24144647
+Yang, B., Nguyen, L. T., Chansanam, W., Yang, B., Nguyen, L. T., & Chansanam, W. 
+(2025). Lightweight attention-augmented YOLOv5s for accurate and real-time fall 
+detection in elderly care environments. Sensors, 25(23), 7365. https://doi.org/ 
+10.3390/S25237365. 2025, Vol. 25.
+Yao, Y., et al. (2026). Privacy-preserving unobtrusive fall detection for older adults: A 
+highly generalized deep anomaly detection model. Tsinghua Science and Technology, 
+31(3), 1802–1818. https://doi.org/10.26599/TST.2024.9010203
+Yu, X., Wang, C., Wu, W., & Xiong, S. (2025). A real-time skeleton-based fall detection 
+algorithm based on temporal convolutional networks and transformer encoder. 
+Pervasive and Mobile Computing, 107, Article 102016. https://doi.org/10.1016/J. 
+PMCJ.2025.102016
+Zaghden, N., Ibrahim, E., Safaldin, M., & Mejdoub, M. (2025). Integrating attention 
+mechanisms in YOLOv8 for improved fall detection performance. Computers, 
+Materials and Continua, 83(1), 1117–1147. https://doi.org/10.32604/ 
+cmc.2025.061948
+Zhang, Z., et al. (2025). Finer-CAM: Spotting the difference reveals finer details for visual 
+explanation. In Proceedings of the IEEE computer society conference on computer vision 
+and pattern recognition (pp. 9611–9620). https://doi.org/10.1109/ 
+CVPR52734.2025.00898
+Zheng, X., Cao, J., Wang, C., & Ma, P. (2024). A high-precision human fall detection 
+model based on FasterNet and deformable convolution. Electronics (Basel)., 13(14), 
+2798. https://doi.org/10.3390/electronics13142798
+Zou, S., Min, W., Liu, L., Wang, Q., & Zhou, X. (2021). Movement tube detection network 
+integrating 3d CNN and object detection framework to detect fall. Electronics 
+(Switzerland), 10(8), 898. https://doi.org/10.3390/electronics10080898
+M.M. Moussa et al.                                                                                                                                                                                                                             Intelligent Systems with Applications 31 (2026) 200722 
+15 

@@ -1,0 +1,547 @@
+--- PAGE 1 ---
+1 ---
+Received December 13, 2021, accepted December 30, 2021, date of publication January 4, 2022, date of current version January 13, 2022.
+Digital Object Identifier 10.1 109/ACCESS.202 1.3140164
+Fall Detection System With Artificial
+Intelligence-Based Edge Computing
+BOR-SHING LIN
+ 1, (Senior Member, IEEE), TIKU YU
+ 2, CHIH-WEI PENG
+ 3,
+CHUEH-HO LIN
+ 4,5, HUNG-KAI HSU 1, I-JUNG LEE
+ 1,6,
+AND ZHAO ZHANG 1,6,7, (Graduate Student Member, IEEE)
+1Department of Computer Science and Information Engineering, National Taipei University, New Taipei City 237303, Taiwan
+2Department of Communication Engineering, National Taipei University, New Taipei City 237303, Taiwan
+3School of Biomedical Engineering, College of Biomedical Engineering, Taipei Medical University, Taipei 11031, Taiwan
+4Master Program in Long-Term Care, College of Nursing, Taipei Medical University, Taipei 11031, Taiwan
+5Center for Nursing and Healthcare Research in Clinical Practice Application, Wan Fang Hospital, Taipei Medical University, Taipei 11031, Taiwan
+6College of Electrical Engineering and Computer Science, National Taipei University, New Taipei City 237303, Taiwan
+7School of Mechanical and Electrical Engineering, Wuyi University, Wuyishan, Fujian 354300, China
+Corresponding author: Chueh-Ho Lin (chueh.ho@tmu.edu.tw)
+This work was supported in part by the Ministry of Science and Technology in Taiwan under Grant MOST 110-2314-B-305-001 and Grant
+MOST 109-2221-E-305-001-MY2; in part by the University System of Taipei Joint Research Program under Grant
+USTP-NTPU-TMU-107-02, Grant USTP-NTPU-TMU-108-01, Grant USTP-NTPU-TMU-109-03, and Grant
+USTP-NTPU-NTOU-110-01; in part by the Faculty Group Research Funding Sponsorship by National Taipei University under Grant
+2021-NTPU-ORDA-02; and in part by the National Taipei University, Taiwan, through the Academic Top-Notch and Features Field Project
+under Grant 110-NTPU_ORDA-F-003.
+ABSTRACT Falls are the second leading cause of death from unintentional injuries in older adults. Although
+many systems have been used to detect falls, they are limited by the computational complexity of the
+algorithm. The images taken by the camera must be transmitted through a network to the back-end server
+for calculation. As the demand for Internet of Things increases, this architecture faces such problems as
+high bandwidth costs and server computing overload. Emerging methods reduce the workload of servers
+by transferring certain computing tasks from cloud servers to edge computing platforms. To this end, this
+study developed a fall detection system based on neuromorphic computing hardware, which streamlines and
+transplants the neural network model of the back-end computer to the edge computing platform. Through
+the neural network model with integer 8 bit precision deployed on the edge computing platform, the object
+photos obtained by the camera are converted into human motion features, and a support vector machine is
+then used for classiﬁcation. After experimen
+--- PAGE 2 ---
+2 ---
+B.-S. Lin et al.: Fall Detection System With Artificial Intelligence-Based Edge Computing
+the cloud server is the resultant high cost in network band-
+width, high latency, and privacy concerns [10]. With too
+many users, the network bandwidth and loading of the cloud
+computing may become unfeasible. The rapid advancement
+of chip technology resulted in algorithms that could not be
+calculated in real time on the front-end being transferred
+from the cloud to the front-end, reducing the burden on the
+server. An edge computing-based system could also be used
+to perform better in real time than a cloud-based system [11],
+which is highly valuable for fall detection systems. There-
+fore, some fall detection systems based on edge computing
+have been proposed, including architectures using general-
+purpose processors [12]–[17] and neuromorphic computing
+hardware [18]. The general-purpose processor architecture
+used in many studies is relatively easy to implement but
+consumes considerable time and computing resources to
+complete the neural network algorithm. These studies have
+been limited to the use of relatively low-rank robust methods
+such as statistics and thresholds. Although [17] used deep
+learning methods in which continuous frames were input to
+the neural network to train it to dynamically recognize falls,
+the system was forced to reduce the image resolution to 32×
+32 to achieve real-time computation on the central processing
+unit (CPU). Low-resolution images can only provide close-
+range information, which limits their potential applicability.
+Other studies have demonstrated that a fall detection system
+based on deep learning can effectively improve detection
+accuracy [18]. However, if a fall detection system based on
+deep learning is to be implemented on an edge computing
+platform with general-purpose processor architecture, it may
+be more time-consuming and may not achieve real-time fall
+detection.
+To address the aforementioned problems, this study pro-
+posed a fall detection system based on edge computing, which
+combined a camera and neuromorphic computing hardware
+based on an application-speciﬁc integrated circuit. The Y ou
+Only Look Once lightweight (YOLO-LW) deep neural net-
+work was implemented on the neuromorphic computing
+hardware. Experiments have validated that the YOLO-LW
+algorithm combined with a support vector machine (SVM)
+can run smoothly on the edge computing platform and can
+accurately detect fall events in real time. In this study, the
+captured images are not uploaded to the cloud server, so when
+a large number of cameras are installed in practical applica-
+tions, fall detection system does not occupy additional large
+amount of bandwidth, and server is not blocked by processing
+images from all cameras at the same time. And the edge
+computing platform sends a warning to server only if a fall
+event is detected, so the transmission delay can be negligible.
+Thus, user privacy is protected to a certain extent.
+II. RELATED WORKS
+S
+--- PAGE 3 ---
+3 ---
+B.-S. Lin et al.: Fall Detection System With Artificial Intelligence-Based Edge Computing
+detects falls with high accuracy 97.8% and 91.7% on the waist
+and the leg.
+Saleh and Jeannès [14] proposed a machine learning-based
+fall detection algorithm designed to deploy on wearable
+sensor. 12-component statistical features vector is extracted
+from a triaxial acceleration signal. The SVM-based algo-
+rithm is used to classify fall events. The experimental results
+show that the proposed algorithm can reach 99.9% on Sisfall
+dataset. In addition, the system implements algorithm with a
+computational cost of less than 500 ﬂoating point operations
+per second.
+Y uet al. proposed a fall detection system based on neuro-
+morphic computing hardware [19] in which the user wore a
+device with an embedded inertial measurement unit (IMU) to
+measure human movement and capture ﬁve types of activi-
+ties, including falls.
+The studies [13], [14], [19] implement fall detection algo-
+rithm on an embedded system and experimental results show
+high accuracy. These studies are limited to the use of lower
+computational cost methods such as SVM or threshold.
+In addition, wearable system is inconvenience.
+Rajavel et al. [20] proposed an IoT-based healthcare smart
+system. The system detects fall events with cloud server,
+edge computing devices and cameras. The images captured
+from cameras are transmitted to edge computing devices via
+Wi-Fi. The edge computing devices ﬁlter the non-sensitive
+data to reduce the communication bandwidth between the
+edge layer and cloud layer by transmitting only the needful
+data to the cloud layer. A deep convolution neural network
+classiﬁer is used to detect fall events on the cloud server.
+The system exploits only 150 kbps network bandwidth and
+80 s response time compared to past research. In addition,
+the system spends 72.76 s on prediction and accuracy reaches
+94.5%. The research [20] uses cloud-edge based computing
+framework to implement fall prediction and performance
+exceeds previous research. But the long prediction time and
+response time may cause a fall event that cannot be handled
+immediately in the actual situation.
+In order to address the aforementioned problems, a fall
+detection method based on artiﬁcial intelligence (AI) edge
+computing with vision sensor was proposed in this study.
+The proposed algorithms are deployed on edge computing
+platforms with AI chips. All operations are done on the edge
+computing platform.
+III. METHOD
+A. SYSTEM OVERVIEW
+The main components of the edge computing platform used
+in this study were a camera (ov2640, OmniVision Technolo-
+gies, Shanghai, China) and an AI development board (Sipeed
+MAix GO, Sipeed Technology, Shenzhen, China), as depicted
+in Fig. 1. The core chip Sipeed M1W of the AI development
+board was composed of Kendryte K210 (Canaan, Beijing,
+China) and the Wi-Fi chip ESP8285. The K210 has two
+RISC-V CPUs and a neural network processor (KPU) that
+FIGURE 1. Prototype of the edge computing platfo
+--- PAGE 4 ---
+4 ---
+B.-S. Lin et al.: Fall Detection System With Artificial Intelligence-Based Edge Computing
+FIGURE 3. Process of training and deploying neural networks.
+[12], [13] to detect falls. In the AI model training phase,
+it is ﬁrst trained using collected posture photos on the PC,
+and then the trained neural network on the edge comput-
+ing platform is deployed. The PC speciﬁcations comprised
+a CPU (I7-10700F, Intel, Santa Clara, CA, USA), graph-
+ics processing unit (GPU) display card (RTX 3080 10G,
+AsusTeK, Taipei, Taiwan) and 64-gigabyte dynamic random-
+access memory. The neural network training framework
+Darknet [21] was used for training the AI model. The trained
+neural network is input to the conversion program and con-
+verted into a TensorFlow-based model that the KPU can infer.
+The KPU only partially supports TensorFlow operators, and
+the rebuilding of neural networks using supported operators
+to develop new edge computing neural networks is a gradual
+process.
+Fig. 3 depicts the process of training and deploying neural
+networks. In preparation of the AI model training, the col-
+lected images were ﬁrst labeled using free image labeling
+software (Labellmg) to manually generate the coordinate
+tuple data of the bounding box, including the width and
+height of the bounding box and the x- and y-axis distance
+from the upper left corner of the bounding box to the origin
+(upper left corner of the image). The coordinate tuple of
+the bounding box is used as the ground truth to train the
+neural network. Details of the labeled bounding box and
+coordinate tuple are presented in Fig. 4. During the following
+training process, the neural network makes inferences on the
+input images and generate estimated coordinate tuples. The
+estimated coordinate tuple and coordinate tuple of ground
+truth are then calculated for the loss function, and the neurons
+of the neural network are updated through back propagation.
+When the training is complete, low-precision quantization of
+the neural network is performed to increase the speed of the
+model and reduce the power consumption of the inferring
+model [22]–[24]. This low precision includes 16-bit ﬂoat
+format, 8-bit integer format, and 4-bit integer format. The
+neural network on the computer side is converted from 32-bit
+ﬂoat format to 8-bit integer format through low-precision
+quantization, during which the offset value in the neuron is
+ignored, and a threshold T is selected between the maximum
+FIGURE 4. (a) Labeled bounding box; (b) Coordinate tuple of the ground
+truth: left, top, width, and height.
+and minimum weight value in all neurons. The weight value
+between−T–T is remapped to−127 to 127, and other weight
+values are discarded. To minimize the inﬂuence of the miss-
+ing model information, the model is calibrated using the
+calibration dataset. The model uses different Ts to infer the
+calibration dataset to determine the threshold T that least
+affects the accuracy of the model. This study employed the
+training dataset as th
+--- PAGE 5 ---
+5 ---
+B.-S. Lin et al.: Fall Detection System With Artificial Intelligence-Based Edge Computing
+and simplify the neurons. According to [29], the ratio of
+the amount of deep separable convolutional layers to that of
+the calculated ordinary convolutional layers can be expressed
+as (1).
+Cost depth_conv+ Cost point_conv
+Cost standard_conv
+= 1
+N+ 1
+K 2 (1)
+where Cost depth_conv represents the computational cost of the
+deep convolutional layer; Cost point_conv represents that of the
+point convolutional layer; Cost standard_conv represents that of
+the ordinary convolutional layer; N represents the number of
+channels; and K denotes the size of the kernel.
+Figs. 7 and 8 depict the modiﬁed YOLO v2-tiny and YOLO
+v3-tiny. According to Eq. (1), when the common convolu-
+tional layer is replaced by the deep separable convolutional
+layer with more ﬁlters (i.e., channels) and a larger kernel size,
+the computational cost is reduced. Considering the limitation
+of memory, we chose to replace the convolutional layer, with
+a ﬁlter amount greater than or equal to 512, with the deep
+separated convolutional layer. The ﬁlters in the output layer
+of YOLO v3-tiny are fewer than those in YOLO v2-tiny, and
+the calculation cost of the output layer is therefore reduced to
+approximately two-thirds that of YOLO v2-tiny. To further
+shrink YOLO v3-tiny, some convolutional layers with a ﬁlter
+amount of 256 were replaced with deep separated convolu-
+tional layers.
+However, after low-precision quantization, the test indi-
+cated that the accuracy of the neural network executed on the
+edge computing platform decreased. To improve the accu-
+racy, some convolutional layers were added to increase the
+depth of the neural network. Because the categories were
+changed from 85 of the original YOLO v3-tiny to 1 (only
+one category for humans), the ﬁlters of the output layer must
+be changed from the original 255 of the YOLO v3-tiny to
+18. The addition of convolutional layers between the out-
+put layer and the previous layer and a decrease in ﬁlters
+better condenses the features, and the increased amount of
+calculation is sustainable. Eq. (2) expresses the relation-
+ship between the categories and the ﬁlters of output layer.
+Fig. 9 presents the architecture of the modiﬁed YOLO v3-tiny
+following the addition of the convolutional layers. In this
+study, this lightweight modiﬁed YOLO v3-tiny was named
+YOLO-LW.
+F= (C+ 5)× A (2)
+where F is the number of ﬁlters in the output layer; C is
+the number of classes; A is the number of anchor points;
+and the number of YOLO v3-tiny anchor points is equal to
+3. Therefore, the number of ﬁlters in the modiﬁed YOLO
+v3-tiny output layer is (1+ 5)× 3= 18.
+C. EXPERIMENTAL PROCEDURES
+In this study, we collected data from 19 participants, includ-
+ing 11 men and 8 women. The ratio of young to old was
+9:10, and their average age, height, and weight was 46.3 ±
+16.1 years, 166.1± 9.9 cm, and 67.3± 12.8 kg, respectively.
+The collected data were captured in ﬁve different indoor
+
+--- PAGE 6 ---
+6 ---
+B.-S. Lin et al.: Fall Detection System With Artificial Intelligence-Based Edge Computing
+FIGURE 5. Architecture of YOLO v2-tiny.
+FIGURE 6. Architecture of YOLO v3-tiny.
+FIGURE 7. Architecture of the modified YOLO v2-tiny.
+falls; and false negative (FN) is the number of falls that are
+mistaken for normal activities.
+In the performance evaluation of YOLO and the overall
+system (YOLO and SVM), the PC and edge computing plat-
+form were used to evaluate and compare the performance of
+different YOLO models, respectively. The overall experimen-
+tal process is detailed in Fig. 10.
+IV. RESULTS
+A. EXPERIMENTAL RESUL TS FOR THE ORIGINAL AND
+MODIFIED YOLO MODELS
+The key part of this system is the design of the AI model
+of the bounding human body. If an AI model with effective
+performance can be selected for use, the overall fall detec-
+tion function is greatly improved. The AI model used for
+VOLUME 10, 2022 4333
+
+--- PAGE 7 ---
+7 ---
+B.-S. Lin et al.: Fall Detection System With Artificial Intelligence-Based Edge Computing
+FIGURE 8. Architecture of the modified YOLO v3-tiny.
+FIGURE 9. Architecture of the modified YOLO v3-tiny following the addition of the convolutional layers.
+TABLE 1. Comparison Yolo v2-tiny and Yolo v3-tiny IoU.
+the bounding human body in this system was scheduled to
+be implemented with YOLO v2-tiny, YOLO v3-tiny, or an
+improved version, because the algorithm of the YOLO system
+is effective for human body detection and its small size facili-
+tates transplantation to the edge computing platform. To eval-
+uate the AI model, 5-fold cross-validation was employed.
+During training, the k-means was used to re-ﬁnd the anchor
+points of the training dataset. The learning rate was set to
+0.001, and the loss of neural network after training was lower
+than 0.05.
+The effectiveness of YOLO v2-tiny and YOLO v3-tiny for
+bounding the human body area was tested on the PC, and the
+comparison is described in Table 1. Signiﬁcant differences
+were noted between the two models, YOLO v3-tiny outper-
+formed YOLO v2-tiny. YOLO v3-tiny could detect all objects
+within 2 to 3.5 m, and the IoU was 98.16%, but YOLO v2-tiny
+could not detect some body curls and tiny objects and had a
+lower IoU.
+The performance of the modiﬁed YOLO v2-tiny and
+modiﬁed YOLO v3-tiny was tested and compared on the
+PC, and the comparison results are presented in Table 2.
+The experimental results revealed that the modiﬁed YOLO
+v3-tiny still detected all objects, but the IoU decreased to
+95.51%. However, YOLO v2-tiny exhibited poorer perfor-
+mance in human body detection, and the IoU decreased
+to 74.86%.
+B. EXPERIMENTAL RESUL TS FOR DIFFERENT PRECISION
+FORMAT MODELS
+By comparing the performance of YOLO v2-tiny and YOLO
+v3-tiny and that of the modiﬁed YOLO v2-tiny and modi-
+ﬁed YOLO v3-tiny, we determined that the modiﬁed YOLO
+v3-tiny or its simpliﬁed version was more suitable for use.
+We then tested the performance of the modiﬁed YOLO
+v3-tiny with ﬂoat 16 precision format, modiﬁed YOLO
+v3-tiny with integer 8 precision format, and modiﬁed
+4334 VOLUME 10, 2022
+
+--- PAGE 8 ---
+8 ---
+B.-S. Lin et al.: Fall Detection System With Artificial Intelligence-Based Edge Computing
+FIGURE 10. Overall experimental process for the performance evaluation
+of different AI models, stages, and platforms.
+TABLE 2. Comparison between the modified Yolo v2-tiny and modified
+Yolo v3-tiny IoU.
+YOLO v3-tiny with integer 8 precision format and a con-
+volutional layer (Fig. 9) on the edge computing platform.
+The comparison of the experimental results is detailed in
+Table 3. The ﬂoat 16 precision format model used the CPU
+on the edge computing platform to infer the neural network.
+The IoU was 94.6%, which is 0.9% lower than that of the
+computer version of the ﬂoat 32 precision format model at
+95.51%. The integer 8 precision format model used the KPU
+on the edge computing platform to infer the neural network;
+the resultant IoU of 91.2% was 4.3% lower than that of the
+ﬂoat 32 precision format model. Although the IoU of the ﬂoat
+16 precision format model was higher than that of the integer
+8 model, the FPS of the integer 8 model was 14.7 times
+that of the ﬂoat 16 model. Following the addition of the
+convolutional layer to the integer 8 precision format model,
+the IoU increased to 94.5% and FPS decreased by 0.3%.
+Among the three models, the integer 8 precision format model
+TABLE 3. Comparison of different precision format models on edge
+computing platform.
+is the smallest at approximately half the size of the other two
+models.
+C. SYSTEM EVALUATION
+The ﬁrst step of the proposed system is human bounding.
+Table 3 presents the performances of bounding models. The
+ﬁnal result shows that model on edge computing platform can
+reach 94.5% average IoU with 11.5 FPS.
+The second step of the proposed system is SVM classiﬁca-
+tion. Table 4 presents the performance of bounding model and
+SVM classiﬁer. System spends less than 0.001 s on feature
+extraction and SVM classiﬁcation. The system using YOLO
+v3-tiny achieved an accuracy of 92.5% on the PC, which is
+almost the same as the classiﬁcation result using the ground
+truth. After part of the convolutional layer was replaced with
+a deep separated convolutional layer, the modiﬁed YOLO
+v3-tiny achieved an accuracy of 91.6%, a decrease of 0.9%.
+The modiﬁed ability of YOLO v3-tiny to detect objects with
+curved bodies was slightly reduced, but the classiﬁcation
+was largely correct. When the modiﬁed YOLO v3-tiny was
+converted to the integer 8 precision format, the information
+of the neural network was lost, resulting in a decreased IoU.
+The addition of a convolutional layer can effectively improve
+the performance of the neural network, which forms a new
+model, YOLO-LW. In comparison with the system that used
+the modiﬁed YOLO v3-tiny, the system that used YOLO-LW
+exhibited a slight decrease in accuracy (0.5%).
+The ﬁnal step of the proposed system is fall event detection.
+A sliding window is used to detect fall event. When the falling
+state appears more than three times in a sliding window, the
+result is considered as a fall.
+--- PAGE 9 ---
+9 ---
+B.-S. Lin et al.: Fall Detection System With Artificial Intelligence-Based Edge Computing
+TABLE 4. Comparison of SVM and different models.
+TABLE 5. Performance of whole system.
+FIGURE 11. Results under different sizes of sliding windows.
+hardware to replace the software for deep learning in embed-
+ded systems. We executed our self-developed YOLO-LW on
+neuromorphic computing hardware to maintain the running
+time of the neural network with the integer 8 precision format,
+without losing the region of interest (ROI) changes related to
+possible fall events.
+To evaluate the fall detection system involving the ROI,
+various action photos collected from ﬁve indoor scenes were
+transmitted to ﬁve YOLO models with different neural layer
+structures, and their performances were compared through
+5-fold cross-validation. From the experimental results of
+Table 1, at a resolution of 320 × 224, the YOLO v3-tiny
+outperformed the YOLO v2-tiny. This is attributable to
+the YOLO v3-tiny use of upsampling to obtain high-scale
+feature maps and retain the information of small targets.
+As described in Table 2, the modiﬁed YOLO v3-tiny exhib-
+ited greater accuracy than the modiﬁed YOLO v2-tiny but
+exhibited 2.65% less accuracy compared with that of the
+YOLO v3-tiny. The modiﬁed YOLO v3-tiny used a deep
+separation of convolutional layers to reduce the complexity
+of the model; thus, the accuracy was slightly reduced, but the
+model size was also reduced by one-ﬁfth.
+In the fall detection system, the bounding of the human
+body is a critical technology. Generally, an improved IoU
+increases the hit rate of human body area, and a reduction in
+IoU often occurs when the detection object is self-occluded
+during bending of the body, such as having the individual
+having their back to camera or curling their limbs. Addi-
+tionally, in the process of porting the PC-side programs to
+the edge computing platform, some components may be
+abandoned, causing IoU decline. Some studies have indi-
+cated that a remapping of the neural network with high
+precision format to the neural network with low precision
+format can effectively reduce the model size and maintain
+the accuracy [23], [24]. The experimental results outlined in
+Table 3 demonstrated that the modiﬁed YOLO v3-tiny with
+ﬂoat 16 format exhibited only a 0.91% decrease in IoU than
+the model before conversion, but the model size is half that of
+the original. However, the modiﬁed YOLO v3-tiny with ﬂoat
+16 precision format could not make inferences in the neuro-
+morphic computing hardware and only reached 0.8 FPS with
+CPU inference. The modiﬁed YOLO v3-tiny with integer
+8 precision format used neuromorphic computing hardware to
+infer and reached 11.8 FPS, but the IoU decreased by 4.3%.
+Despite the robustness of the modiﬁed YOLO v3-tiny with
+integer 8 precision format and its ability to detect all objects in
+different scenes and with different actions, the IoU decreased
+markedly. If the complexity of the model is increased through
+the addi
+--- PAGE 10 ---
+10 ---
+B.-S. Lin et al.: Fall Detection System With Artificial Intelligence-Based Edge Computing
+TABLE 6. Comparison of the proposed method and other fall detection systems.
+neural network was simulated using PSpice as a circuit of
+the neuromorphic computing hardware. The system analyzed
+the IMU data to determine falls with an accuracy of 88.9%,
+though the author performed a circuit simulation rather than
+constructing the wearable device. Y ang et al. [30] used ﬁeld
+programmable gate array (FPGA)-based ZYNQ-7020 hard-
+ware to implement a CNN model with an accuracy rate of
+92%, but the power consumption of 2.5 W is too costly for
+a fall monitoring system that must operate for a long time.
+The detection time was also 0.43 s, with an FPS of only
+2.42. Mauldin et al. [31] employed three-layer open system
+architecture to transmit the sensor data from a smart watch
+to a smartphone for edge computing. They implemented a
+recurrent neural network on a smartphone based on an ARM
+processor, but an accuracy of only 70% was achieved. The
+method of Alaoui et al. [32] is to ﬁrst calculate the key
+points of human skeleton, and then use principal component
+analysis (PCA) and SVM to detect whether someone has
+fallen in the image data. The accuracy of the experimental
+results of their algorithm is 98.5%. The overall performance
+is good, but the entire study is based on an analysis of a ready-
+made dataset, and it is impossible to conﬁrm the performance
+in the real environment. The system will transmit the video
+to the server, there will be the problem of personal privacy
+leakage. Chang et al. [33] constructed OpenPose-light and
+SVM algorithms on an edge computing platform (Jetson
+TX2, NVIDIA Corp., Santa Clara, CA, USA) to detect falls
+for elderly people with an accuracy of 98.1%. Its overall
+performance is good, and the use of edge computing can
+avoid personal privacy issues. But its processing time is a bit
+of long and power consumption is a bit of high.
+Overall, the method proposed in this study was more
+accurate than the aforementioned methods. In terms of use,
+we used a camera as the input device, which is more con-
+venient than a wearable fall detection system using IMU.
+Regarding the same vision-based solution, compared with
+the 2.5 W and 15 W power consumption reported in [30]
+and [33] respectively, the architecture proposed in this study
+required 0.3 W, providing a low-cost, low-computing, feasi-
+ble resource allocation solution. In terms of detection speed,
+this system reached 11.5 FPS, which provided effective real-
+time performance. Additionally, the FPGA debugging pro-
+cess is difﬁcult and extends the development time.
+VI. CONCLUSION
+In this study, a fall detection system with neuromorphic com-
+puting hardware for AI-based edge computing was proposed.
+The images of individuals were captured through the camera
+and transmitted to the neural network model on the edge com-
+puting platform. After detection of the object characteristics,
+the SVM was used for
+--- PAGE 11 ---
+11 ---
+B.-S. Lin et al.: Fall Detection System With Artificial Intelligence-Based Edge Computing
+variety of light may affect performance of fall detection
+system.
+In future work, the fall detection system can incorporate the
+use of different sensors, such as a thermal camera installation
+to monitor the activities of older adults in lightly lit environ-
+ments and at night or a ﬁsheye lens installation to expand
+the detection range. In addition, different shooting angles and
+complex occlusion situations can be further evaluated.
+REFERENCES
+[1] S. J. Naja, M. M. Makhlouf, and M. Chehab, ‘‘An ageing world of the 21st
+century: A literature review,’’Int. J. Community Med. Public, vol. 4, no. 12,
+pp. 4364–4369, 2017.
+[2] C. S. Florence, G. Bergen, A. Atherly, E. Burns, J. Stevens, and C. Drake,
+‘‘Medical costs of fatal and nonfatal falls in older adults,’’Ann. Long-Term
+Care, vol. 66, no. 4, pp. 693–698, Jul. 2018.
+[3] E. Auvinet, F. Multon, A. Saint-Arnaud, J. Rousseau, and J. Meunier, ‘‘Fall
+detection with multiple cameras: An occlusion-resistant method based on
+3-D silhouette vertical distribution,’’ IEEE Trans. Inf. Technol. Biomed.,
+vol. 15, no. 2, pp. 290–300, Mar. 2011.
+[4] N. Lu, Y . Wu, L. Feng, and J. Song, ‘‘Deep learning for fall detection:
+Three-dimensional CNN combined with LSTM on video kinematic data,’’
+IEEE J. Biomed. Health Inform., vol. 23, no. 1, pp. 314–323, Jan. 2019.
+[5] E. Akagunduz, M. Aslan, A. Sengu, H. Wang, and M. C. Ince, ‘‘Silhouette
+orientation volumes for efﬁcient fall detection in depth videos,’’ IEEE
+J. Biomed. Health Informat., vol. 21, no. 3, pp. 756–763, May 2017.
+[6] Z.-P . Bian, J. Hou, L.-P . Chau, and N. Magnenat-Thalmann, ‘‘Fall detection
+based on body part tracking using a depth camera,’’IEEE J. Biomed. Health
+Inform., vol. 19, no. 2, pp. 430–439, Mar. 2015.
+[7] F. Harrou, N. Zerrouki, Y . Sun, and A. Houacine, ‘‘An integrated vision-
+based approach for efﬁcient human fall detection in a home environment,’’
+IEEE Access, vol. 7, pp. 114966–114974, 2019.
+[8] B.-H. Wang, J. Y u, K. Wang, X.-Y . Bao, and K.-M. Mao, ‘‘Fall detec-
+tion based on dual-channel feature integration,’’ IEEE Access, vol. 8,
+pp. 103443–103453, 2020.
+[9] A. Lotﬁ, S. Albawendi, H. Powell, K. Appiah, and C. Langensiepen,
+‘‘Supporting independent living for older adults: Employing a visual based
+fall detection through analyzing the motion and shape of the human body,’’
+IEEE Access, vol. 6, pp. 70272–70282, 2018.
+[10] N. Abbas, Y . Zhang, A. Taherkordi, and T. Skeie, ‘‘Mobile edge computing:
+A survey,’’IEEE Internet Things J., vol. 5, no. 1, pp. 450–465, May 2018.
+[11] Y . Liu, M. Peng, G. Shou, Y . Chen, and S. Chen, ‘‘Toward edge intelli-
+gence: Multiaccess edge computing for 5G and Internet of Things,’’ IEEE
+Internet Things J., vol. 7, no. 8, pp. 6722–6747, Aug. 2020.
+[12] K. Ozcan and S. V elipasalar, ‘‘Wearable camera and accelerometer-based
+fall detection on portable devices,’’ IEEE Embed. Syst. Lett., vol. 8, no. 1,
+pp. 6–9, Mar. 2015.
+[1

@@ -1,0 +1,427 @@
+--- PAGE 1 ---
+1 ---
+Available online at www.sciencedirect.com
+ScienceDirect
+ICT Express 9 (2023) 734–740
+www.elsevier.com/locate/icte
+Dilated spatial–temporal convolutional auto-encoders for human fall
+detection in surveillance videos
+Suyuan Lia, Xin Songa,b,∗, Siyang Xua,b, Haoyang Qia,b, Yanbo Xuec
+a School of Computer Science and Engineering, Northeastern University, Shenyang 110819, China
+b School of Computer and Communication Engineering, Northeastern University at Qinhuangdao, Qinhuangdao 066004, China
+c BOSS ZhiPin Career Science Lab (CSL), Beijing 100028, China
+Received 25 March 2022; received in revised form 19 June 2022; accepted 12 July 2022
+Available online 20 July 2022
+Abstract
+Although methods based on supervised learning have demonstrated remarkable performance on fall detection, these existing fall detection
+algorithms require a substantial quantity of manually labeled training data. In this paper, we combine dilated convolution and LSTM based
+on auto-encoder, which can be trained on unlabeled data, further saving time and resources, and a novel fall score is computed based on
+the high-quality reconstructed frame to detect falls. Extensive experimental results indicate that the proposed method further boosts the
+performance, achieving recognition rate of 97.1%, sensitivity rate of 93.9% and precision rate of 95.1% on the UR dataset.
+© 2022 The Author(s). Published by Elsevier B.V . on behalf of The Korean Institute of Communications and Information Sciences. This is an open
+access article under the CC BY-NC-ND license (http://creativecommons.org/licenses/by-nc-nd/4.0/).
+Keywords: Dilated convolution; Auto-encoder; Fall detection; LSTM
+1. Introduction
+Aging population has become a global issue that all gov-
+ernments have to deal with. According to the reports of WHO,
+there are 727 million people aged 65 in 2020, and the number
+will reach over 1.5 billion by 2050 [1]. As the aging population
+grows, more elderly will need to be cared for, and many safety
+issues of the elderly will be highlighted. Among various issues
+that influence the safety of the elderly, falls become one of
+the major causes leading to elderly casualties [2]. Falls often
+happen unexpectedly and usually consume shorter time from
+start to end. For the elderly, failing to timely recognize acci-
+dents will result in physical harm and significant psychological
+impairment. Especially, more and more elderly begin to live
+alone, which will aggravate the serious consequences of falls.
+As a result, designing a real-time fall detection system to
+timely detect and rescue falling elderly becomes more and
+more critical.
+∗ Corresponding author at: School of Computer Science and Engineering,
+Northeastern University, Shenyang 110819, China.
+E-mail addresses: 2010649@stu.neu.edu.cn (S. Li),
+sxin78916@neuq.edu.cn (X. Song), 1810584@stu.neu.edu.cn (S. Xu),
+1910600@stu.neu.edu.cn (H. Qi), yanboxue@gmail.com (Y . Xue).
+Peer review under responsibility of The Korean Institute of Communica-
+tions and 
+--- PAGE 2 ---
+2 ---
+S. Li, X. Song, S. Xu et al. ICT Express 9 (2023) 734–740
+is utilized to obtain the human silhouette for describing falls.
+Additionally, optical flow can also be adopted to estimate
+the human posture [5]. However, these hand-crafted feathers
+are prone to image noise, brightness change, and occlusion,
+which will influence performance. In this decade, deep neural
+networks have already generated a rapid and revolutionary
+development. Recently, deep learning, particularly convolu-
+tional neural networks (CNN) [6], now has a great deal of
+success in computer vision, such as action recognition and
+object classification etc. Deep learning algorithms have been
+adopt to automatically learn efficient deep features of objects
+for recognizing falls, and have demonstrated remarkable per-
+formance on fall detection. However, all existing fall detection
+algorithms based on deep neural networks are usually trained
+in supervised manner, which is consuming time to acquire and
+manually annotate.
+To solve the above problem, we propose a novel unsuper-
+vised method based on the dilated convolutional auto-encoder
+and LSTM (DCLSTMAE) for recognizing fall events in video
+surveillance, aiming to train on unlabeled data. Specifically, we
+firstly adopts depth colorization to fill holes in the depth image.
+Then, dilated convolution is utilized to expand receptive field
+with fewer parameters, and LSTM is incorporated to allow
+the model to take advantage of temporal dependency. Finally,
+according to the reconstruction error of DCLSTMAE, fall
+score can be computed for determining whether or not falls
+occur. We summarize the main contributions of this paper as
+follows:
+• We establish a new end-to-end network DCLSTMAE for
+fall detection, which can obtain better spatial–temporal
+features and train on unlabeled data for saving amount
+of time and resources.
+• We propose to utilize hole filling method to enhance
+the depth and details on the UR depth images, which is
+beneficial for obtaining high-quality reconstructed frames
+and can effectively protect personal privacy.
+• We design a novel fall score, derived from the DCLST-
+MAE’s reconstruction error and find out its relationship
+with normal and fall events in a video, which is effective
+to detect fall events.
+2. Proposed method
+In this work, a novel fall detection method based on dilated
+convolution is proposed. As depicted in Fig. 1, the structure
+of the DCLSTMAE is mainly comprised of a dilated con-
+volutional encoder, dilated convolutional LSTM (DCLSTM)
+and a decoder. To begin, continuous video frames are fed
+into the DCLSTMAE, and dilated convolutional encoder and
+DCLSTM can be combined to extract spatial–temporal fea-
+tures with behavioral information. Secondly, the decoder in
+DCLSTMAE is used to reconstruct continuous original frames.
+After optimizing the loss function in training stage, the optimal
+DCLSTMAE model can be obtained. Finally, fall score based
+on reconstruction error can be computed to discriminate fall
+eve
+--- PAGE 3 ---
+3 ---
+S. Li, X. Song, S. Xu et al. ICT Express 9 (2023) 734–740
+more abundant spatial–temporal features can be obtained with
+fewer parameters.
+Encoder: The encoder in DCLSTMAE mainly consists of
+dilated convolution and pooling. The convolutional encoder of
+DCLSTMAE uses dilated convolution to extract features from
+the input frames. In particular, the input of DCLSTMAE is
+T consecutive frames X1, X2,..., X T . The information in a
+filter can be abstracted into a scalar using dilated convolutional
+layers to parameterize the number of maps, maps size and ker-
+nel size. For each dilated convolutional input X1, X2,..., X T ,
+the hidden feature gt of the dilated convolutional layer can be
+represented as:
+gt=σ(W∗ Xt+ bt) (1)
+in which W indicates the weight matrix that can expand the
+receptive field,σ is the activation function, bt is the bias, and
+the symbol∗ is the dilated convolution.
+The feature cube, which is made up of hidden features
+produced by the dilated convolutional layers, can be down-
+sampled by the pooling layer. Pooling operations, such as
+calculating the maximum value among non-overlapping rect-
+angular sub areas, can reduce the spatial dimension of the rep-
+resentation and the number of parameters. Thus, feature size
+and parameters in the fully connected layer can be efficiently
+decreased.
+DCLSTM: DCLSTM that consists of dilated convolutional
+layers and LSTM is suitable for obtaining the temporal fea-
+tures of human falls. Rather than employing a sliding window
+to extract spatial features in CNN, the DCLSTM accom-
+plishes data transmission and processing with three specific
+gate mechanisms, allowing spatial–temporal information to
+be employed more efficiently. DCLSTM is shown in Fig. 3,
+input gate, output gate, and forget gate are three primary
+gate components used to perform information protection and
+control. The DCLSTM calculation formulae for these three
+gate architectures can be obtained as follows:
+i t=σ
+(
+W gi∗ gt+ W hi∗ Ht−1+ W ci◦ Ct−1+ bi
+)
+(2)
+f t=σ
+(
+W g f∗ gt+ W h f∗ Ht−1+ W c f◦ Ct−1+ b f
+)
+(3)
+˜Ct= tanh
+(
+W gc∗ gt+ W hc∗ Ht−1+ bc
+)
+(4)
+Ct= f t◦ Ct−1+ i t◦˜Ct (5)
+ot=σ
+(
+W go∗ gt+ W ho∗ Ht−1+ W co◦ Ct+ bo
+)
+(6)
+Ht= ot◦ tanh (Ct) (7)
+where i t, f t and ot are respectively the input gate, forget
+gate and output gate of DCLSTM. gt, Ht−1 and Ct−1 are the
+input of the current cell, the output and state of the last cell.
+W·i, W· f and W·o (· represents g, h and c) are respectively
+the weight matrixes of the input gate, the forget gate and the
+output gate. bi, b f and bo are respectively the bias of the
+input gate, the forget gate and the output gate. σ and∗ are
+Fig. 3. Illustration of DCLSTM.
+respectively the dilated convolution and the sigmoid nonlinear
+activation function, and◦ denotes the Hadamard product.
+Three gate mechanisms are expanded from one-dimensional
+to multidimensional convolution operations, allowing features
+to simulate long-range relationships in the temporal domain of
+video while also capturing the spatial cont
+--- PAGE 4 ---
+4 ---
+S. Li, X. Song, S. Xu et al. ICT Express 9 (2023) 734–740
+Fig. 4. Processed depth frame and corresponding original depth frame of
+UR dataset.
+on frame reconstruction error. The reconstruction error can be
+normalized to the range [0, 1] [7], and the fall score for each
+frame can be calculated as follows:
+Score(t)= 1− R(t)− mink: 1...T R(k)
+maxk: 1...T R(k)− mink: 1...T R(k) (10)
+in which R(t) is the reconstruction error of test frame and T
+is the length of a test fall video. The lower Score(t) is that
+the frame more likely corresponds to a fall event.
+3. Experiments
+All experiments are implemented in Python using Keras on
+a PC with GPU GTX-2080Ti, 11 GB RAM. On public fall
+detection datasets, such as the UR dataset [8] and the Thermal
+dataset [9], we empirically evaluate our proposed method. In
+this section, the UR dataset and Thermal dataset are described
+first. Then, to explore the contributions of different com-
+ponents, related experiments and analyses are concluded. In
+addition, the performance of the proposed method is compared
+with the several advanced algorithms.
+3.1. Dataset used
+UR Dataset – The UR dataset consists of 70 depth videos
+and 70 RGB videos collected by Microsoft Kinect cameras at
+30 frames per second, as well as corresponding acceleration
+data collected by accelerometers. To protect personal privacy,
+70 depth videos provided in a 640× 480 resolution, including
+40 videos of activities of daily living (ADL) and 30 videos
+containing falls, are utilized. ADL videos mainly include
+sitting down, walking and lying down in bed, etc. Falls videos
+mainly include two fall behaviors that falling from sitting on
+the chair and from standing position. Nevertheless, due to
+occlusion or scattering, Microsoft Kinect depth sensors may
+contain error, which will result in many regions of missing
+pixels. For learning effective spatial–temporal features, these
+regions of missing pixels are detrimental. As a consequence,
+hole filling method is adopted to correct these regions in UR
+dataset. Corresponding processed depth frame and original
+depth frame are depicted in Fig. 4.
+Thermal Dataset – The Thermal dataset consists of 9
+ADL videos and 35 videos containing falls obtained by an
+Android phone with 640× 480 resolution. These videos have
+a frame rate of either 25 or 15 frames per second. The thermal
+camera can guarantee individual privacy and identity while
+still capturing photographs in low-light situations. As shown
+in Fig. 5, some samples of Thermal dataset are given.
+Fig. 5. Samples of Thermal dataset.
+Fig. 6. The ROC curve of different dilated rates in DCLSTMAE.
+3.2. Ablation study
+In this section, an ablation study on the processed UR
+dataset is performed. The performance can be evaluated with
+aspect to the hyper-parameters in our framework, such as
+dilated rate and the number of the dilated convolutional lay-
+ers and preprocessed data. After that, the optimal setting of
+DCLSTMAE can be found by evaluating the variations of the
+network a
+--- PAGE 5 ---
+5 ---
+S. Li, X. Song, S. Xu et al. ICT Express 9 (2023) 734–740
+Fig. 7. The ROC curve of different dilated convolutional layers.
+Table 1
+Metrics of different dilated rates in DCLSTMAE.
+Dilated rate Precision F1_score Accuracy
+Dilated rate = 2 95.1% 94.7% 97.1%
+Dilated rate = 3 89.7% 88.9% 93.4%
+Dilated rate = 4 84.1% 85.0% 92.5%
+Table 2
+Metrics of different convolutional layers in DCLSTMAE.
+Convolutional layers Precision F1_score Accuracy
+l = 2 95.1% 94.7% 97.1%
+l = 3 90.3% 90.6% 95.3%
+l = 4 87.3% 87.7% 93.3%
+of the proposed algorithm is shown for the d from 2 to 4
+in Fig. 7. From Fig. 7, we note that the optimal performance
+is at l = 2. In addition, with the increase of the dilated
+convolutional layers, the average AUC of the proposed method
+is gradually decreased. Furthermore, as shown in Table 2,
+precision, F1 score and accuracy are gradually decreased with
+the increase of the dilated convolutional layers. It is because
+larger deeper neural network can result in overfitting when the
+scale of training data is small. Accordingly, the number of
+dilated convolutional layers in the proposed method is set as 2.
+The Comparison on the UR dataset and processed UR
+dataset: To further verify the advantage of processed UR
+dataset, we train and test the proposed method respectively on
+UR dataset and processed UR dataset. The cross entropy value
+on processed UR dataset and UR dataset is shown in Fig. 8.
+From Fig. 8, the cross entropy value on processed UR dataset
+is significantly lower than that on UR dataset in training
+phase, which can demonstrate that the proposed method on the
+processed UR dataset is easier to train. In the test phase, The
+ROC curve of the proposed algorithm on processed UR dataset
+and UR dataset is shown in Fig. 9. From Fig. 9, the AUC
+of the proposed method on processed UR dataset is higher.
+In addition, the metrics of the proposed method on processed
+UR dataset and UR dataset are reported in Table 3, we can
+clearly see that the proposed method based on UR dataset and
+processed UR dataset has the same model size 12.3 MB, which
+Fig. 8. The cross entropy value of DCLSTMAE on processed UR dataset
+and UR dataset.
+Fig. 9. The ROC curve of DCLSTMAE on processed UR dataset and UR
+dataset.
+Table 3
+Metrics of the proposed method on processed UR dataset and UR dataset.
+Dataset Accuracy Model size Average time/Epoch
+UR dataset 97.1% 12.3MB 128s
+Processed UR dataset 86.3% 12.3MB 99s
+can verify that the number of parameters is not affected by
+input. In addition, the accuracy has a great improvement from
+86.27% to 97.09%. And it worth noticing that the proposed
+method based on processed UR dataset is 99 s per epoch,
+where average processing time is a slightly shorter than that
+based on the UR dataset. These results effectively show the
+improvement based on the processed UR dataset.
+3.3. Verification on real fall datasets
+In this section, we deploy the experiments on the processed
+UR depth dataset and the Thermal dataset. It is desirable that
+the tr
+--- PAGE 6 ---
+6 ---
+S. Li, X. Song, S. Xu et al. ICT Express 9 (2023) 734–740
+Fig. 10. Score of fall video sample from the processed UR video.
+Fig. 11. Score of fall video sample from the Thermal video.
+of the processed UR depth video, and the fall score suddenly
+decreases in the next 25 frames. The fall score and fall video
+sample can be mapped as shown in Fig. 10, and the fall events
+are highlighted with red boxes.
+The fall score of Thermal video is shown in Fig. 11.
+From Fig. 11, the fall score represents the empty scene in
+the first 380 frames and normal human activities from 381 th
+frames to 580th frames of the Thermal video, and the fall score
+suddenly decreases in the next 20 frames. The fall score and
+fall video sample can be mapped as shown in Fig. 11, and
+the fall events are highlighted with red boxes. According to
+the fall score, a threshold can be set to discriminate falls. For
+normal activity data, the fall score is higher. Conversely, for
+the anomaly fall data, fall score will become lower with the
+change of appearance or motion.
+3.4. Comparison with existing methods
+To further validate the performance of our proposed method
+for the fall detection, we firstly conclude the experiments on
+the UR depth dataset, processed UR depth dataset and the
+Table 4
+The AUC values compared on different datasets.
+Methods UR dataset Processed UR
+dataset
+Thermal
+dataset
+CAE 0.38 0.76 0.75
+CLSTMAE 0.49 0.82 0.64
+The proposed
+method
+0.65 0.89 0.87
+Table 5
+Comparison with state-of-the-art methods on the UR dataset.
+Methods Sensitivity F1_score Precision Specificity Accuracy
+Area-FD 98% 90% 83% 89.4% 94%
+CNN 100% – – 92% 95.0%
+CNN-
+LSTM
+91.4% 93.1% 94.8% – –
+CLST-
+MAE
+91.3% 90.5% 89.7% 97.4% 95.8%
+The
+proposed
+method
+93.9% 94.7% 95.1% 98.6% 97.1%
+Thermal dataset. The AUC values compared with state-of-the-
+art methods on different datasets are reported in Table 4. The
+average AUC of the proposed method is obviously higher than
+other methods on all the three public datasets. It clearly shows
+that our method outperforms other existing methods, including
+CAE, CLSTMAE [10]. Due to process the UR dataset, the
+average AUC has a great improvement from 0.65 to 0.89.
+These results adequately prove that the combination of LSTM
+and the dilated convolution makes significant contribution to
+fall detection. Furthermore, Table 5 shows experimental results
+on UR fall dataset, with respect to the evaluation metrics
+accuracy, specificity, sensitivity, F1 score, precision. As we
+can see from Table 5, our proposed method can yield detection
+result with the best accuracy and obviously achieve better
+performance than traditional method based on hand-crafted
+features [10] and other state-of-the-art methods based CNN,
+such as CNN proposed in [11], the CNN with LSTM proposed
+in [12] and the convolutional auto-encoder with LSTM pro-
+posed in [13], which can further verify the effectiveness of the
+proposed network. This mainly results from the processed data
+can enhance the depth and details, and
+--- PAGE 7 ---
+7 ---
+S. Li, X. Song, S. Xu et al. ICT Express 9 (2023) 734–740
+successfully accomplish accurate detection. In the future, re-
+searchers should focus on the approach for dealing with com-
+plex surroundings to better protect the elderly.
+CRediT authorship contribution statement
+Suyuan Li: Conceptualization, Methodology, Software, In-
+vestigation, Formal analysis, Writing – original draft. Xin
+Song: Supervision, Writing – review & editing, Funding ac-
+quisition. Siyang Xu: Methodology, Writing – review & edit-
+ing. Haoyang Qi: Visualization, Investigation. Yanbo Xue:
+Resources, Data curation.
+Declaration of competing interest
+The authors declare that they have no known competing
+financial interests or personal relationships that could have
+appeared to influence the work reported in this paper.
+Acknowledgments
+This work was supported in part by the National Nature
+Science Foundation of China under Grant 61473066 and Grant
+61601109, and in part by the Natural Science Foundation of
+Hebei Province, China under Grant F2021501020.
+References
+[1] Department of economic and social affairs, population division united
+nations, world population ageing 2020 highlights, 2020, [Online].
+Available: https://population.un.org/development/.
+[2] L. Ren, Y . Peng, Research of fall detection and fall preven-
+tion technologies: a systematic review, IEEE Access 7 (1) (2019)
+77702–77722.
+[3] A. Abobakr, M. Hossny, S. Nahavandi, A skeleton-free fall detection
+system from depth images using random decision forest, IEEE Syst.
+J. 12 (3) (2017) 2994–3005.
+[4] C. Liu, C. Lee, P. Lin, A fall detection system using k-nearest neighbor
+classifier, Expert Syst. Appl. 37 (10) (2010) 7174–7181.
+[5] A. Iazzi, M. Rziza, R. Thami, Efficient fall activity recognition by
+combining shape and motion features, Comput. Vis. Media 6 (3)
+(2020) 247–263.
+[6] G. Hinton, R. Salakhutdinov, Reducing the dimensionality of data with
+neural networks, Science 313 (5786) (2006) 504–507.
+[7] B. Kwolek, M. Kepski, Human fall detection on embedded platform
+using depth maps and wireless accelerometer, Comput. Methods
+Programs Biomed. 117 (3) (2014) 489–501.
+[8] UR fall detection dataset, [Online]. Available: http://fenix.univ.rzeszo
+w.pl/~mkepski/ds/uf.html.
+[9] V . Somasundaram, G. Sudakshin, O. Ramana, Abhinav Dhall, Thermal
+imaging based elderly fall detection, in: ACCV Workshop, Springer,
+2016, pp. 541–553.
+[10] N. Zerrouki, F. Harrou, A. Houacine, Y . Sun, Fall detection using
+supervised machine learning algorithms: A comparative study, in: Proc.
+8th Int. Conf. Model. Identificat. Control, ICMIC, Algiers, Algeria,
+2016, pp. 665–670.
+[11] A. Marcos, G. Azkune, I. Arganda-Carreras, Vision-based fall de-
+tection with convolutional neural networks, Wirel. Commun. Mob.
+Comput. 1 (1) (2017) 1–16.
+[12] Q. Feng, C. Gao, L. Wang, Y . Zhao, T. Song, Q. Li, Spatio-temporal
+fall event detection in complex scenes using attention guided LSTM,
+Pattern Recognit. Lett. 130 (1) (2020) 242–249.
+[13] J. Nogas, S. Khan, A. M

@@ -1,0 +1,977 @@
+
+--- PAGE 1 ---
+Received 7 August 2022, accepted 23 August 2022, date of publication 31 August 2022, date of current version 14 September 2022.
+Digital Object Identifier 10.1 109/ACCESS.2022.3203174
+Exploring Human Pose Estimation and the Usage
+of Synthetic Data for Elderly Fall Detection
+in Real-World Surveillance
+SARDOR JURAEV
+ 1, (Student Member, IEEE), AKASH GHIMIRE 2,
+JUMABEK ALIKHANOV
+ 1, (Student Member, IEEE),
+VIJAY KAKANI
+ 2, (Member, IEEE), AND HAKIL KIM
+ 1, (Member, IEEE)
+1Department of Electrical and Computer Engineering, Inha University, Incheon 402751, South Korea
+2Department of Integrated System Engineering, School of Global Convergence Studies, Inha University, Incheon 402751, South Korea
+Corresponding author: Hakil Kim (hikim@inha.ac.kr)
+This research was supported by the BK21 Four Program funded by the Ministry of Education(MOE, Korea) and National Research
+Foundation of Korea (NRF).
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+ABSTRACT The world’s elderly population continues to grow at an unprecedented rate, creating a need
+to monitor the safety of an aging population. One of the current problems is accurately classifying elderly
+physical activities, especially falling down, and delivering prompt assistance to someone in need. Owing
+to the advancements in deep learning research, vision based solutions are employed for action recognition.
+One such popular approach is human pose estimation based action recognition or fall detection. Nevertheless,
+due to a lack of large-scale elderly fall datasets and the continuation of numerous challenges such as varying
+camera angles, illumination, and occlusion accurately classifying falls has been a problematic. To address
+these problems, this research ﬁrst carried out a comprehensive study of the AI Hub dataset collected from
+real lives of elderly people in order to benchmark the performance of state-of-the-art human pose estimation
+methods. Secondly, owing to the limited number of real datasets, augmentation with synthetic data was
+applied and performance improvement was validated based on changes in the degree of accuracy. Third, this
+study shows that a Transformer network applied to elderly action recognition outperforms LSTM-based
+networks by a noticeable margin. Lastly, by observing the quantitative and qualitative performances of
+different networks, this paper proposes an efﬁcient solution for elderly activity recognition and fall detection
+in the context of surveillance cameras.
+16
+ INDEX TERMS Elderly care, fall detection, pose estimation, synthetic data, video surveillance.
+I. INTRODUCTION17
+In today’s world, one of the increasing challenges is caring for18
+the elderly. By 2050 there will be 1.5 billion people 65 years19
+or older, accounting for 16% of the world population [1].20
+As a result, monitoring the physical activities of older people,21
+especially for fall detection and prevention, is critical to pro-22
+viding better elderly care and a longer life expectancy. Fortu-23
+nately, with the advent of modern technologies assisted living24
+has become more accessible to monitor the behavior of an25
+The associate editor coordinating the review of this manuscript and
+approving it for publication was Mehul S. Raval
+ .
+aging population. In the last decade, researchers detected falls 26
+by wearable devices, environmental sensors, and cameras [2]. 27
+Sensors and wearable devices may offer a quick response 28
+time and better fall-detection accuracy. Nevertheless, these 29
+methods fail when a person forgets to wear the device or falls 30
+in an untracked area [3]. Thus, a more efﬁcient approach is 31
+to take advantage of the increasing number of surveillance 32
+cameras which are easy to set up and that receive consistent 33
+data by tracking an entire area. However, the rapid increase 34
+of surveillance cameras raises serious concerns about pri- 35
+vacy, and discriminatory bias against speciﬁc groups of peo- 36
+ple [4]. Among many methods, an effective one to avoid the 37
+VOLUME 10, 2022 This work is licensed under a Creative Commons Attribution 4.0 License. For more information, see https://creativecommons.org/licenses/by/4.0/ 94249
+--- PAGE 2 ---
+S. Juraev et al.: Exploring Human Pose Estimation and the Usage of Synthetic Data for Elderly Fall Detection
+FIGURE 1. Overview of the Performance Evaluation Methodology. Using the AI Hub dataset, performance of
+bottom-up and top-down human pose estimation approaches underwent pose estimation and action recognition
+evaluations. Next, after mixing AI Hub and KIST SynADL datasets performance improvement was measured in terms
+of model accuracy. Here, T represents the number of frames.
+previously mentioned problems is skeleton-based action38
+recognition, which offers a high degree of anonymity [5].39
+Although human pose estimation achieves desirable results40
+for scientiﬁc datasets, when encountering real-life chal-41
+lenges, such as occlusion, illumination, and steep camera42
+angles the recognition accuracy may degrade leading to fail-43
+ure of action classiﬁers. However, the lack of real-world44
+elderly activity datasets has limited current fall detection45
+research focusing mainly on scientiﬁc datasets: [6], [7], [8],46
+[9] and [10]. These datasets are collected from laboratory47
+surroundings that differ from daily living environments. Fur-48
+thermore, most of the fall detection datasets involve young49
+people whose speed and actions differ from the elderly [11].50
+As a result, when an action recognition model is trained on51
+such datasets and tested in real-world settings, these dif-52
+ferences may result in unreliable action recognition [12].53
+Consequently, it is assumed that these methods do not exhibit54
+generalization capabilities for elderly physical action recog-55
+nition in real-world environments. To address these problems56
+a qualitative and quantitative study was carried out on the AI57
+Hub dataset [13], which covers 12 types of falls and daily life58
+activities.59
+The major contributions of this paper are threefold:60
+(i) In this research, the performance of state-of-the-art61
+pose estimation methods is evaluated qualitatively and62
+quantitatively by using the AI Hub dataset. (ii) This paper63
+evaluates the degree of performance improvement from syn-64
+thetic data when added to the limited amount of real-life65
+data. (iii) After extensive experiments, accurate and efﬁcient66
+pose estimation and action recognition models are proposed67
+for real-world fall detection and elderly physical activity68
+recognition.69
+This paper is organized in the following order. Section II 70
+outlines a literature review of public fall detection datasets, 71
+pose-based human action recognition and fall detection 72
+in addition to synthetic data usage. Section III introduces 73
+the proposed methodology. Section IV presents implemen- 74
+tation details, describing the qualitative and quantitative 75
+results. Section V discusses the ﬁndings of the research. 76
+Finally, section VI draws conclusions from this research. 77
+Code and video explanations are publicly available in 78
+https://sard0r.github.io/. 79
+II. RELATED WORKS 80
+A. VISION-BASED FALL DETECTION DATASETS 81
+Because deep learning models require a large amount of data, 82
+it is crucial to select training and testing datasets to achieve 83
+high performance in real-world applications. For this reason, 84
+this research compared several vision-based public datasets 85
+and a dataset that fulﬁlls the real-world requirements was 86
+chosen. Table 1 lists the well-known and public fall detec- 87
+tion datasets comparing the year published, the types of fall, 88
+the number of subjects, daily activities included, occlusion, 89
+places recorded, participant’s ages, dataset size, and number 90
+of locations. 91
+1) Le2i 92
+In 2013, being one of the ﬁrst, Charﬁ et al. [6] presented 93
+the Le2i fall detection dataset, which was recorded by a 94
+single surveillance camera. In total, the dataset consists of 95
+191 videos in which 143 contain falls and the other 48 show 96
+daily activities. To collect the dataset, nine subjects were 97
+involved in performing three types of fall-down actions and 98
+six different activities of daily life. Videos were captured 99
+94250 VOLUME 10, 2022
+--- PAGE 3 ---
+S. Juraev et al.: Exploring Human Pose Estimation and the Usage of Synthetic Data for Elderly Fall Detection
+TABLE 1. Vision-based publicly available fall detection datasets.
+in four different locations with a resolution of 320 x 240100
+at 25 fps.101
+2) UNIVERSITY OF RZESZOW102
+Later in 2014, Kwolek and Kepski [7] introduced the Univer-103
+sity of Rzeszow fall detection (URFD) dataset including both104
+RGB and depth data types. It was recorded in a laboratory105
+environment by a single subject using two Kinetic cameras.106
+Overall, it contains 70 videos in which 2373 frames are falls,107
+7452 are non-falls, and the other 1719 are transition frames.108
+3) HIGH-QUALITY FALL SIMULATION DATASET109
+In order to bridge the gap between simulated datasets and110
+realistic falls, Baldewijns et al. [8] presented the High-quality111
+Fall Simulation Dataset (HQFSD). This dataset was captured112
+using ﬁve web cameras using 640 x 480 resolution recorded113
+at 12 fps in a nursing home room. Ten subjects were involved114
+in 55 fall scenarios. Each of the ﬁve cameras recorded115
+2:25:54 hrs of fall data.D116
+4) FALL DETECTION DATASET117
+In 2017, Adhikari et al. [9] presented the Fall Detection118
+Dataset (FDD) [12], which was captured using an uncali-119
+brated Kinect sensor. Five subjects performed falling-down120
+actions. In total, the dataset consists of 22,636 images121
+recorded in ﬁve different rooms from eight viewing angles.122
+Out of ﬁve participants, two of them are male (32 and 50 years123
+of age) and three are female (19, 28, and 40).124
+5) UP-FALL125
+In 2019, the UP-Fall dataset [10] was presented. The dataset126
+was captured using three modalities: wearable sensors, ambi-127
+ent sensors, and vision sensors. Seventeen subjects between128
+ages 18 and 24 staged ﬁve falls and six daily life activities.129
+6) AI HUB DATASET130
+In 2020, the Korean government collected the AI Hub dataset131
+for assisted living scenarios. The dataset was captured in both132
+indoor and outdoor environments where elderly people aged133
+60 years and over performed 12 different actions. The dataset134
+contains 2500 untrimmed videos recorded using CCTV at135
+3840 x 2160 resolution consisting of the following actions:136
+falling down, leaning, sitting, bending, lying down, standing137
+up, walking, crawling, picking something up, turning, drink-138
+ing, and eating. Actions were recorded at home, in a hospital,139
+at a community center, in a parking lot, a park, a market,140
+a residential alley, a subway station, on a footbridge, and in 141
+front of apartment complexes. 142
+This research was carried out using the AI Hub dataset 143
+for a number of reasons. First, because it was collected in 144
+10 different environments there is great variance in distances 145
+and viewing angles from camera to subject. Second, unlike 146
+laboratory environments, real-world surveillance cameras 147
+stream continuously, day and night. Thus, as the videos were 148
+recorded both at night and during the daytime, it represents 149
+different levels of complexity. Third, it was collected in places 150
+where the elderly usually happen to be in need (for example, 151
+hospitals and community centers), enabling us to evaluate the 152
+performance of human pose estimation methods in real-world 153
+assisted living scenarios. 154
+B. POSE-BASED HUMAN ACTION RECOGNITION AND 155
+FALL DETECTION 156
+In recent years, pose-based human action recognition has 157
+attracted a lot of attention owing to big improvements in 158
+human pose estimation. Table 2 outlines related work. There 159
+have been many successful attempts to exploit human pose 160
+estimation for elderly action recognition. Y ang et al. [14] 161
+proposed a pose reﬁnement system in a combination of 162
+AlphaPose [15], OpenPose [16], and LCRNet++ [17] to 163
+extract accurate pose sequences from the Toyota Smarthome 164
+dataset [18], including cases of occlusion, truncation, and low 165
+resolution, and reporting a 4.4% accuracy increase compared 166
+to other multimodal methods. Later, Y ang and colleagues 167
+[19] introduced a new framework called UNIK for real-world 168
+skeleton-based action recognition. Their proposed approach 169
+used the Toyota Smarthome dataset, achieving accuracies of 170
+64.3% in cross-subject evaluations and 65% in cross-view 171
+evaluations. Moreover, Jang et al. [12] presented an RGBD 172
+dataset of daily activities by elderly people for care robots 173
+and proposed a four-stream adaptive CNN architecture for 174
+action recognition. Their work reported 90.10% accuracy by 175
+training the model on features obtained using OpenPose. 176
+In terms of pose-based fall detection, Hasan et al. [20] 177
+built a robust human fall detection system using Long 178
+short-term memory (LSTM) and GRU networks based on 179
+the OpenPose pose estimator and reported 99% sensitivity 180
+using the Le2i, and URFD datasets. Linet al. [21] approached 181
+the problem of fall detection with a similar method, intro- 182
+ducing a fall detection framework utilizing OpenPose as 183
+a feature extractor and LSTM and GRU for classiﬁca- 184
+tion, achieving 98.2% accuracy using the URFD dataset. 185
+VOLUME 10, 2022 94251
+--- PAGE 4 ---
+S. Juraev et al.: Exploring Human Pose Estimation and the Usage of Synthetic Data for Elderly Fall Detection
+TABLE 2. Related works for pose estimation-based human action recognition and fall detection.
+Taufeeque et al. [22] introduced real-time, multi-camera,186
+multi-person fall detection by using skeleton features from187
+OpenPifPaf [23] and LSTM for classiﬁcation, reporting188
+a 92.5% F1-score with the UP-Fall dataset. Furthermore,189
+Ramirez et al. [24] exploited the AlphaPose pose estima-190
+tion method and performed fall detection with the UP-Fall191
+dataset, improving the average accuracy to 99.34% with a192
+random forest classiﬁer. More recently, Y adavet al. [25]pre-193
+sented an efﬁcient activity recognition and fall detection194
+system utilizing OpenPose and a combination of Conv1D195
+and GRU networks. This system was trained on the UP-Fall196
+dataset showing 96.7% accuracy. Similar to our research,197
+Serpa et al. [26] evaluated human pose estimation methods198
+such as AlphaPose, OpenPose, and PoseNet [27] as a solution199
+to the fall detection problem. Their proposed work compared200
+these methods in terms of average precision, frame accuracy,201
+and keypoint accuracy, as well as action classiﬁcation accu-202
+racy. To conduct a comparative study, they chose the URFD203
+dataset and an MLP model for classiﬁcation. The ﬁndings of204
+the research were that AlphaPose outperformed the other two205
+pose estimation networks at 94.5% for sensitivity and 99.9%206
+for speciﬁcity. The shortcomings of this work are threefold.207
+One is that the evaluation was performed on limited scientiﬁc208
+data consisting of only 70 videos. Another shortcoming high-209
+lighted by the authors is that low light and occlusions were210
+not considered but left for future work. Most importantly,211
+performance evaluation was based solely on a quantitative212
+comparison, excluding qualitative analysis.213
+C. SYNTHETIC DATA USAGE214
+While learning behaviors from synthetic data is an under-215
+researched area, recently there has been a great deal of interest216
+in usage of synthetic data for human action recognition and217
+fall detection. Because deep learning models are extremely218
+data hungry, to achieve better generalization a number of219
+researchers have resorted to exploiting synthetic data to pro-220
+vide networks with an abundant amount. Wang et al. [11]221
+generated a large-scale synthetic dataset covering 55 elderly222
+activities using Unreal Engine platform. The study covered223
+the exploitation of synthetic data as an augmentation224
+for real data reporting up to 2.41% accuracy improve-225
+ment in recognition of elderly physical activities. Similarly,226
+Zherdev et al. [28] generated a synthetic dataset to overcome227
+the data scarcity problem for elderly fall detection. The aim228
+of the study was to evaluate the effectiveness of using only 229
+synthetic data in real fall scenarios. It reported a 97.6% fall 230
+detection accuracy when the network was trained with solely 231
+synthetic data and tested on URFD real dataset. 232
+Throughout the literature, the generative adversarial net- 233
+work and computer graphics techniques have been popular 234
+for obtaining synthetic datasets. Khodabandeh et al. [29] and 235
+Wang et al. [30] generated synthetic data using a GAN, while 236
+other studies utilized computer graphics and game platforms 237
+to simulate human actions [11], [28], [31], [32]. To evaluate 238
+performance improvement from using synthetic data, KIST 239
+SynADL [11] was utilized for a number of reasons. Firstly, 240
+the body shapes and motions of the characters were captured 241
+from real actions by elderly people. Secondly, it was designed 242
+especially for augmenting realistic elderly datasets for action 243
+recognition by smart surveillance and care robots. Finally, 244
+it is a large synthetic dataset including 15 characters who 245
+performed 55 actions of elderly people in four different envi- 246
+ronments. Although the article by Wang et al. [11] is closely 247
+related to our research, it only considered synthetic data usage 248
+targeting recognition of daily activities from a care robot’s 249
+view. Therefore, it utilized realistic datasets [33] and [12] 250
+which were captured in laboratory settings from a side view 251
+for application by care robots. By contrast, our study focuses 252
+on the usage of synthetic data for real-world surveillance 253
+applications which is explored for the ﬁrst time. 254
+III. METHODOLOGY 255
+In this section, a performance evaluation methodology for 256
+human pose estimation methods is introduced as a solution 257
+to elderly action recognition and fall detection. The overall 258
+process of the proposed methodology is illustrated in Fig. 1. 259
+The main aim of this research is to explore the performance 260
+of human pose estimation methods for elderly action recog- 261
+nition and fall detection in real-world surveillance, and to 262
+illustrate the degree of improvement through synthetic data 263
+exploitation. To evaluate the potential of pose estimation for 264
+fall detection problems, ﬁve human pose estimation meth- 265
+ods are considered with two prominent action recognition 266
+networks. In general, the raw video frames from the chosen 267
+real dataset are ﬁrst fed into the selected pose estimation 268
+methods, which output sets of human poses. Next, qualita- 269
+tive and quantitative evaluations were performed for each 270
+pose estimation method utilizing the extracted human pose 271
+94252 VOLUME 10, 2022
+--- PAGE 5 ---
+S. Juraev et al.: Exploring Human Pose Estimation and the Usage of Synthetic Data for Elderly Fall Detection
+TABLE 3. Comparision of the pose estimation methods. FPS values were
+computed a using Nvidia GTX 1080Ti.
+features. After qualitative and quantitative analysis of the272
+selected pose estimation models, the inﬂuence of synthetic273
+data was observed when mixed with real data.274
+A. HUMAN POSE ESTIMATION AND DATA275
+PREPROCESSING276
+Human pose estimation methods can be categorized277
+into top-down and bottom-up approaches. The top-down278
+approaches employ a human detector to ﬁnd human candi-279
+dates before doing single-person pose estimation. In contrast,280
+the bottom-up approaches ﬁrst predict the keypoints of a281
+person, and later associate the detected keypoints to form full282
+poses. There are advantages and disadvantages to both pro-283
+posed approaches [34]. For example, bottom-up approaches284
+are efﬁcient in inference speed while predicting the keypoints285
+irrelative to human candidates in a scene. Nevertheless, they286
+may produce disconnected or error-associated parts in trun-287
+cation or occlusion scenarios.288
+On the other hand, top-down approaches are dependent289
+on person detector accuracy in addition to having inference290
+speed in accordance with the person count in the image.291
+However, the keypoint prediction performance of top-down292
+approaches is highly accurate compared to the bottom-up293
+approaches. Thus, to ﬁnd the most accurate and efﬁcient294
+pipeline, two top-down and three bottom-up state-of-the-art295
+human pose estimation methods were selected. From the296
+top-down approaches, AlphaPose and DCPose [35] using297
+YOLOv3 [36] as a detector were chosen for evaluation.298
+From the bottom-up approaches, OpenPose, OpenPiPaf, and299
+MoveNet [37] were selected. Table 3 shows the pose esti-300
+mation methods with the chosen trained datasets and their301
+respective mAPs and frames per second. All of the methods302
+were trained on the COCO [38] dataset except DCPose,303
+which was trained on the PoseTrack2017 [39] dataset. For a304
+fair comparison, the most accurate models in terms of detec-305
+tion quality were chosen for every pose estimation method.306
+First, 25 image sequences at 960 x 540 were fed into the307
+selected human pose estimation models, which extracted 2D308
+poses in a T x K shape, where K is the total number of key-309
+points and T is the number of frames. After applying human310
+pose estimation, 18 and 17 keypoints were obtained from311
+OpenPose and the other models, respectively. Each keypoint312
+consists of three values: X and Y (representing human joint313
+coordinates) in addition to C, measuring how correctly the314
+keypoint was estimated. The keypoints obtained from pose315
+estimation models were further normalized from 0 to 1 and316
+fed into the action recognition models. For normalization, 317
+if X represents the extracted keypoint features: 318
+Xnormalized= X− Xmin
+Xmax− Xmin
+(1) 319
+B. ACTION RECOGNITION MODELS 320
+1) TRANSFORMER MODEL 321
+Mazzia et al. [40] proposed the Action Transformer archi- 322
+tecture for classifying human action recognition in short 323
+time steps. The proposed method outperformed many 324
+RNN-based networks achieving real-time performance on 325
+a CPU. Inspired by their success, the authors applied the 326
+Transformer-based architecture to elderly action recognition 327
+and fall detection for the ﬁrst time. Fig. 2 illustrates the 328
+classiﬁcation procedures by Transformer of elderly actions. 329
+In this proposed method, pose estimation is initially applied 330
+to the input video, after which estimated keypoints are prepro- 331
+cessed and projected linearly to the predeﬁned transformer 332
+encoder. Following that, keypoint features from pose estima- 333
+tion models are added to class tokens and positional encoding, 334
+forming input embeddings by the Transformer encoder. Then, 335
+within the Transformer encoder, the input embeddings are 336
+projected onto the multi-head attention layer followed by 337
+fully connected layers. The output is then passed to the MLP 338
+head, which predicts the action classes. 339
+FIGURE 2. Architecture of the Transformer Model.
+2) LSTM MODEL 340
+Long short-term memory is an evolution of the classic 341
+Recurrent Neural Network. Unlike traditional RNNs, LSTM 342
+is designed to maintain the information of longer data 343
+sequences and to learn variations in time. In the literature, 344
+LSTM is popular in the application of action classiﬁcation 345
+achieving state-of-the-art accuracy [20], [21], [22]. Thus, 346
+in this research for quantitative comparisons, LSTM was 347
+chosen for observation alongside Transformer. An overview 348
+of action recognition using LSTM can be seen in Fig. 3. 349
+For action classiﬁcation, the extracted keypoint features of 350
+input videos from pose estimation models are passed as input 351
+to pre-deﬁned LSTM layers. The output features of the last 352
+LSTM layer are then passed through dense layers followed 353
+by a softmax layer to predict the probabilities of each class. 354
+VOLUME 10, 2022 94253
+--- PAGE 6 ---
+S. Juraev et al.: Exploring Human Pose Estimation and the Usage of Synthetic Data for Elderly Fall Detection
+FIGURE 3. Architecture of the LSTM Model.
+C. EVALUATION METRICS355
+1) POSE ESTIMATION METRICS356
+The conﬁdence score of each detected keypoint represents357
+how likely the pose estimation models have successfully358
+detected human joints. Extracted keypoint features from an359
+input video having higher average conﬁdence rate produce360
+preferable results when used to recognize human actions.361
+To calculate the average conﬁdence of keypoints in a video362
+(ACV), ﬁrst average conﬁdence of keypoints in an image363
+(IC), is calculated as seen below:364
+IC=
+∑K−1
+i=0 Ci
+K (2)365
+ACV=
+∑T−1
+i=0 ICi
+T (3)366
+In equation (2), C is the conﬁdence of each keypoint, K367
+denotes the total number of keypoints, and T stands for the368
+number of frames.369
+Owing to many factors, such as occlusion, dim light, and370
+low-resolution pose estimation models fail to detect key-371
+points of the human body. The ability of pose estimation372
+models to detect keypoints under the above-mentioned condi-373
+tions directly impacts the performance of action recognition374
+models. Because the number of keypoints for each pose375
+estimation is not equal, in this paper for the evaluation of376
+pose estimation models the average percentage of missing377
+keypoints is calculated. To estimate the average percentage of378
+missing keypoints (AMV) from a video, ﬁrst the percentage379
+of missing keypoints (IM) in an image is calculated as seen380
+below:381
+IM= n
+K× 100% (4)382
+AMV=
+∑T−1
+i=0 IMi
+T (5)383
+In equation (4), n represents the total number of missing 384
+keypoints from an image. 385
+2) ACTION RECOGNITION METRICS 386
+To evaluate the performance of action recognition models, 387
+four metrics of a confusion matrix [41], (accuracy, recall, pre- 388
+cision, and F1-score) were chosen. Accuracy can be deﬁned 389
+as the ratio of the total number of correct predictions to the 390
+total number of predictions. For a binary class classiﬁcation, 391
+recall, precision, and F1-score can be deﬁned as follows. Pre- 392
+cision is a measure of correct predictions out of all the positive 393
+predictions. Recall (or Sensitivity) is a measure observing the 394
+accurately classiﬁed cases out of all positive cases. F1-score 395
+combines precision and recall into a single metric by taking 396
+their harmonic mean. However, because this study classiﬁes 397
+four action classes, the evaluation method differs from the 398
+binary classiﬁcation problem. For this study, precision, recall, 399
+and F1-score for each action class were calculated separately, 400
+after which the weighted average of each evaluation metric 401
+from all action classes was calculated. 402
+IV. EXPERIMENTS 403
+A. IMPLEMENTATION DETAILS 404
+1) DATASETS 405
+To conduct the experiments four action classes were chosen: 406
+falling down, standing up, lying down, and walking. Those 407
+four classes exist in both the AI Hub and the Kist SynADL 408
+datasets. KIST SynADL dataset was captured only from 409
+indoor environments. Therefore, only indoor video samples 410
+from the AI Hub dataset were considered for quantitative 411
+analysis. Fig. 4 depicts the distribution of real and synthetic 412
+videos exploited in our experiments. Sample instances from 413
+both datasets are visualized in Fig. 5. In total, 1296 videos 414
+were chosen from the AI Hub dataset. Classes such as falling 415
+down, standing up, lying down, and walking included 166, 416
+280, 350, and 500 samples, respectively. For each action 417
+class, 1600 new synthetic video samples were added to the 418
+training dataset from KIST SynADL. The amount of avail- 419
+able indoor data in realistic scenarios is extremely limited. 420
+Hence, one of the aims of this study was to evaluate the 421
+FIGURE 4. The number of videos utilized from the AI Hub and KIST
+SynADL datasets.
+94254 VOLUME 10, 2022
+--- PAGE 7 ---
+S. Juraev et al.: Exploring Human Pose Estimation and the Usage of Synthetic Data for Elderly Fall Detection
+FIGURE 5. Examples of each Action classes from AI Hub and KIST SynADL datasets.
+performance gains obtained from exploiting synthetic data to422
+combat data limitations. In other words, synthetic data were423
+mixed with real video samples for training the deep learning424
+models. For fair evaluation and reproducibility, the AI Hub425
+dataset was divided into training and testing sets at a 3:1 ratio.426
+Multiple experiments were performed where synthetic data427
+used in the training set was increased by 1600, with each428
+class given 400 new synthetic samples. The testing accuracy429
+of action recognition models such as Transformer and LSTM430
+were calculated on the real test dataset.431
+2) TRAINING SETTINGS432
+Table 4 summarizes the hyperparameters obtained from433
+progressively training the two action recognition models.434
+In order to obtain optimal hyperparameters for each network,435
+the Optuna [42] framework was utilized with Hyperband [43]436
+algorithms. Hyperparameters were tuned for the training set,437
+excluding the test set. Thus optimal parameters were selected438
+for training the Transformer and LSTM models. For a fair439
+evaluation, both models were trained for 200 epochs on a440
+personal computer with 16 GB RAM, an Intel I9-11900K441
+CPU, and the Nvidia GTX 1080Ti GPU. For the LSTM442
+model, three LSTM layers were designed with hidden units443
+of 32, 64, and 32, after which there were four dense layers444
+with dense units of 128, 64, 32, and 16. The Transformer445
+model was composed of four Transformer encoder layers446
+each consisting of one multi-head self-attention layer. In both447
+TABLE 4. Training details of Transformer and LSTM.
+of the action recognition models, the Adam [44] optimizer 448
+was used with a learning rate of 0.001. Lastly, a dropout rate 449
+of 0.3 was applied to both models for regularization. 450
+B. EXPERIMENTAL RESUL TS 451
+1) QUALITATIVE ANALYSIS 452
+Human pose estimation is considered a challenging task in 453
+real-world applications. These challenges arise under many 454
+conditions, such as camera angle, lighting condition, occlu- 455
+sions, and camera-to-subject distance [45]. We evaluated the 456
+performance of the above-mentioned pose estimation models 457
+for elderly physical activity recognition in real-life surveil- 458
+lance scenarios. In this regard, a qualitative comparison was 459
+VOLUME 10, 2022 94255
+--- PAGE 8 ---
+S. Juraev et al.: Exploring Human Pose Estimation and the Usage of Synthetic Data for Elderly Fall Detection
+FIGURE 6. Qualitative analysis of state-of-the-art pose estimation models.
+conducted on indoor and outdoor image samples from the460
+AI Hub dataset. Fig. 6 shows qualitative analysis where each461
+row depicts different scenario complications, such as indoor462
+bright and dim light, outdoor bright and dim light, occlusions,463
+and lying. Each column illustrates the keypoint detection464
+result of a given pose estimator. Among pose estimation465
+models, AlphaPose achieved the most robust results in all466
+cases. One exception was observed in indoor dim light sce-467
+narios where it failed to detect occluded parts of the person.468
+OpenPifPaf and DCPose demonstrated similar results, fail-469
+ing only under indoor dim light. Although OpenPose pre-470
+dicted the keypoints of a person in every scenario, it suf-471
+fered from false positives in outdoor environments. MoveNet472
+performed the worst, failing to detect keypoints accurately473
+with respect to body joints in most scenarios. We observed474
+that OpenPose and MoveNet detected false positive keypoints475
+when a person was far from the camera and when there476
+were other non-human objects similar to the shape of a 477
+person. 478
+2) QUANTITATIVE ANALYSIS 479
+a: PERFORMANCE FROM SELECTED PIPELINES 480
+To evaluate the robustness of the chosen pose estimation 481
+methods quantitative experiments were conducted using 482
+the AI Hub dataset. First, performance from the pose- 483
+estimation-based action recognition pipelines was compared. 484
+Results for accuracy, precision, recall, and F1-score in both 485
+action recognition pipelines are shown in Table 5. Both 486
+Transformer- and LSTM-based pipelines achieved good per- 487
+formance when coupled with AlphaPose. The worst perfor- 488
+mance was observed when MoveNet was used as a pose 489
+feature extractor in the action recognition pipeline. The best 490
+pipelines were AlphaPose for pose features and Transformer 491
+for action classiﬁcation. Pipeline results for accuracy, recall, 492
+94256 VOLUME 10, 2022
+--- PAGE 9 ---
+S. Juraev et al.: Exploring Human Pose Estimation and the Usage of Synthetic Data for Elderly Fall Detection
+TABLE 5. Transformer and LSTM pipeline results for each human pose
+estimation model with the AI Hub dataset.
+FIGURE 7. Comparisons for average percentage of missing keypoints with
+the AI Hub dataset.
+precision, and F1-score were 89.22%, 90%, 89%, and 89%,493
+respectively. As an action classiﬁcation model, Transformer494
+showed superior performance compared to LSTM when495
+paired with any pose estimation method. Performance differ-496
+ences ranged up to 2.57%.497
+b: POSE ESTIMATION EVALUATION498
+Secondly, for quantitative analysis of pose estimation models,499
+the average percentage of missing keypoints and the aver-500
+age conﬁdence for keypoints in T frames were compared.501
+The reason was that the AI Hub dataset did not provide502
+ground truth keypoints for body joints. Therefore, the mAP503
+of the detected keypoints could not be calculated. To solve504
+this issue, two metrics were proposed in Sec. III: average505
+percentage of missing keypoints and average conﬁdence of506
+keypoints. The average percentage of missing keypoints for507
+all methods is illustrated using boxplots in Fig. 7. Aver-508
+age conﬁdence of keypoints for all methods is explained509
+in Fig. 8. We can see that AlphaPose and DCPose showed510
+similar percentages of missing keypoints whereas the former511
+achieved the best results with mean and median of 9.66% and512
+2.26%, respectively. OpenPifPaf demonstrated the highest513
+FIGURE 8. Comparisons for average confidence of pose estimation
+models with the AI Hub dataset.
+percentage of missing keypoints with mean and median of 514
+42.12% and 36.51%, respectively. Similarly, from studying 515
+the average conﬁdence in keypoints, AlphaPose performed 516
+the best with mean and median of 75.29% and 76.15%, 517
+respectively, while MoveNet showed the worst result with 518
+mean and median of 21.55% and 22.92%, respectively. 519
+c: ACTION RECOGNITION MODEL COMPARISON 520
+Lastly, for fair evaluation of action recognition in the models’ 521
+performance, the important characteristics of Transformer 522
+and LSTM were calculated when trained and tested on the AI 523
+Hub data. Table6 shows the number of parameters, MFLOPs, 524
+GPU memory requirements, and inference time of the Trans- 525
+former and LSTM models. The table shows that both models 526
+had comparable inference speeds. It is also worth mention- 527
+ing that the number of parameters was 3.6 times higher in 528
+Transformer. 529
+TABLE 6. Model Parameters, MFLOPS, GPU Memory Requirements, and
+Inference Time.
+3) IMPACT OF THE SYNTHETIC DATA 530
+a: SYNTH+REAL TRAINING 531
+This section reports the impact from increasing the train- 532
+ing data by using synthetic video samples. First, the per- 533
+formance from action recognition models trained with real- 534
+only (Real), synthetic-only (Synthetic), and mixed synthetic 535
+and real (Real+Synthetic) data were compared. Correspond- 536
+ing data are shown in the second row of Table 7 for both 537
+Transformer and LSTM networks. It is interesting to see 538
+the degree of generalization when the model was trained on 539
+completely synthetic data and evaluated on real data. The 540
+table shows that training the action classiﬁcation models with 541
+VOLUME 10, 2022 94257
+--- PAGE 10 ---
+S. Juraev et al.: Exploring Human Pose Estimation and the Usage of Synthetic Data for Elderly Fall Detection
+TABLE 7. Training jointly on synthetic and real data.
+FIGURE 9. Impact of synthetic data on accuracy: LSTM.
+only synthetic data can achieve up to 70.19% accuracy with542
+a Transformer model that uses AlphaPose keypoints. This543
+already demonstrates a promising generalization capability544
+with synthetic data. Up to 89.22% accuracy was obtained545
+using only real data for training. When adding synthetic546
+data to real training data, accuracy increased to 94.35%.547
+Similar behavior was observed for other keypoint extractor548
+methods.549
+b: IMPACT OF SYNTHETIC SAMPLES PER CLASS550
+In the above, we saw an increase in performance when adding551
+synthetic data. Next, we examined the trend in performance552
+improvement by adding synthetic data incrementally. Graphs553
+in Fig. 9 and Fig. 10 capture the increased trends when554
+adding more synthetic data to the training set of the action555
+classiﬁcation model.556
+For each action classiﬁcation model (i.e., Transformer and557
+LSTM), ﬁve pipelines were analyzed with each pipeline cor-558
+responding to different keypoint extractors. Analysis showed559
+that the amount of synthetic data had a direct impact on action560
+recognition performance. To capture the trend, we added561
+1600 synthetic data in each step (400 samples for each class).562
+With each addition of synthetic video samples to the real data563
+there was a consistent increase in accuracy from both the564
+Transformer and LSTM models. The accuracy improvement565
+FIGURE 10. Impact of synthetic data on Accuracy: Transformer.
+was noticeable in the early steps, which tended to decrease 566
+marginally with more synthetic data. The highest increase can 567
+be attributed to AlphaPose with the Transformer pipeline at 568
+a 5.16% improvement, where accuracy went from 89.22% to 569
+94.35%. The lowest increase was obtained from OpenPifPaf 570
+and LSTM pipelines (an increase in accuracy of 2.46%). 571
+The mean increase in accuracy from Transformer and LSTM 572
+action recognition models when coupled with all pose estima- 573
+tion methods was 3.96% and 3.77%, respectively. It is worth 574
+noting that the trend in the performance increase generalized 575
+similarly with both Transformer- and LSTM-based action 576
+classiﬁcation models. 577
+c: INFLUENCE OF SYNTHETIC DATA ON FALL DETECTION 578
+To visualize the performance improvement after adding syn- 579
+thetic data, a Transformer pipeline was used. Keypoints were 580
+extracted from AlphaPose and given as input to the Trans- 581
+former model. Three scenarios were tested with two pipelines 582
+where, in all cases, test data were the same three samples of 583
+falling down from the AI Hub dataset. In the ﬁrst pipeline, 584
+the Transformer-based action recognition model was trained 585
+only on real (AI Hub) data. Next, 6400 synthetic video sam- 586
+ples were added to the real data to create a larger training 587
+set. Then, on this larger set, the second Transformer-based 588
+pipeline was trained. Performance improvements after adding 589
+synthetic data are shown in Table 8 for the three cases 590
+shown in Fig. 11 where each row represents a single video 591
+clip failure with different snapshots. When the pipeline was 592
+trained only using real data, all three cases failed with high 593
+probabilities of identifying the wrong category. The pipeline 594
+that was trained with the additional synthetic dataset cor- 595
+rectly predicted the correct class with high probability. One 596
+possible explanation is that the nature of falling down is 597
+diverse. There is not enough falling down data in the AI Hub 598
+dataset to capture such diversity. However, the synthetic Kist 599
+SynADL dataset can be used to cover some missing action 600
+variations. 601
+94258 VOLUME 10, 2022
+--- PAGE 11 ---
+S. Juraev et al.: Exploring Human Pose Estimation and the Usage of Synthetic Data for Elderly Fall Detection
+FIGURE 11. Improved failure cases after including synthetic data in training. All three scenarios were failing when model is trained only using real
+data. Adding synthetic data then retraining the model successfully corrected failure cases.
+TABLE 8. Performance Comparison of the Transformer pipeline trained
+with and without synthetic data.
+V. DISCUSSION602
+It is noteworthy that top-down approaches performed better603
+than bottom-up approaches. AlphaPose was the most robust604
+pose estimator in both qualitative and quantitative analyses.605
+In terms of robustness, DCPose was similar to AlphaPose606
+but suffered the highest latency. The pose estimation model607
+with the lowest latency was MoveNet, but it was the least608
+robust in both qualitative and quantitative studies. Overall, for609
+top-down pose estimation, we noted that the metrics deﬁned610
+in Sec III correlate with action classiﬁcation model robust-611
+ness. However, this conclusion cannot be drawn from bottom-612
+up approaches. A possible explanation is that bottom-up pose613
+estimation demonstrated false positive results. In other words,614
+false positives where non-human objects appear to be a per-615
+son to the pose estimator decreased accuracy.616
+Also, one of the ﬁndings was that the addition of syn-617
+thetic data to real data improved the accuracy of the action618
+recognition models. This observation holds for all the pose619
+estimation models. In order to build highly robust elderly620
+care applications, it is crucial, yet challenging, to obtain621
+large-scale elderly behavior datasets. A better solution can622
+be building synthetic datasets that can be obtained at less cost623
+without manual annotation. The current quality of synthetic624
+datasets does not show high generalization when used alone625
+to build models. However, they can be used to augment a626
+real dataset, boosting performance from action classiﬁcation627
+models.628
+Another ﬁnding of this work is that the Transformer model 629
+showed inference speed comparable to the LSTM model. 630
+Thus, in real-world applications using AlphaPose in combi- 631
+nation with a Transformer model can be assumed to demon- 632
+strate high accuracy with lower latency. This approach can be 633
+optimized to target real-time applications, especially in mon- 634
+itoring elderly people where the problem should be solved 635
+instantly to prevent sudden accidents. 636
+VI. CONCLUSION 637
+Exploiting state-of-the-art human pose estimation methods 638
+for pose-based action recognition and fall detection was the 639
+main emphasis of this study. Speciﬁcally, this paper explored 640
+action classiﬁcation for elderly-care-monitoring applications 641
+that include fall detection. As a pose estimation model, 642
+we used ﬁve methods: AlphaPose, DCPose, OpenPose, 643
+OpenPifPaf, and MoveNet. LSTM and Transformer were 644
+explored as potential methods to model action sequences. 645
+Perhaps most importantly, this study examined the beneﬁts 646
+from using synthetic data for pose-based action recognition 647
+and fall detection due to the limited amount of real-world 648
+data. AlphaPose was found to be the most accurate human 649
+pose estimator in surveillance scenarios. Transformer outper- 650
+formed LSTM in accuracy, precision, recall, and F1-score. 651
+Results show that exploitation of synthetic data improved 652
+action recognition performance signiﬁcantly. A limitation of 653
+this research is that quantitative evaluations were performed 654
+only on indoor data. As future research, one can extend 655
+the present work by considering observations from outdoor 656
+elderly human behavior datasets as well. 657
+ACKNOWLEDGMENT 658
+(Sardor Juraev and Akash Ghimire contributed equally to this 659
+work.) 660
+VOLUME 10, 2022 94259
+--- PAGE 12 ---
+S. Juraev et al.: Exploring Human Pose Estimation and the Usage of Synthetic Data for Elderly Fall Detection
+REFERENCES661
+[1] Y . Kamiya, N. M. S. Lai, and K. Schmid. (Jan. 2021). World Population662
+Ageing 2020. [Online]. Available: https://bit.ly/3aPJb9A663
+[2] M. Mubashir, L. Shao, and L. Seed, ‘‘A survey on fall detection:664
+Principles and approaches,’’ Neurocomputing, vol. 100, pp. 144–152,665
+Jan. 2013.666
+[3] M. N. H. Mohd, Y . Nizam, S. Suhaila, and M. M. A. Jamil, ‘‘An optimized667
+low computational algorithm for human fall detection from depth images668
+based on support vector machine classiﬁcation,’’ in Proc. IEEE Int. Conf.669
+Signal Image Process. Appl. (ICSIPA), Sep. 2017, pp. 407–412.670
+[4] T. Mukhiddin, H. R. Arousha, A. Ubaydullo, L. Wookey, and S. Lee,671
+‘‘Privacy-preserving of human identiﬁcation in CCTV data using a novel672
+deep learning-based method,’’ in Proc. IEEE Int. Conf. Big Data Smart673
+Comput. (BigComp), Jan. 2022, pp. 211–214.674
+[5] H. Duan, Y . Zhao, K. Chen, D. Lin, and B. Dai, ‘‘Revisiting skeleton-675
+based action recognition,’’ in Proc. IEEE/CVF Conf. Comput. Vis. Pattern676
+Recognit., Jun. 2022, pp. 2969–2978.677
+[6] I. Charﬁ, J. Miteran, J. Dubois, M. Atri, and R. Tourki, ‘‘Optimized spatio-678
+temporal descriptors for real-time fall detection: Comparison of support679
+vector machine and AdaBoost-based classiﬁcation,’’ J. Electron. Imag.,680
+vol. 22, no. 4, Jul. 2013, Art. no. 041106.681
+[7] B. Kwolek and M. Kepski, ‘‘Human fall detection on embedded platform682
+using depth maps and wireless accelerometer,’’ Comput. Methods Pro-683
+grams Biomed., vol. 117, no. 3, pp. 489–501, Dec. 2014.684
+[8] G. Baldewijns, G. Debard, G. Mertes, B. V anrumste, and T. Croonenb,685
+‘‘Bridging the gap between real-life data and simulated data by pro-686
+viding a highly realistic fall dataset for evaluating camera-based fall687
+detection algorithms,’’ Healthcare Technol. Lett., vol. 3, no. 1, pp. 6–11,688
+Mar. 2016.689
+[9] K. Adhikari, H. Bouchachia, and H. Nait-Charif, ‘‘Activity recognition for690
+indoor fall detection using convolutional neural network,’’ in Proc. 15th691
+IAPR Int. Conf. Mach. Vis. Appl. (MVA), May 2017, pp. 81–84.692
+[10] L. Martínez-Villaseñor, H. Ponce, J. Brieva, E. Moya-Albor,693
+J. Núñez-Martínez, and C. Peñafort-Asturiano, ‘‘UP-fall detection694
+dataset: A multimodal approach,’’ Sensors, vol. 19, no. 9, p. 1988,695
+Apr. 2019.696
+[11] H. Hwang, C. Jang, G. Park, J. Cho, and I.-J. Kim, ‘‘ElderSim: A synthetic697
+data generation platform for human action recognition in eldercare appli-698
+cations,’’ 2020, arXiv:2010.14742.699
+[12] J. Jang, D. Kim, C. Park, M. Jang, J. Lee, and J. Kim, ‘‘ETRI-activity3D:700
+A large-scale RGB-D dataset for robots to recognize daily activities of701
+the elderly,’’ in Proc. IEEE/RSJ Int. Conf. Intell. Robots Syst. (IROS),702
+Oct. 2020, pp. 10990–10997.703
+[13] (2020). AI Hub Dataset. [Online]. Available: https://bit.ly/3ob99qT704
+[14] D. Y ang, R. Dai, Y . Wang, R. Mallick, L. Minciullo, G. Francesca, and705
+F. Bremond, ‘‘Selective spatio-temporal aggregation based pose reﬁne-706
+ment system: Towards understanding human activities in real-world707
+videos,’’ 2020, arXiv:2011.05358.708
+[15] H.-S. Fang, S. Xie, Y .-W. Tai, and C. Lu, ‘‘RMPE: Regional multi-person709
+pose estimation,’’ inProc. IEEE Int. Conf. Comput. Vis. (ICCV), Oct. 2017,710
+pp. 2334–2343.711
+[16] Z. Cao, G. Hidalgo, T. Simon, S. E. Wei, and Y . Sheikh, ‘‘OpenPose:712
+Realtime multi-person 2D pose estimation using part afﬁnity ﬁelds,’’713
+IEEE Trans. Pattern Anal. Mach. Intell., vol. 43, no. 1, pp. 172–186,714
+Jan. 2021.715
+[17] G. Rogez, P . Weinzaepfel, and C. Schmid, ‘‘LCR-Net++: Multi-person 2D716
+and 3D pose detection in natural images,’’IEEE Trans. Pattern Anal. Mach.717
+Intell., vol. 42, no. 5, pp. 1146–1161, May 2020.718
+[18] S. Das, R. Dai, M. Koperski, L. Minciullo, L. Garattoni, F. Bremond,719
+and G. Francesca, ‘‘Toyota smarthome: Real-world activities of daily liv-720
+ing,’’ in Proc. IEEE/CVF Int. Conf. Comput. Vis. (ICCV), Oct. 2019,721
+pp. 833–842.722
+[19] D. Y ang, Y . Wang, A. Dantcheva, L. Garattoni, G. Francesca, and723
+F. Bremond, ‘‘UNIK: A uniﬁed framework for real-world skeleton-based724
+action recognition,’’ 2021, arXiv:2107.08580.725
+[20] M. M. Hasan, M. S. Islam, and S. Abdullah, ‘‘Robust pose-based human726
+fall detection using recurrent neural network,’’ in Proc. IEEE Int. Conf.727
+Robot., Autom., Artif.-Intell. Internet Things (RAAICON), Nov. 2019,728
+pp. 48–51.729
+[21] C.-B. Lin, Z. Dong, W.-K. Kuan, and Y .-F. Huang, ‘‘A framework for fall730
+detection based on OpenPose skeleton and LSTM/GRU models,’’ Appl.731
+Sci., vol. 11, no. 1, p. 329, Dec. 2020.732
+[22] M. Taufeeque, S. Koita, N. Spicher, and T. M. Deserno, ‘‘Multi-camera, 733
+multi-person, and real-time fall detection using long short term memory,’’ 734
+Proc. SPIE, vol. 11601, pp. 35–42, Feb. 2021. 735
+[23] S. Kreiss, L. Bertoni, and A. Alahi, ‘‘OpenPifPaf: Composite ﬁelds for 736
+semantic keypoint detection and spatio-temporal association,’’IEEE Trans. 737
+Intell. Transp. Syst., vol. 23, no. 8, pp. 13498–13511, Aug. 2022. 738
+[24] H. Ramirez, S. A. V elastin, I. Meza, E. Fabregas, D. Makris, and G. Farias, 739
+‘‘Fall detection and activity recognition using human skeleton features,’’ 740
+IEEE Access, vol. 9, pp. 33532–33542, 2021. 741
+[25] S. K. Y adav, A. Luthra, K. Tiwari, H. M. Pandey, and S. A. Akbar, 742
+‘‘ARFDNet: An efﬁcient activity recognition & fall detection system 743
+using latent feature pooling,’’ Knowl.-Based Syst. , vol. 239, Mar. 2022, 744
+Art. no. 107948. 745
+[26] Y . R. Serpa, M. B. Nogueira, P . P . M. Neto, and M. A. F. Rodrigues, ‘‘Evalu-746
+ating pose estimation as a solution to the fall detection problem,’’ in Proc. 747
+IEEE 8th Int. Conf. Serious Games Appl. Health (SeGAH) , Aug. 2020, 748
+pp. 1–7. 749
+[27] Google. (2019). Tensorﬂowjs Posenet. [Online]. Available: https://bit. 750
+ly/2seAmfa 751
+[28] D. Zherdev, L. Zherdeva, S. Agapov, A. Sapozhnikov, A. Nikonorov, and 752
+S. Chaplygin, ‘‘Producing synthetic dataset for human fall detection in 753
+AR/VR environments,’’ Appl. Sci., vol. 11, no. 24, p. 11938, Dec. 2021. 754
+[29] M. Khodabandeh, H. R. V . Joze, I. Zharkov, and V . Pradeep, ‘‘DIY human 755
+action dataset generation,’’ in Proc. IEEE/CVF Conf. Comput. Vis. Pattern 756
+Recognit. Workshops (CVPRW), Jun. 2018, pp. 1448–1458. 757
+[30] L. Wang, Z. Ding, Z. Tao, Y . Liu, and Y . Fu, ‘‘Generative multi-view human 758
+action recognition,’’ in Proc. IEEE/CVF Int. Conf. Comput. Vis. (ICCV), 759
+Oct. 2019, pp. 6212–6221. 760
+[31] A. Roitberg, D. Schneider, A. Djamal, C. Seibold, S. Reiß, and 761
+R. Stiefelhagen, ‘‘Let’s play for action: Recognizing activities of daily 762
+living by learning from life simulation video games,’’ in Proc. IEEE/RSJ 763
+Int. Conf. Intell. Robots Syst. (IROS), Sep./Oct. 2021, pp. 8563–8569. 764
+[32] D. Ludl, T. Gulde, and C. Curio, ‘‘Enhancing data-driven algorithms 765
+for human pose estimation and action recognition through simula- 766
+tion,’’ IEEE Trans. Intell. Transp. Syst., vol. 21, no. 9, pp. 3990–3999, 767
+Sep. 2020. 768
+[33] A. Shahroudy, J. Liu, T.-T. Ng, and G. Wang, ‘‘NTU RGB+ D: A large scale 769
+dataset for 3D human activity analysis,’’ in Proc. IEEE Conf. Comput. Vis. 770
+Pattern Recognit. (CVPR), Jun. 2016, pp. 1010–1019. 771
+[34] M. Li, Z. Zhou, J. Li, and X. Liu, ‘‘Bottom-up pose estimation of multiple 772
+person with bounding box constraint,’’ in Proc. 24th Int. Conf. Pattern 773
+Recognit. (ICPR), Aug. 2018, pp. 115–120. 774
+[35] Z. Liu, H. Chen, R. Feng, S. Wu, S. Ji, B. Y ang, and X. Wang, ‘‘Deep 775
+dual consecutive network for human pose estimation,’’ inProc. IEEE/CVF 776
+Conf. Comput. Vis. Pattern Recognit. (CVPR), Jun. 2021, pp. 525–534. 777
+[36] J. Redmon and A. Farhadi, ‘‘YOLOv3: An incremental improvement,’’ 778
+2018, arXiv:1804.02767. 779
+[37] Google. (2021). Tensorﬂowjs MoveNet. [Online]. Available: https: 780
+https://bit.ly/3Pho1jG 781
+[38] T.-Y . Lin, M. Maire, S. Belongie, J. Hays, P . Perona, D. Ramanan, P . Dollár, 782
+and C. L. Zitnick, ‘‘Microsoft COCO: Common objects in context,’’ in 783
+Proc. Eur . Conf. Comput. Vis. (ECCV) . Zürich, Switzerland: Springer, 784
+2014, pp. 740–755. 785
+[39] U. Iqbal, A. Milan, and J. Gall, ‘‘PoseTrack: Joint multi-person pose esti- 786
+mation and tracking,’’ in Proc. IEEE Conf. Comput. Vis. Pattern Recognit. 787
+(CVPR), Jul. 2017, pp. 2011–2020. 788
+[40] V . Mazzia, S. Angarano, F. Salvetti, F. Angelini, and M. Chiaberge, 789
+‘‘Action transformer: A self-attention model for short-time pose-based 790
+human action recognition,’’ Pattern Recognit., vol. 124, Apr. 2022, 791
+Art. no. 108487. 792
+[41] Sklearn Confusion Matrix. Accessed: Jul. 31, 2022. [Online]. Available: 793
+https://bit.ly/3v1qFC5 794
+[42] T. Akiba, S. Sano, T. Y anase, T. Ohta, and M. Koyama, ‘‘Optuna: 795
+A next-generation hyperparameter optimization framework,’’ inProc. 25th 796
+ACM SIGKDD Int. Conf. Knowl. Discovery Data Mining, Jul. 2019, 797
+pp. 2623–2631. 798
+[43] J. S. Tham, Y . C. Chang, and M. F. A. Fauzi, ‘‘Automatic identiﬁcation of 799
+drinking activities at home using depth data from RGB-D camera,’’ inProc. 800
+Int. Conf. Control, Autom. Inf. Sci. (ICCAIS), Dec. 2014, pp. 153–158. 801
+[44] D. P . Kingma and J. Ba, ‘‘Adam: A method for stochastic optimization,’’ 802
+2014, arXiv:1412.6980. 803
+[45] M. Cormier, A. Clepe, A. Specker, and J. Beyerer, ‘‘Where are we with 804
+human pose estimation in real-world surveillance?’’ in Proc. IEEE/CVF 805
+Winter Conf. Appl. Comput. Vis. Workshops (WACVW), Jan. 2022, 806
+pp. 591–601. 807
+94260 VOLUME 10, 2022
+--- PAGE 13 ---
+S. Juraev et al.: Exploring Human Pose Estimation and the Usage of Synthetic Data for Elderly Fall Detection
+SARDOR JURAEV (Student Member, IEEE)808
+received the B.S. degree from Inha University,809
+in 2021, where he is currently pursuing the M.E.810
+degree with the Department of Electrical and Com-811
+puter Engineering. His research interests include812
+deep learning and its applications to computer813
+vision, and intelligent video surveillance.814
+AKASH GHIMIRE is currently pursuing the B.E.815
+degree with the Department of Integrated Sys-816
+tem Engineering, School of Global Convergence817
+Studies, Inha University. His research interests818
+include deep learning and its applications to com-819
+puter vision, human pose estimation, and intelli-820
+gent video surveillance.821
+JUMABEK ALIKHANOV (Student Member,822
+IEEE) received the B.S. degree from the Tashkent823
+University of Information Technology, in 2014,824
+and the M.E. degree from Inha University, in 2017,825
+where he is currently pursuing the Ph.D. degree826
+with the Department of Electrical and Com-827
+puter Engineering. His research interests include828
+machine learning and its applications to computer829
+vision, sensor data science, and natural language830
+processing.831
+VIJAY KAKANI (Member, IEEE) received the 832
+B.Tech. degree in electronics and communica- 833
+tion engineering from Jawaharlal Nehru Techno- 834
+logical University, Kakinada, India, in 2012, the 835
+M.S. degree in computers and communication sys- 836
+tems from the University of Limerick, Ireland, 837
+in 2014, and the Ph.D. degree in information and 838
+communication engineering (major) and future 839
+vehicle engineering (minor) from Inha University, 840
+South Korea, in 2020. He is currently an Assistant 841
+Professor with the Department of Integrated System Engineering, School of 842
+Global Convergence Studies, Inha University. His research interests include 843
+autonomous vehicles, sensor signal processing, applied computer vision, 844
+deep learning, systems engineering, and machine vision applications. 845
+HAKIL KIM (Member, IEEE) received the M.Sc. 846
+and the Ph.D. degrees in electrical and computer 847
+engineering from Purdue University, in 1985 and 848
+1990, respectively. In 1990, he joined the Col- 849
+lege of Engineering, Inha University, Incheon, 850
+South Korea, where he is a Full Professor with the 851
+Department of Information and Communication 852
+Engineering. In order to retain the balance between 853
+academic research and commercial development, 854
+he founded Vision Inc., in 2014, and is currently 855
+the CEO of the company. His research interests include biometrics, intel- 856
+ligent video surveillance, and embedded vision for autonomous vehicles. 857
+Since 2003, he has been actively involved as the Project Editor in the 858
+International Standardization of Biometrics at ISO/IEC JTC1/SC37. 859
+860
+VOLUME 10, 2022 94261

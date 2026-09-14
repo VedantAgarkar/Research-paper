@@ -1,0 +1,1177 @@
+
+--- PAGE 1 ---
+Received 6 September 2022, accepted 26 September 2022, date of publication 4 October 2022, date of current version 12 October 2022.
+Digital Object Identifier 10.1 109/ACCESS.2022.32 1 1939
+Multi Visual Modality Fall Detection Dataset
+STEFAN DENKOVSKI
+ 1,2, SHEHROZ S. KHAN
+ 1,2, (Member, IEEE), BRANDON MALAMIS 2,
+SAE YOUNG MOON 1,2, BING YE 1,2, AND ALEX MIHAILIDIS 1,2
+1KITE Research Institute, Toronto Rehabilitation Institute, University Health Network, Toronto, ON M5G 2A2, Canada
+2Institute of Biomedical Engineering, University of Toronto, Toronto, ON M5G 2A2, Canada
+Corresponding author: Stefan Denkovski (stefan.denkovski@mail.utoronto.ca)
+This work was support by the Aging Gracefully Across Environments Using Technology to Support Wellness, Engagement and Long Life
+Networks of Centres of Excellence (AGE-WELL NCE) through Research Fund under Grant 499052.
+This work involved human subjects or animals in its research. Approval of all ethical and experimental procedures and protocols was
+granted by the University of Toronto Research Ethics Boards under Protocol No. 00036744.
+ABSTRACT Falls are one of the leading causes of injury-related deaths among the elderly worldwide.
+Effective detection of falls can reduce the risk of complications and injuries. Fall detection can be performed
+using wearable devices or ambient sensors; these methods may struggle with user compliance issues or false
+alarms. Video cameras provide a passive alternative; however, regular red, green, and blue (RGB) cameras
+are impacted by changing lighting conditions and privacy concerns. From a machine learning perspective,
+developing an effective fall detection system is challenging because of the rarity and variability of falls. Many
+existing fall detection datasets lack important real-world considerations, such as varied lighting, continuous
+activities of daily living (ADLs), and camera placement. The lack of these considerations makes it difﬁcult
+to develop predictive models that can operate effectively in the real world. To address these limitations,
+we introduce a novel multi-modality dataset (MUVIM) that contains four visual modalities: infra-red, depth,
+RGB and thermal cameras. These modalities offer beneﬁts such as obfuscated facial features and improved
+performance in low-light conditions. We formulated fall detection as an anomaly detection problem, in which
+a customized spatio-temporal convolutional autoencoder was trained only on ADLs so that a fall would
+increase the reconstruction error. Our results showed that infra-red cameras provided the highest level of
+performance (AUC ROC = 0.94), followed by thermal (AUC ROC = 0.87), depth (AUC ROC = 0.86)
+and RGB (AUC ROC= 0.83). This research provides a unique opportunity to analyze the utility of camera
+modalities in detecting falls in a home setting while balancing performance, passiveness, and privacy.
+INDEX TERMS Fall detection, multi-modal, autoencoder, anomaly detection, deep learning, computer
+vision.
+I. INTRODUCTION
+Falls are one of the leading causes of injury-related deaths
+among the elderly worldwide [1], [2] and are a major cause
+of both death and injury in people over 65 years of age [3],
+[4]. The faster an individual receives help after a fall, the
+lower the risk of complications arising from the fall [5], [6],
+[7]. Fall detection systems improve the ability of older adults
+to live independently and ‘‘age in place’’ by ensuring they
+receive support when required. However, fall detection is a
+The associate editor coordinating the review of this manuscript and
+approving it for publication was Muhammad Sharif
+ .
+challenging problem from both predictive modeling and prac-
+tical considerations (such as low false alarm rate, privacy) [8].
+Predictive modeling challenges faced in fall detection
+include the rarity and diversity of fall events [9]. Previous
+studies by Stone et al., [10] found 454 falls in 3339 days
+worth of data and Debard et al., [11] found 24 in 1440 days
+worth of data. Therefore, it is very challenging and time
+consuming to run studies over a long duration, and even then
+they may still contain few falls which may not be sufﬁcient
+enough for building robust classiﬁers [12]. Another challenge
+is that fall events last only for short intervals in comparison
+with normal ADLs [9]. Finally, each rare fall event can vary
+greatly from one another, making it difﬁcult to strictly deﬁne
+106422 This work is licensed under a Creative Commons Attribution 4.0 License. For more information, see https://creativecommons.org/licenses/by/4.0/ VOLUME 10, 2022
+--- PAGE 2 ---
+S. Denkovski et al.: Multi Visual Modality Fall Detection Dataset
+a well-deﬁned class or to capture all possible variations in a
+dataset [12], [13], [14].
+Many possibilities exist for the practical implementation
+of fall-detection systems. However, because solutions are
+ultimately intended to be implemented in a person’s daily life,
+they should be easy to live with. Thus, passive systems are
+ideal, as they require no input from the user. They can monitor
+the environment before detecting a fall. These systems are
+preferable because a user may be unresponsive after a fall,
+or they may not be wearing a monitoring device [15], [16].
+However, older adults express privacy concerns regarding
+passive systems such as cameras. In addition to these con-
+cerns, systems must balance high sensitivity to falls while
+maintaining a low false alarm rate. Missed falls are potentially
+dangerous to users, who may rely on a passive system to
+detect falls. In contrast, a system with a high false alarm
+rate can cause many issues. If a system automatically calls
+an ambulance or even notiﬁes loved ones, a high false alarm
+rate would result in large bills, potentially ignored cases of
+real falls, and eventual rejection of the monitoring system.
+Therefore, the key factors to consider when designing a
+system are (i) passive, (ii) privacy protection and, (iii) per-
+form with a high fall detection rate and low false alarm rate.
+In this paper, we introduce a novel multi-camera and mutli-
+modal fall detection dataset containing falls and ADLs from
+30 healthy adults and ADLs (with no fall) from 10 older
+adults. This dataset collected data in a semi-naturalistic set-
+ting inside a room designed as a home. The experiments are
+designed to emulate real-world scenarios and sequences of
+events. This study used six visual modalities mounted on
+the ceiling and four additional wearable modalities. The six
+visual modalities consisted of two infra-red cameras, two
+depth cameras, a thermal camera, and an RGB camera. The
+four wearable modalities included an accelerometer, PPG,
+GSR and temperature sensors. We did comprehensive experi-
+ments on detecting falls using a customized 3D convolutional
+autoencoder and showed that infra-red modalities performed
+the best among others, including depth, thermal and RGB
+cameras.
+A. LITERATURE REVIEW
+A wide range of modalities, methods of capturing informa-
+tion, and subsequent systems have been explored for fall
+detection. They can be divided into various groups, such
+as wearables, ambient sensors and computer vision-based
+sensors [17], [18]. Khan and Hoey [9] presented a review of
+fall detection methods based on the availability of fall data
+during model training.
+Wearable systems often incorporate accelerometers, gyro-
+scopes, and inertial measurement units (IMUs) to detect falls.
+However, other modalities may also be used such as an
+electroencephalographic (EEG) or barometric sensors [19],
+[20]. Systems that use accelerometers or IMUs are relatively
+affordable and accurate [15], [17] [21]. However, these sys-
+tems are invasive and require the user to constantly wear and
+charge the device. This can lead to many missed falls as one
+may not wear the device all the time (e.g., while charging or
+bathing). Chaudhuri et al. [16] found that the wearable device
+was not worn for two-thirds of falls events. Additionally,
+older adults may be hesitant to wear a device because of the
+stigma it may imply regarding independence [22]. Despite the
+beneﬁts of wearables, the real-world short comings of this
+type of device may limit its successful deployment.
+Ambient or environmental systems, such as pressure mats,
+radar/Doppler, microphones, and motion sensors, typically
+use a wide range of sensors within the home to determine the
+user’s activities [19], [23]. These systems may be difﬁcult to
+install or have high false-alarm rates owing to environmental
+noise [17], [24].
+Computer vision systems have traditionally relied on clas-
+sical machine learning techniques to determine when a fall
+has occurred [25], [26]. They often use RGB or depth camera
+modalities; however, other visual modalities have also been
+used. These systems are generally low-cost and can achieve
+high performance. However, they struggle to maintain user
+privacy and may be limited in the area they are installed.
+Imaging modalities, such as depth and thermal cameras, may
+help alleviate this issue by obscuring identiﬁable features,
+though a person may still be identiﬁed. The techniques used
+to analyze images vary [26]. 3D bounding boxes and back-
+ground subtraction are among some of the most popular tra-
+ditional approaches. Recently, deep learning techniques have
+been applied to improve results. Modeling techniques such
+as CNN-LSTM models and 3D CNNs have shown promising
+results [25].
+We now present a review of some of the available fall
+detection datasets. Our review of fall detection datasets and
+multi-modal fall detection datasets is limited to those that
+contain at least one visual modality.
+B. UNIMODAL DATASETS
+A review of existing publicly available fall datasets contain-
+ing only a singular visual modality is outlined below.
+Charﬁ et al. [13] released an unnamed dataset containing
+197 falls and 57 wall mounted videos of normal activities.
+It comprised four background scenes, varying actors, and
+different lighting conditions. The directions of activities rel-
+ative to the camera are varied to reduce any impact that
+the directional camera location may have. All activities and
+falls started with a person in the frame and were segmented
+into short video clips of speciﬁc actions. To determine falls,
+manually generated bounding boxes were used to extract
+features, and an SVM was used to classify falls.
+The multi-camera fall dataset collected by Auvinet et
+al. [27] contained eight IP cameras placed around the room.
+It included only 24 scenarios, 22 of which contained falls
+after a short activity. These videos were segmented into clips
+lasting less than 30 seconds. All rooms were well lit, with
+minimal furniture placed in the center of the room. The small
+size of the dataset and other limiting factors could limit
+the development of generalized models in real-world set-
+tings. Methods included background subtraction to obtain a
+VOLUME 10, 2022 106423
+--- PAGE 3 ---
+S. Denkovski et al.: Multi Visual Modality Fall Detection Dataset
+silhouette, in which the vertical volume distribution ratio was
+used to classify falls.
+The Kinect Infrared dataset published by
+Mastorakis et al., [28] used one camera placed at eye level
+in the middle of a wall. The dataset included three variations
+of camera angles (backward, forward and sideways) totaling
+48 video falls. The direction of the fall is important because
+of the eye-level placement of the camera. In addition to falls,
+activities were performed while sitting, lying on the ﬂoor, and
+‘‘picking up an item from the ﬂoor’’ were performed by eight
+different participants. Additionally, two participants were
+asked to perform activities slowly to replicate the movements
+of older adults. OpenNI and depth data were used from the
+Kinect sensor to generate a 3D bounding box whose ﬁrst
+derivative parameters were analyzed to classify falls.
+The EDF/OCCU datasets contain two viewpoints of a
+kinetic camera [29]. Their data were then divided into two
+datasets. A non-occlusion dataset, EDF, of 40 falls and
+30 actions, and an occlusion dataset, OCCU, of 30 occluded
+falls and 80 actions were used. Both viewpoints were from
+cameras placed at eye level, and thus ’directional falls’ were
+performed. Room furniture and fall variations were minimal,
+with most variations related to the direction of falls. Occlu-
+sion was introduced by a single bed positioned to block the
+view of the bottom half of a fall. Actions in the dataset without
+occlusions included: picking things off the ﬂoor; sitting on
+the ﬂoor; and lying on the ﬂoor. These same actions were
+performed in the occluded dataset, with the further addition
+of tying shoelaces. All actions, except for lying on the ﬂoor
+were occluded by the bed.
+The SDU dataset comprises ten young adults performing
+six simple actions captured with a depth camera [23]. These
+include falling, bending, squatting, sitting, lying down and
+walking. These actions were repeated 30 times each under the
+following conditions: carrying or not carrying a large object,
+lighting on or off, room layout, camera direction, and position
+relative to the camera. Despite the large variation in each
+repetition of the action, the eye-level placement of the camera
+indicates that the direction is still important. Additionally, all
+actions were still short and segmented with an average length
+of eight seconds per clip.
+The KUL simulated fall detection dataset was designed to
+address many of the shortcomings that these datasets face
+when real-world factors were considered [30]. Five IP cam-
+eras, 55 fall scenarios, and 17 ADL videos were used. The
+dataset includes realistic environments (in terms of furnish-
+ings) and longer videos instead of short, segmented clips of
+various activities. Five goals were highlighted to improve the
+real-world effectiveness of the dataset. This includes realistic
+settings, fall scenarios, improved balance of ADL to fall
+activities, including real-world challenges (occlusions, partial
+falls, lighting, etc. . . ), and continuously recording the data.
+However, cameras mounted on the walls were used, and no
+older adults were included in the dataset.
+The thermal fall detection dataset was designed to repli-
+cate the KUL simulated fall dataset but with a thermal
+camera [31]. This dataset contains only nine video segments
+with ADL activities and 35 segments with fall scenarios.
+However, this dataset only uses a single eye level mounted
+thermal camera with a slightly more constrained ﬁeld of view.
+The same limitations from the KUL simulated fall datasets
+also apply, as they formulated that dataset.
+Computer vision datasets can vary in several main cat-
+egories: camera type, location, lighting, occlusions in the
+scene, and recorded participant activities.
+Different camera types or modalities struggle with various
+considerations. Cameras can capture clear images in general
+lighting conditions; however, they may not work well under
+poor lighting conditions, such as dark or night-time scenarios.
+RGB cameras also do not offer any level of privacy. Depth
+cameras, such as the defunct Microsoft Kinect camera, are
+a popular alternative to an RGB camera because they can
+provide a light independent image and protect the privacy
+of individuals [18], [19], [23], [28]. Vision modalities, such
+as thermal and depth cameras obscure identifying features,
+while still providing silhouettes of individuals. In addition,
+they may perform better in certain scenarios such as those
+with poor lighting or visually busy environments due to inde-
+pendent lighting and silhouette segmentation.
+The location of the camera in the room can also affect
+the results. Most of the previous datasets commonly have a
+camera mounted on a wall at or above eye level, as shown in
+Table 1. The problem with this placement is that a fall looks
+very different depending on its direction (across or in-line
+with the ﬁeld-of-view). As such, these datasets include strict
+deﬁnitions of the orientation of falls relative to the camera.
+This limits the variety of falls to a short list of possible
+variations [19]. In addition to being affected by the fall direc-
+tion, cameras mounted at eye level are more susceptible to
+occlusions, blocking the view of the participant and affecting
+the cameras’ ability to detect falls (e.g. behind furniture).
+Some datasets make efforts to include furniture/occlusions
+in the dataset; however they may be limited to a single
+chair or bed (The Multiple Camera [27], EDF/OCCU [29],
+SDU Datasets [23]), while others have no furniture in frame
+(Mastorakis et al. [28]). To mitigate these limitations (i.e.,
+orientation of falls and occlusions) cameras can be placed on
+the ceiling. This helps provide a similar view of every fall,
+and removes furniture that may be between the subject and
+camera [32], [33].
+As with falls, the ADLs performed by the participants in
+the datasets varied widely. Activities are often segmented
+into very short and speciﬁc motions such as a single squat,
+picking up an object, taking a seat, and lying down. These
+short and speciﬁc videos that last from ﬁve to 60 seconds
+may limit a system’s ability to generalize to the real world.
+This is because of the oversimpliﬁcation and trivialization
+of diversity and problems that can arise in activities and
+falls. In response to the lack of real-world considerations,
+Baldewijns et al. [30] attempted to create a dataset that con-
+siders these factors. However, the dataset still lacks ceiling
+mounted cameras, varying environments, and older adult
+106424 VOLUME 10, 2022
+--- PAGE 4 ---
+S. Denkovski et al.: Multi Visual Modality Fall Detection Dataset
+TABLE 1. Fall detection datasets with unimodal camera(s).
+TABLE 2. Highlighting various multi-modal datasets, their modalities and considerations.
+participants. A table consisting of these ‘‘real’’ world factors
+are outlined in Table 1.
+C. MUL TIMODAL DATASETS
+In recent years, the ability to merge a variety of sensors to
+improve performance has become of interest in fall detection
+systems and several multi-modal datasets have emerged. This
+is because a multi-modal approach provides different sources
+of information that can help compensate for the deﬁciencies
+in each other.
+Combining modalities may complement each other from
+a technical perspective, but it may cause practical consider-
+ations to be further impaired. More modalities mean more
+sensors or cameras, increasing costs and potentially more
+inconvenience to the user. Because a wide range of modalities
+are used for fall detection, a wide range of combinations
+is possible. Thus, it is important to select modalities that
+are complimentary to each other without increasing practical
+costs to the user. These practical or real-world considerations
+for multi-modal datasets are highlighted in Table 2.
+The UP fall detection data set contained two cameras at
+eye level with frontal and lateral views [19]. Other modalities
+were captured through ﬁve IMU sensors, one EEG head-
+set and six infrared motion sensors placed in a grid. The
+activities were limited to six simple motions and ﬁve fall
+variations. Activities varied from 10 to 60 seconds and were
+segmented from each other. The limited fall directions and
+short segmented activities limit the real-world implications of
+this dataset. In addition, many of the chosen modalities were
+also impractical. Five IMU sensors are difﬁcult to imple-
+ment; selection of only most relevant sensors may be more
+plausible, which was performed by the authors in a follow up
+paper [34], [35]. However, motion sensors still struggle with
+accuracy and with occlusions or furniture placed in a room.
+EEG headsets may also be extremely difﬁcult to use in the
+real world.
+The URFD dataset was recorded with two Kinect cameras.
+One was at eye level and one was ceiling-mounted for fall
+sequences [36]. However, only a single eye level camera was
+used to record the ADL activities. The accelerometer was
+worn on the lower back using an elastic belt. This sensor
+location is not ideal because a special device would need to
+be worn. The dataset contained only 30 falls and 40 activities
+of daily living. Along with the limited dataset size, it also
+contained short, segmented activities and falls with limited
+variation.
+The CMDFALL dataset [14] focuses on multi-view as well
+as multi-modal capturing. Seven overlapping Kinect sensors
+were used, and two accelerometers were worn on the right
+hand and hip. The room was well lit, with a minimal amount
+of furniture in the room unless required for the fall scenario.
+It also contained eight falls and 12 actions. The eight falls
+were based on three main groups: walking, lying on the bed,
+or sitting on a chair. This dataset also contained many of the
+same issues as others, such as trimmed videos and limited
+fall styles. Further, they included a limited variety of simple
+single action activities and fall styles. The environment is also
+always well lit, with minimal furniture and occlusion in the
+space.
+These existing multi-modal datasets lack consideration for
+lighting, furniture, fall, variety of ADLs, and camera place-
+ment. This may impact real-world performance. Practical
+VOLUME 10, 2022 106425
+--- PAGE 5 ---
+S. Denkovski et al.: Multi Visual Modality Fall Detection Dataset
+considerations were also lacking, where collecting many
+multi-modal datasets could require multiple wearable devices
+to be worn.
+D. INTRODUCED MUL TI-MODAL DATASET (MUVIM)
+To circumvent the problems associated with previous
+uni-modal and multi-modal datasets, we present the Multi
+Visual Modality fall detection dataset (MUVIM), which is
+a novel, multi-camera, multi-modality fall detection dataset.
+The MUVIM dataset places a larger emphasis on dif-
+ferent types of camera-based modalities. Multiple camera
+modalities were selected because of their practical impli-
+cation compared to wearable or other types of modalities.
+Additionally, this allows for a direct comparison between
+privacy-protecting and non privacy-protecting modalities.
+In MUVIM, wearable modalities were also included for
+completeness and to allow researchers to explore vari-
+ous combinations and performances. However, they were
+removed from further analysis in this paper. Camera modali-
+ties involving thermal, depth, infra-red and RGB cameras are
+only considered to develop models to detect falls.
+The RGB camera is the most commonly available camera
+and provides a good baseline for comparison with the other
+modalities. Infra-red contains only grayscale images, but
+the image quality is still high enough to discern identifying
+features. However, these are low cost cameras, that operate
+well in low light scenarios with a wide ﬁeld of view. Depth
+cameras are less common, but are still relatively low in cost.
+They are light-independent, and do not capture identifying
+features. They can struggle with creating a consistent image
+due to ‘‘holes’’ that occur in the depth-math due to sen-
+sor limitations. In addition, they struggle with scenarios in
+which participants, backgrounds or occlusions have similar
+distances.
+For access to the dataset, email: alex.mihailidis@utoronto.
+ca. Please set the subject line to ‘‘Fall detection data access
+request’’, and include your include title, email address,
+work address, and afﬁliation. In addition, a data privacy
+waiver will have to be completed. For additional informa-
+tion, instructions and sample code please see the Github:
+https://github.com/MUVIM/FallDetection
+II. DATASET COLLECTION
+A. DESCRIPTION OF THE DATASET
+Six vision-based sensors were mounted on the ceiling of a
+ﬂoor at the Intelligent Assistive Technology and Systems Lab
+(IA TSL), University of Toronto. This study was approved by
+the Research Ethics Board at the university. Each participant
+provided their written consent to publish their images for
+research purposes.
+Four camera types were used:
+(i) One Hikvision IP network camera is a dome- style
+security camera that uses IR illumination. It captures
+20 frames per second (fps) video at a resolution of
+704× 408 pixels.
+FIGURE 1. Start of the fall as indicated by manually produced labels for
+each camera.
+(ii) A StereoLabs ZED Depth Camera, captures 3D depth
+and RGB images. It releases an ambient illumination
+into the room to capture video at 30 fps and 1280 ×
+720 pixels.
+(iii) One Orbbec Astra Pro camera, captured 3D depth and
+IR images using near-IR illumination. It captured video
+at 30 fps and at 640× 840 pixels.
+(iv) Three FLIR ONE Gen 3 Thermal cameras were used.
+These were used in order to capture an entire view of
+the room due to their narrow ﬁeld of view. They work
+as an attachment to a smartphone and capture video at
+8.7 fps at 1440× 1080 pixels.
+All cameras were mounted in the middle of the ceiling
+except for the thermal cameras which had two more placed
+separately on each side of the room in order to cover the entire
+room. An Empatica wristband was worn by each participant
+to monitor movement and physiological signals. An overview
+of all modalities used in this study can be found in Table 3.
+Data was collected simultaneously from all sensors during
+each trial.
+B. PARTICIPANTS AND ACTIVITIES
+The study was divided into two phases, each with a different
+participant population. In Phase 1, data was collected from
+30 healthy younger adults between 18 and 30 years of age
+(mean age= 24; number of females= 14 (or 46.7%)). Inclu-
+sion criteria for this phase included: must be from ages 18-30,
+be clear of any health complications that may hinder balance
+or performance in the study, and must be able to understand
+106426 VOLUME 10, 2022
+--- PAGE 6 ---
+S. Denkovski et al.: Multi Visual Modality Fall Detection Dataset
+TABLE 3. Highlighting devices used and the data collected form each.
+and speak English, must be able to move around safely in a
+furnished room without eyeglasses, must be able to travel and
+attend sessions on site. In Phase 2, data was collected from
+10 healthy older adults, who are at least 70 years of age (mean
+age= 76.4; number of females = 5 (or 50%)). Participants
+in Phase 1 were asked to simulate falls onto a 4’’ thick crash
+mat. Participants in Phase 2 did not require the use of a crash
+mat, since no falls were simulated by this population.
+Prior to a session, participants were provided with a con-
+sent form detailing the protocol of this study. Once consent
+was provided, the researchers conﬁrmed the eligibility of
+the participant by conducting a brief screening question-
+naire. Two versions of this questionnaire were used, since
+the populations for Phase 1 and Phase 2 differed. In Phase 2,
+questions pertained to the participants mobility and vision
+issues to ensure safety and older adults were asked if they
+have experienced a fall within the last year to help ensure they
+do not have any mobility issues.
+Each session was approximately one (1) hour in length,
+including consent, preparation time, data collection, and
+intermissions to change the setting of the room. The setting
+of the room (including furniture and the crash mat) was
+randomized for each participant based on ﬁve (5) pre-made
+arrangements. The furniture and crash mat were stationary
+throughout each session, but were moved to a new conﬁgu-
+ration between participant sessions. This was done to avoid
+building a trivial classiﬁer to detect the crash mat as the cue
+for a fall in a scene. These ﬁve room settings were created
+in order to include as many props and furniture within the
+ﬁeld of view of all modalities. An example layout of the lab
+is presented in Figure 2.
+Each session contained ten (10) trials, ﬁve ‘‘day-time’’
+trials that were well lit and ﬁve ‘‘night-time’’ trials with poor
+lighting. Blackout curtains and main overhead lights were
+turned off in night-time trials but an incandescent lamp was
+still left on in order to provide enough illumination to allow
+participants to move around safely. Each trial required the
+participant to act out a scripted ‘‘story’’, while interacting
+with various furniture and props in the scene. For example,
+one story involves the participant returning home from an
+outing, putting down his or her bags, taking off his or her
+shoes and jacket, making tea, and sitting down at a computer.
+The format of each story was intended to put participants at
+ease and increase the realism of the data that was collected.
+The collection of stories used in this study covered a broad
+range of normal activities that might occur in a younger/older
+adult’s living room. In addition, the stories allowed the partic-
+ipants to move around the room as they interact with the furni-
+ture and props placed throughout. The order of completion for
+all ten trials were randomized between participants to prevent
+researcher bias (e.g., non-signiﬁcant trends/presumptions due
+to order of trials) and allowed for better comparison between
+trials.
+Each script was designed to mimic common household
+ADLs, such as coming home from work or waking up in
+the morning. The steps within each script were carefully
+reviewed by the authors. The co-authors SK and AM have
+considerable experience and publication record in the area
+of fall detection. Additionally, data collection protocols from
+existing studies were also consulted in developing the scripts.
+Initial scripts were reviewed by an occupational therapist
+researcher as an independent consultant (non-author).
+At the beginning of each session, a research assistant (out-
+side the view of the camera) would provide cue to the par-
+ticipant to perform certain activities. These cues were based
+on a pre-determined script that contained different scenarios
+(as discussed above). The participant would follow the cues
+(e.g., sit on sofa, walk around, pick up an object from the
+ﬂoor, work on laptop, etc. . . ) and perform these activities the
+way they would like to do. In each session, a person carried
+VOLUME 10, 2022 106427
+--- PAGE 7 ---
+S. Denkovski et al.: Multi Visual Modality Fall Detection Dataset
+FIGURE 2. One example of the arrangements of five furniture pieces in
+room. Furniture pieces are as follows; black - mat; brown - shelf; olive -
+chair; grey - desk + chair; blue - table; red - sofa + end table; purple -
+lamp.
+Five general representative fall types of older adults were
+selected
+• Tripping or stumbling forward, and falling when
+unable to catch oneself.
+• Standing or walking, losing one’s balance, and
+falling backwards or sideways. Note that a back-
+ward fall ends in a sitting or a lying position.
+• Falling slowly/incrementally. (Person loses bal-
+ance, catches self on some object, but continues to
+fall slowly when they don’t have the strength to
+recover.)
+• Attempting to sit, but falling when the chair slides
+out from underneath.
+• Attempting to stand, putting weight on a chair, table
+or walker, but the supporting object moves away
+and fails to provide support.
+• Sitting in a chair, leaning forward to reach an item
+on the ﬂoor, putting on shoes, or attempting other
+activities, and toppling out of the chair.
+out normal activities based on the given cues and each session
+would end with a fall on the crash mat. The types of fall were
+kept diverse across each session and for different persons to
+capture different types of falls. Each story was assigned one or
+more fall types and recovery methods that could logically ﬁt
+at the end of the story. If multiple fall types were possible for
+that story, one was determined at random. A higher number
+of normal activities relative to fall events were deliberately
+performed to represent actual scenarios. A disproportionately
+high number of falls may over-simplify or bias the predictive
+models. In summary, a trial consisted of: enacting a story;
+simulating a fall; and engaging in a recovery, all of which
+were chosen randomly from a pre-deﬁned script.
+Participants in Phase 2 were also asked to complete ten
+stories but were not tasked with simulating a fall or a
+recovery.
+Participants were prompted through the steps of each trial.
+However, these prompts were not given with speciﬁc details
+to allow the participant to complete the assigned tasks based
+on their own interpretation. This would help in building
+FIGURE 3. Directory tree used to store trials and cameras. FD001 is the
+folder for participant 1, containing all cameras. Each camera has its own
+folder, containing 10 sub-folders for each trial done (labeled day or night).
+The FLIR thermal camera contains three additional folders for each three
+thermal cameras used. (Note: 278, 279 and 280 are generated labels.)
+generalized classiﬁers and not based on a particular sequence
+of activities.
+The Empatica E4 wristband was turned on at the beginning
+of the session. Trials were deﬁned through the pressing of
+the main button by the participant at the beginning and end
+of each trial. The Astra Pro, FLIR ONE, ZED, and IP cam-
+eras were manually controlled by the researchers. Recordings
+were started at the beginning of each trial, and stopped at the
+end of each trial.
+C. DATA PRE-PROCESSING AND CONSOLIDATION
+1) DATA STRUCTURE
+Immediately after each session, the researchers transferred all
+collected data to a secure network server, and into a folder
+labelled with their participant ID. In each participant’s folder
+contained subfolders for each type of modality used during
+the trial, including data from the Empatica E4 wristband. See
+Figure 3 for a breakdown of the directory structure of the
+public dataset. Each modality folder contained ten folders
+for each trial (i.e. Day 1-5, Night 1-5). Once data transfer
+was complete, the researchers converted each of the camera
+videos into individual frames, in JPEG format.
+2) LABELLING PROCEDURE
+Once all data was transferred, the researchers labelled the
+beginning and end frame numbers for each fall that occurred
+during all recorded sessions. All labels were noted using an
+Excel spreadsheet. Two researchers were recruited for this
+task to reduce sample bias and increase labelling accuracy.
+The start of a fall was marked as the frame when the partic-
+ipant started to lose balance. The end of a fall was marked
+as the frame when the participant was at rest on the ground.
+106428 VOLUME 10, 2022
+--- PAGE 8 ---
+S. Denkovski et al.: Multi Visual Modality Fall Detection Dataset
+The types of falls that were observed are listed below. Certain
+trials also contained more than one fall. In this case, both falls
+were documented in the spreadsheet.
+3) LIMITATIONS
+This dataset was created with the intention of an anomaly
+detection framework for fall detection. As such, only fall
+activities are labeled. The advantage of anomaly detection
+framework is that it can detect not-normal activities. There-
+fore, in a real-world system, this type of system can detect
+other anomalous or risky behaviours, exhibited by a person,
+including agitation, aggression, seizure, and wandering.
+One major limitation involved the positioning of the FLIR
+cameras. The cameras were often not able to capture the com-
+plete duration of the fall clearly. For example, when the start
+of fall was unclear in the footage, the ﬁrst visible frame was
+used instead. If the end of fall was clearly visible, it was still
+recorded in the main label table. This led to the incomplete
+labelling of falls for certain trials. Another limitation was that
+recording software for some modalities would freeze during
+the trial, particularly with the thermal and Orbbec cameras,
+and thus were unable to capture the fall. However, this did
+not happen often and was not a major issue, with all missing
+videos noted in the Appendix. For any trial that was missing
+the start or end of fall frames, the researcher made a note
+but did not record the frame into the data sheet. A further
+limitation appeared due to the lack of detail produced by
+recordings from the FLIR cameras. Its low resolution video
+made it difﬁcult to observe the exact start and end frames for
+certain falls. Speciﬁcally, we observed that when participants
+remained in one position for a long time, they left a heat
+residue, and thus made it difﬁcult to differentiate between the
+residue and the participant who had fallen.
+III. FALL DETECTION
+To compare the performance between cameras, a baseline
+modality performance was required. This would allow for the
+comparison between camera modalities on the MUVIM fall
+detection dataset.
+Fall detection was approached as a one-class classiﬁ-
+cation problem or anomaly detection owing to the rarity
+of fall events [37]. Previous work has established that 3D
+CNN auto-encoders can achieve high performance by learn-
+ing spatial and temporal features [38]. In this approach,
+a spatio-temporal autoencoder is trained only on video clips
+of normal activities that are available in abundance. During
+testing, the autoencoder should be able to reconstruct unseen
+normal activities with low reconstruction error. However,
+this autoencoder will reconstruct unseen falls with a higher
+reconstruction error. Thus, using 3D autoencoder, a fall
+can be effectively detected as an anomaly. We adapted the
+DeepFall [38] model and re-implemented it in PyTorch. The
+performance of this methodology on other datasets and in
+comparison to other anomaly detection models are presented
+in DeepFall and therefore not repeated within this paper.
+A 3D CNN auto-encoder is formed through stacked lay-
+ers of 3D convolutional and 3D max-pooling layers. Model
+parameters and design were adapted from previous work
+including, stride, padding, activation functions and kernel
+size [38]. Similar preprocessing steps were performed. All
+videos were resized to 64 × 64 pixels and interpolated
+or extrapolated to change the frame rate of each video to
+8 fps. Interpolation was performed by duplicating existing
+frames. Depth videos were in-painted in order to ﬁll out
+black sections of the video. These black sections occur from
+poor reﬂection of near-infrared light required to measure
+‘‘time-of-ﬂight’’ in order to determine depth. In-painting was
+done using an Navier-Stokes based in-paint function provided
+in the OpenCV python package. Model parameters were
+changed from the original DeepFall model to remove drop
+out layers from auto-encoders as they simply added noise to
+the encoder and did not provide any improved performance.
+Training was performed with 20 epochs as further training
+did not improve results. The MaxUnpool3d operation was
+used in PyTorch, which sets all non-maximal imputed values
+are set to zero. The architecture of the 3DCNN autoencoder
+models for fall detection is shown in Figure 4. The main
+changes to the work done by Nogas et al. [38], involves
+the removal of drop out layers, loss function and training
+parameters. However, batch size was increased to 128 frames
+and frame rate was lowered to eight fps. This decrease in
+frame rate efﬁciently increased the temporal window of the
+model. Experiments changing window size down to four did
+not signiﬁcantly alter results.
+Training was performed on all videos of normal activities
+of daily living and then tested on videos that contain falls.
+A notable difference between the data splits is that the ADL
+videos only contained elderly participants, while the fall
+videos only contain younger adults. This results in 100 videos
+of older adults for training and 300 for testing of younger
+adults. However, due to data loss during capturing of data
+the number of videos for each modality varies. Since the
+thermal cameras have a narrow ﬁeld of view, many falls were
+not captured within the central cameras ﬁeld of view. When
+controlling for videos that are common across all modalities,
+only 182 falls for testing and 62 videos of ADLs for training
+are available. Performance is reported for these videos.
+As shown by Nogas et al., [38] two main methods of
+determining reconstruction error can be used. The ﬁrst is
+on a per-frame basis (cross-context) and the second is on
+a per-window basis (within-context). These are outlined in
+Figure 5.
+In cross-context, a reconstruction error is calculated for
+each individual frame. However, as a single frame is repeated
+in multiple windows, it has multiple reconstruction errors.
+The mean and standard deviation reconstruction error for a
+frame is then calculated across the multiple windows. As data
+is taken from across multiple windows it is called cross-
+context. AUC ROC is then calculated for each test video (per
+video) and then mean performance is reported (see Table 4).
+This allows for more speciﬁc tuning on a per video basis to
+VOLUME 10, 2022 106429
+--- PAGE 9 ---
+S. Denkovski et al.: Multi Visual Modality Fall Detection Dataset
+FIGURE 4. 3D autoencoder structure.
+TABLE 4. Cross-context results when averaging performance on a per
+video basis. Where (σ ) is using the mean reconstruction error and (µ) is
+using the standard deviation of reconstruction error for each frame across
+all videos it appears in. Shaded regions represent the reconstruction error
+that achieved the highest AUC ROC for a given modality.
+TABLE 5. Cross-context results when using a global receiving operating
+characteristic curve across all videos. Shaded regions represent the
+reconstruction error that achieved the highest AUC ROC for a given
+modality.
+a person and their speciﬁc activities. Alternatively, all recon-
+struction scores can be concatenated together, after which one
+AUC ROC can be found across all videos (global). Global
+threshold results are reported in Table 5. This method may
+show a more generalizable level of performance.
+Secondly, a within-context anomaly score can be gen-
+erated. This operates on a per-window basis, where mean
+reconstruction error of each sliding window is used. However,
+in order to determine a window’s label a hyper-parameter on
+the number of falls must be set. For example, if a window
+contains eight frames, the hyper-parameter may be set to four,
+so that at least four frames of the eight must contain a fall for
+the window be classiﬁed as a fall. As such reporting for all
+within-context results is for all possible parameters given a
+window size of eight. The results are presented in Figure 7.
+TABLE 6. Cross-context precision-recall results for a global threshold
+across all videos.
+IV. RESULTS AND DISCUSSION
+To evaluate the performance of our model at detecting anoma-
+lies as falls, the Area Under Curve (AUC) of Receiver Oper-
+ating Characteristics (ROC) and Precision-Recall (PR) curve
+was used. We observed good performance across all modal-
+ities. Mean performance for each modality cross-contexts is
+reported in Table 4. The best performance is seen by the IP
+infra-red camera, achieving an average AUC ROC(σ) of 0.95
+(0.049) using cross-context mean reconstruction error. Per-
+formance was comparable between mean reconstruction error
+and standard deviation of reconstruction error; however most
+modalities performed slightly better using the standard error
+of reconstruction. Precision-recall performance is relative to
+the ratio of true positives in the dataset divided by the number
+of samples. Our dataset contained roughly 885 falls frames
+from a total of 92,709 frames for each modality. This means
+that the baseline of a random classiﬁer would achieve an AUC
+PR of 0.0096. Best AUC PR performance was seen with the IP
+modality, achieving an AUC PR(σ ) of 0.261(0.280) standard
+deviation.
+Instead of averaging performance across all videos, recon-
+struction error from each video camera is concatenated into
+a single vector; AUC ROC and PR can then be calcu-
+lated. Table 5 presents the results. We observe a decrease
+in performance across all modalities. However, the strongest
+performing modalities had the least decline, with the IP
+106430 VOLUME 10, 2022
+--- PAGE 10 ---
+S. Denkovski et al.: Multi Visual Modality Fall Detection Dataset
+FIGURE 5. Within-context versus cross-context scoring methods.
+(A) Within-context reconstruction scoring method. In this example, for
+illustration purposes three frames out of five must contain a fall for the
+window to be considered a fall. Reconstruction error is averaged across
+each window. (B) Cross-context reconstruction scoring method.
+Reconstruction error for a frame is averaged across all windows
+containing the frame.
+camera sill achieving an AUC ROC (σ ) of 0.913 (down
+from 0.937(0.051). However, weaker modalities saw a larger
+decrease, speciﬁcally with the RGB camera decreasing from
+an AUC ROC (σ ) of 0.828(0.123) to 0.657. When using
+global thresholding, a large decrease in the AUC PR perfor-
+mance is also seen. The best AUC PR performance decreased
+from the IP camera’s AUC PR (µ) of 0.261(0.280) to 0.076.
+However, since the baseline for AUC PR is 0.0096 (due to the
+large class imbalance) performance is still better than a ran-
+dom classiﬁer. This decrease in AUC PR is most likely caused
+FIGURE 6. Mean within-context AUC ROC scores for various number of
+frames that contain a fall in order for the window to be considered to
+contain a fall.
+FIGURE 7. Mean within-context AUC PR scores for various number of
+frames that contain a fall in order for the window to be considered to
+contain a fall.
+by an optimal threshold for reconstruction error that cannot
+be found on a per video, but instead could be generalizable
+across all videos.
+The within-context results using mean reconstruction error
+are shown in Figure 6. Similar performance was achieved
+with a within-context context scoring method. Performance
+increases as the number of falls in a window required to
+classify it a fall window increases, peaking at ﬁve and then
+beginning to slightly decrease. However, the precision-recall
+performance is best at a lower number. As a larger number
+of frames are required to classify a window as containing a
+fall, the fewer number of windows are considered to have
+a fall. Thus, the ratio of true positive labels to total labels
+will decrease. As baseline performance is too small to show
+clearly on the graph it is reported in Table 6.
+IR was the best performing modality (see Table 4 with the
+IP camera achieving AUC ROC (σ ) scores of 0.950(0.049)
+AUC ROC (µ) scores of 0.937(0.077) and the Orbbec camera
+achieving AUC ROC (σ ) 0.923(0.085) and AUC ROC (µ)
+0.927(0.077). IR cameras beneﬁt from high visual clarity
+VOLUME 10, 2022 106431
+--- PAGE 11 ---
+S. Denkovski et al.: Multi Visual Modality Fall Detection Dataset
+while also being able perform well in a range of lighting
+conditions. This creates a low amount of a noise within the
+image and less challenging conditions for an autoencoder
+to reconstruct. These factors can help improve the perfor-
+mance of the classiﬁer. We also see a negligible difference
+between the IP camera and Orbbec IR camera’s indicating
+that achieved performance is due to modality differences
+rather than camera variables such as recording frame rate or
+ﬁeld of view.
+Thermal video also performed very well achieving an
+AUC ROC (σ ) of 0.874(0.112) and an AUC ROC (µ) of
+0.883(0.088) (see Table 4). This was despite the lower frame
+and narrower frame of view. This modality tends to obscure
+facial features, details in the background and create a silhou-
+ette of participants. This creates a strong separation between
+an individual and their surroundings. However, when an
+individual leaves or enters the frame the gradient in the
+image changes to represent the hottest and coldest parts of
+an image. This may have resulted in decreased performance
+due to increased variability between scenes and as a par-
+ticipants enter and leave frames. Additionally, this modal-
+ity did include interpolated frames in order to increase fps
+from 4 to 8.
+The ZED Depth camera achieved AUC ROC(µ)
+0.894(0.119). The Orbbec Depth camera achieved 0.839
+(0.133) and an AUC ROC(µ) of 0.872(0.115). Performance
+decreased for the depth modality with the use of a global
+threshold as compared to a per-video basis with an AUC
+ROC(µ) of 0.843 and 0.831 for the ZED and Orbbec cam-
+eras respectively. This may be due to depth cameras often
+having depth errors at an objects edges/corners, requiring in-
+painting. Despite in-painting improving performance, it is an
+estimation of missing values and thus introduces additional
+noise into the image.
+The RGB camera had the worst performance amongst
+all datasets with an AUC ROC (σ ) of 0.859(0.125) and an
+AUC ROC (µ) of 0.828(0.123). The ﬁeld of view, cam-
+era placement, and image quality were similar to those
+of other datasets. V aried lighting conditions both within a
+single image and across videos may have greatly affected
+performance.
+The performance from models on this dataset are very
+encouraging; however, the dataset is collected in a semi-
+naturalistic setting. We would validate the algorithms in a
+community setting (or domestic monitoring) in a future study
+to understand the acceptability and the unique challenges
+faced in deployment. The current models work for one or
+two people, in a controlled setting. Deployment in care homes
+require a higher level of consideration due to the presence of
+other residents and staff.
+As we approached one-class classiﬁcation through mea-
+suring reconstruction error, having a lower amount of noise
+can help isolate reconstruction error due to fall activities.
+However, strong performance is still observed across vari-
+ous modalities and camera types, indicating that the signal
+strength is strong.
+V. CONCLUSION AND FUTURE WORK
+In this paper, we present a multi-modal fall detection dataset
+with real-world considerations. It contains six-vision based
+modalities, and four physiological modalities considering
+environmental factors, a variety of complex activities and
+privacy considerations. Performance across multiple visual
+modalities was analyzed within an anomaly detection frame-
+work. The current work is focused on detecting falls based on
+the overall movement of images in the scene. Pose estimation
+can be a potential future direction for this research [39];
+however it is out of scope for the focus of this work. In future
+work, methods developed on this dataset can be applied on
+other public domain videos for further validation.
+IR modalities outperformed other modalities, followed by
+thermal and then depth, with traditional RGB performing
+the worst. This order of results was maintained through
+various reconstruction scoring methods (cross-context and
+within-context). This difference became more apparent when
+a global threshold was used to classify the results. It is
+also encouraging that strong privacy performing modalities
+such as the thermal and depth cameras had competitive
+performance. This provides a path forward to create strong
+performing and privacy-protecting passive fall detection
+systems.
+Future work could expand on this analysis through using
+multi-modal fusion. By being able to combine multiple
+modalities and their respective strengths it may improve over-
+all performance with less false positives. Additionally, the
+objective or loss functions of the autoencoder may be altered
+to improve the reconstructive ability of the autoencoder.
+Future work may also explore other deep learning methods,
+such as applying contrastive learning or attention using visual
+transformers.
+We believe MUVIM will help provide a new benchmark
+dataset to help drive the development of real-world fall detec-
+tion systems that can be deployed effectively in homes world-
+wide.
+APPENDIX
+Participants with incomplete data: 9/30
+• FD003:
+- - Orbecc: Day 2, 4 (video stopped recording prema-
+turely, doesn’t contain fall)
+- - FLIR 279: Day 2, 3 (video missing from drive, not
+transferred properly after trial)
+- - FLIR 280: Day 1,2,3 (video missing from drive, not
+transferred properly after trial)
+• FD006:
+- - Orbecc: Day 3 (video missing from drive, not trans-
+ferred properly after trial)
+• FD007:
+- - Orbecc: Day 4 (video missing from drive, not trans-
+ferred properly after trial)
+• FD009:
+- - FLIR 280: Day 1 (video is corrupted on drive)
+106432 VOLUME 10, 2022
+--- PAGE 12 ---
+S. Denkovski et al.: Multi Visual Modality Fall Detection Dataset
+FIGURE 8. Additional possible room furniture layouts used in study
+protocol. Furniture pieces are as follows; black - mat; brown - shelf; olive
+- chair; grey - desk + chair; redblue - table; red - sofa + end table; purple
+- lamp.
+• FD010:
+- - Orbecc: Night 1,2,3,4,5 (invalid video on drive <ie.
+very small video size>, not transferred properly
+after trial)
+• FD029:
+- - FLIR 279: ALL (video missing from drive, not
+transferred properly after trial)
+• FD030:
+- - FLIR 279: ALL (Wrong participant recorded in
+video, not transferred properly after trial)
+• FD031:
+- - Day 1,2,3,4,5, Night 1,2,3 (invalid video on drive
+<ie. very small video size>, not transferred properly
+after trial)
+• FD033:
+- - Orbecc: Day 3,4,5 (invalid video on drive <ie. very
+small video size>, not transferred properly after
+trial)
+CONFLICT OF INTEREST STATEMENT
+The authors declare that the research was conducted in the
+absence of any commercial or ﬁnancial relationships that
+could be construed as a potential conﬂict of interest.
+ACKNOWLEDGMENT
+The authors would like to thank all participants for their time,
+and efforts in the creation of this dataset. They would also
+like to thank Paris Roserie for his support in collection of the
+dataset.
+REFERENCES
+[1] (Apr. 2021). Falls. [Online]. Available: https://www.who.int/news-
+room/fact-sheets/detail/falls
+[2] E. A. Kramarow, L. H. Chen, H. Hedegaard, and M. Warner, Deaths From
+Unintentional Injury Among Adults Aged 65 and Over: United States,
+2000–2013. Hyattsville, MD, USA: National Center for Health Statistics,
+NCHS Data Brief, 2015, p. 199.
+[3] Centers for Disease Control and Prevention, ‘‘Fatalities and injuries from
+falls among older adults—United States, 1993–2003 and 2001–2005,’’
+MMWR, Morbidity Mortality Weekly Rep., vol. 55, no. 45, pp. 1221–1224,
+2006.
+[4] L. D. Gillespie, M. C. Robertson, W. J. Gillespie, C. Sherrington, S. Gates,
+L. Clemson, and S. E. Lamb, ‘‘Interventions for preventing falls in older
+people living in the community,’’ Cochrane Database Systematic Rev.,
+vol. 2021, no. 6, Sep. 2012.
+[5] A. Stinchcombe, N. Kuran, and S. Powell, ‘‘Seniors’ falls in Canada: Sec-
+ond report: Key highlights,’’ Chronic Diseases Injuries Canada, vol. 34,
+nos. 2–3, pp. 171–174, 2014.
+[6] L. Z. Rubenstein and K. R. Josephson, ‘‘The epidemiology of falls and
+syncope,’’ Clinics Geriatric Med., vol. 18, no. 2, pp. 141–158, May 2002.
+[7] M. E. Tinetti, ‘‘Predictors and prognosis of inability to get up after falls
+among elderly persons,’’ J. Amer . Med. Assoc., vol. 269, no. 1, pp. 65–70,
+Jan. 1993.
+[8] R. Igual, C. Medrano, and I. Plaza, ‘‘Challenges, issues and trends in fall
+detection systems,’’ Biomed. Eng. online, vol. 12, no. 1, pp. 1–24, 2013.
+[9] S. S. Khan and J. Hoey, ‘‘Review of fall detection techniques: A data
+availability perspective,’’Med. Eng. Phys., vol. 39, pp. 12–22, Jan. 2017.
+[10] E. E. Stone and M. Skubic, ‘‘Fall detection in Homes of older adults using
+the Microsoft Kinect,’’ IEEE J. Biomed. Health Inform., vol. 19, no. 1,
+pp. 290–301, Jan. 2015.
+[11] G. Debard, P . Karsmakers, M. Deschodt, E. Vlaeyen, E. Dejaeger,
+K. Milisen, T. Goedemé, B. V anrumste, and T. Tuytelaars, ‘‘Camera-based
+fall detection on real world data,’’ in Outdoor and Large-Scale Real-World
+Scene Analysis. Berlin, Germany: Springer, 2012, pp. 356–375.
+[12] S. Khan, ‘‘Classiﬁcation and decision-theoretic framework for detect-
+ing and reporting unseen falls,’’ M.S. thesis, Dept. Comput. Sci., Univ.
+Waterloo, ON, Canada, 2016.
+VOLUME 10, 2022 106433
+--- PAGE 13 ---
+S. Denkovski et al.: Multi Visual Modality Fall Detection Dataset
+[13] I. Charﬁ, J. Miteran, J. Dubois, M. Atri, and R. Tourki, ‘‘Deﬁnition and
+performance evaluation of a robust SVM based fall detection solution,’’ in
+Proc. 8th Int. Conf. Signal Image Technol. Internet Based Syst., Nov. 2012,
+pp. 218–224.
+[14] T.-H. Tran, T.-L. Le, D.-T. Pham, V .-N. Hoang, V .-M. Khong, Q.-T. Tran,
+T.-S. Nguyen, and C. Pham, ‘‘A multi-modal multi-view dataset for human
+fall analysis and preliminary investigation on modality,’’ in Proc. 24th Int.
+Conf. Pattern Recognit. (ICPR), Aug. 2018, pp. 1947–1952.
+[15] S. Chaudhuri, H. Thompson, and G. Demiris, ‘‘Fall detection devices
+and their use with older adults: A systematic review,’’ J. Geriatric Phys.
+Therapy, vol. 37, no. 4, p. 178, 2014.
+[16] S. Chaudhuri, D. Oudejans, H. J. Thompson, and G. Demiris, ‘‘Real world
+accuracy and use of a wearable fall detection device by older adults,’’
+J. Amer . Geriatrics Soc., vol. 63, no. 11, p. 2415, 2015.
+[17] M. Mubashir, L. Shao, and L. Seed, ‘‘A survey on fall detection: Principles
+and approaches,’’ Neurocomputing, vol. 100, pp. 144–152, Jan. 2013.
+[18] X. Wang, J. Ellul, and G. Azzopardi, ‘‘Elderly fall detection systems:
+A literature survey,’’ Frontiers Robot. AI, vol. 7, p. 71, Jun. 2020.
+[19] L. Martínez-Villaseñor, H. Ponce, J. Brieva, E. Moya-Albor,
+J. Nuñez-Martínez, and C. Peñafort-Asturiano, ‘‘UP-fall detection
+dataset: A multimodal approach,’’ Sensors, vol. 19, no. 9, p. 1988,
+Apr. 2019.
+[20] P . Pierleoni, A. Belli, L. Maurizi, L. Palma, L. Pernini, M. Paniccia, and
+S. V alenti, ‘‘A wearable fall detector for elderly people based on AHRS
+and barometric sensor,’’ IEEE Sensors J., vol. 16, no. 17, pp. 6733–6744,
+Sep. 2016.
+[21] T. Lee and A. Mihailidis, ‘‘An intelligent emergency response sys-
+tem: Preliminary development and testing of automated fall detection,’’
+J. Telemedicine Telecare, vol. 11, no. 4, pp. 194–198, 2005.
+[22] S. Chaudhuri, L. Kneale, T. Le, E. Phelan, D. Rosenberg, H. Thompson,
+and G. Demiris, ‘‘Older adults perceptions of fall detection devices,’’
+J. Appl. Gerontol., vol. 36, no. 8, pp. 915–930, Aug. 2017.
+[23] X. Ma, H. Wang, B. Xue, M. Zhou, B. Ji, and Y . Li, ‘‘Depth-based human
+fall detection via shape features and improved extreme learning machine,’’
+IEEE J. Biomed. Health Inform., vol. 18, no. 6, pp. 1915–1922, Nov. 2014.
+[24] F. Riquelme, C. Espinoza, T. Rodenas, J.-G. Minonzio, and C. Taramasco,
+‘‘EHomeSeniors dataset: An infrared thermal sensor dataset for automatic
+fall detection research,’’ Sensors, vol. 19, no. 20, p. 4565, Oct. 2019.
+[25] J. Gutiérrez, V . Rodríguez, and S. Martin, ‘‘Comprehensive review of
+vision-based fall detection systems,’’ Sensors, vol. 21, no. 3, p. 947,
+Feb. 2021.
+[26] A. Ramachandran and A. Karuppiah, ‘‘A survey on recent advances in
+wearable fall detection systems,’’ BioMed Res. Int., vol. 2020, pp. 1–17,
+Jan. 2020.
+[27] E. Auvinet, F. Multon, A. Saint-Arnaud, J. Rousseau, and J. Meunier, ‘‘Fall
+detection with multiple cameras: An occlusion-resistant method based on
+3-D silhouette vertical distribution,’’ IEEE Trans. Inf. Technol. Biomed.,
+vol. 15, no. 2, pp. 290–300, Mar. 2011.
+[28] G. Mastorakis and D. Makris, ‘‘Fall detection system using Kinect’s
+infrared sensor,’’ J. Real-Time Image Process., vol. 9, no. 4, pp. 635–646,
+2014.
+[29] Z. Zhang, C. Conly, and V . Athitsos, ‘‘Evaluating depth-based computer
+vision methods for fall detection under occlusions,’’ in Proc. Int. Symp.
+Vis. Comput. Cham, Switzerland: Springer, 2014, pp. 196–207.
+[30] G. Baldewijns, G. Debard, G. Mertes, B. V anrumste, and T. Croonenb,
+‘‘Bridging the gap between real-life data and simulated data by providing
+a highly realistic fall dataset for evaluating camera-based fall detection
+algorithms,’’Healthcare Technol. Lett., vol. 3, no. 1, pp. 6–11, Mar. 2016.
+[31] S. V adivelu, S. Ganesan, O. R. Murthy, and A. Dhall, ‘‘Thermal imaging
+based elderly fall detection,’’ in Proc. Asian Conf. Comput. Vis. Cham,
+Switzerland: Springer, 2016, pp. 541–553.
+[32] X. Luo, T. Liu, J. Liu, X. Guo, and G. Wang, ‘‘Design and implementation
+of a distributed fall detection system based on wireless sensor networks,’’
+EURASIP J. Wireless Commun. Netw., vol. 2012, no. 1, pp. 1–13, 2012.
+[33] S. Gasparrini, E. Cippitelli, S. Spinsante, and E. Gambi, ‘‘A depth-based
+fall detection system using a Kinect sensor,’’ Sensors, vol. 14, no. 2,
+pp. 2756–2775, 2014.
+[34] L. Martinez-Villaseñor and H. Ponce, ‘‘Design and analysis for fall
+detection system simpliﬁcation,’’ J. Visualized Exp., vol. 158, no. 158,
+Apr. 2020, Art. no. e60361.
+[35] H. Ponce, L. Martinez-Villasenor, and J. Nunez-Martinez, ‘‘Sensor loca-
+tion analysis and minimal deployment for fall detection system,’’ IEEE
+Access, vol. 8, pp. 166678–166691, 2020.
+[36] B. Kwolek and M. Kepski, ‘‘Improving fall detection by the use of
+depth sensor and accelerometer,’’Neurocomputing, vol. 168, pp. 637–645,
+Nov. 2015.
+[37] S. S. Khan and M. G. Madden, ‘‘One-class classiﬁcation: Taxonomy
+of study and review of techniques,’’ Knowl. Eng. Rev., vol. 29, no. 3,
+pp. 345–374, Jan. 2014.
+[38] J. Nogas, S. S. Khan, and A. Mihailidis, ‘‘DeepFall: Non-invasive
+fall detection with deep spatio-temporal convolutional autoencoders,’’
+J. Healthcare Informat. Res., vol. 4, no. 1, pp. 50–70, Mar. 2020. [Online].
+Available: https://link.springer.com/article/10.1007/s41666-019-00061-4
+[39] H. Ramirez, S. A. V elastin, P . Aguayo, E. Fabregas, and G. Farias, ‘‘Human
+activity recognition by sequences of skeleton features,’’ Sensors, vol. 22,
+no. 11, p. 3991, May 2022.
+STEFAN DENKOVSKI received the B.Eng.
+degree in biomedical engineering from Toronto
+Metropolitan University, in 2019. He is currently
+pursuing the M.A.Sc. degree in biomedical engi-
+neering with the KITE—Toronto Rehabilitation
+Institute (TRI), University Health Network, Uni-
+versity of Toronto. He worked as a Research
+Assistant at the Signal Processing and Information
+Laboratory, Toronto Metropolitan University. His
+research interests include development of data
+science, machine learning, and new technologies, that lie in the intersection
+of health and engineering.
+SHEHROZ S. KHAN (Member, IEEE) received
+the B.Sc. degree in engineering and the master’s
+and Ph.D. degrees in computer science, in 1997,
+2010, and 2016, respectively. He is currently
+working as a Scientist with the KITE—Toronto
+Rehabilitation Institute (TRI), University Health
+Network, Canada. He is also cross-appointed
+as an Assistant Professor with the Institute of
+Biomedical Engineering, University of Toronto
+(U of T). Previously, he worked as a Postdoctoral
+Researcher with the U of T and TRI. Prior to joining academics, he worked
+in various scientiﬁc and researcher roles in the industry and government
+jobs. He has organized four editions of the peer-reviewed workshop on
+AI in aging, rehabilitation, and intelligent assisted living held with top
+AI conferences (ICDM and IJCAI), from 2017 to 2021. His research is
+funded through several granting agencies in Canada and abroad, including
+NSERC, CIHR, AGEWELL, SSHRC, CABHI, AMS Healthcare, JP Bickell
+Foundation, United Arab Emirates University, and LG Electronics. He has
+published 49 peer-reviewed research articles and his research focus is the
+development of AI algorithms for solving aging-related health problems.
+He is an Associate Editor of the Journal of Rehabilitation and Assistive
+Technologies.
+BRANDON MALAMIS received the B.Sc. degree
+in kinesiology and the B.A. degree in psychology,
+neuroscience, & behavior from McMaster Univer-
+sity, in 2020 and 2022, respectively. He was a
+Research Assistant with the Intelligent Assistive
+Technology and Systems Laboratory (IA TSL) for
+ﬁve years. His research interests include interdis-
+ciplinary research, leading to his enrollment into
+other research assistantships within psychology,
+kinesiology, and pediatrics. He hopes to pursue
+further education in interdisciplinary approaches to better understand how
+combining solutions from different disciplines can better the lives of relevant
+populations.
+106434 VOLUME 10, 2022
+--- PAGE 14 ---
+S. Denkovski et al.: Multi Visual Modality Fall Detection Dataset
+SAE YOUNG MOON received the master’s
+degree in biomedical engineering from the Uni-
+versity of Toronto, under the supervision of
+Dr. Mihailidis and Dr. Khan at the Intelligent
+Assistive Technology and Systems Laboratory.
+She hopes to pursue further research in machine
+learning and artiﬁcial intelligence applications to
+natural language processing.
+BING YE received the M.Sc. degree from Queen’s
+University, Canada. She has over ten years
+research experience in aging and technology. She
+has been working as the Research Manager with
+the Intelligent Assistive Technology and Sys-
+tems Laboratory (IA TSL), University of Toronto
+(U of T), since 2016. Her research interests include
+age-related diseases (i.e., dementia), quality of life
+of older adults, people with dementia and their
+caregivers, assistive technologies, and human-
+centred design. Speciﬁcally, she is interested in how technology can help
+people age gracefully and assist caregivers in supporting care and how tech-
+nology can be developed/designed that reﬂect user’s needs and requirements.
+ALEX MIHAILIDIS received the Ph.D. degree
+from the University of Strathclyde, Glasgow, U.K.,
+in 2002. He is currently the Barbabra G. Stymest
+Research Chair of Rehabilitation Technology with
+the KITE Research Institute, University Health
+Network/University of Toronto (U of T). He is
+also the Scientiﬁc Director of the AGE-WELL
+Network of Centres of Excellence, which focuses
+on the development of new technologies and ser-
+vices for older adults. He is also a Professor with
+the Department of Occupational Science and Occupational Therapy and
+the Institute of Biomedical Engineering, U of T, where he holds a cross
+appointment with the Department of Computer Science. He is very active in
+the rehabilitation engineering profession and is the Immediate Past President
+for the Rehabilitation Engineering and Assistive Technology Society for
+North America (RESNA) and was named a fellow of RESNA, in 2014,
+which is one of the highest honors within this ﬁeld of research and practice.
+He is an Internationally Recognized Researcher in the ﬁeld of technology
+and aging. He has published over 150 journals and conference papers in this
+ﬁeld and co-edited two books: Pervasive Computing in Healthcareand Tech-
+nology and Aging. His research interests include biomedical and biochemical
+engineering, computer science, geriatrics, and occupational therapy. He is a
+P .Eng.
+VOLUME 10, 2022 106435
